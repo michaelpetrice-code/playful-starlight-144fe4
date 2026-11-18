@@ -66,7 +66,7 @@ function setMode(next){
  authTitle.textContent=mode==='register'?(venueSignup?'Create your venue account':'Join The Local'):'Welcome to The Local';
  authSubtitle.textContent=venueSignup
   ? (mode==='register'?'Confirm your email and you’ll be ready to start your trial.':'Log in to continue to your chosen plan.')
-  : (mode==='register'?'Create your free account to join your local community.':'Sign in with your Local account or continue with your Coombe account.');
+  : (mode==='register'?'Create your free member account. No payment details or commitment.':'Sign in with your Local account or continue with your Coombe account.');
  document.getElementById('tl-auth-switch').textContent=mode==='register'?'Already have an account? Log in':'New here? Create an account';
  document.getElementById('tl-auth-forgot').hidden=mode==='register';
  status('');
@@ -145,7 +145,7 @@ form.addEventListener('submit',async e=>{
  }catch(e){status(e.message,'error')}finally{busy(false)}
 });
 async function init(){
- show(true);setMode(venueSignup && !params.has('confirmed') ? 'register' : 'login');
+ show(true);setMode((venueSignup && !params.has('confirmed')) || (!venueSignup && params.get('register') === '1') ? 'register' : 'login');
  if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){status('Sign-in has not been configured. Contact the site administrator.','error');busy(true);return}
  try{
   const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2');
