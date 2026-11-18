@@ -1,6 +1,6 @@
 import { trackPage } from './analytics-track.js?v=174';
 import { memberPageUrl, sharedPage } from './page-share.js?v=173';
-import { venueDirectoryView, bindVenueDirectory } from './venue-directory.js?v=175';
+import { venueDirectoryView, bindVenueDirectory } from './venue-directory.js?v=213';
 import { renderClubContent } from './simple-admin-v82.js?v=175';
 import { marketTeaserHTML } from './marketplace.js?v=175';
 
