@@ -1,0 +1,5 @@
+/* v207: additive keyboard and reduced-motion improvements; no gameplay modifications */
+.tl207-skip{position:absolute;top:0;left:12px;z-index:99999;transform:translateY(-160%);background:#fff;color:#06372f;padding:12px 18px;border:3px solid #b58d36;border-radius:0 0 10px 10px;font-weight:700}
+.tl207-skip:focus{transform:translateY(0)}
+:where(button,a,input,select,textarea,[tabindex]):focus-visible{outline:3px solid #d6ac4c!important;outline-offset:3px!important}
+@media(prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto!important}*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
