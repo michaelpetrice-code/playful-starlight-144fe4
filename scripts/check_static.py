@@ -41,7 +41,7 @@ def check_page(filename):
 
 def main():
     failures = []
-    pages = ('index.html', 'guest.html', 'games-room-next.html', 'for-venues.html', 'coombe-builder-preview.html')
+    pages = sorted({p.name for p in ROOT.glob('*.html')} | {'index.html', 'guest.html', 'games-room-next.html', 'for-venues.html', 'coombe-builder-preview.html'})
     parsed = {}
     for filename in pages:
         p, f = check_page(filename)
@@ -77,6 +77,10 @@ def main():
     for marker in ('id="game-root"', 'id="games"', 'games-room-next.js', 'realistic-engines-v192.js'):
         if marker not in game_html:
             failures.append(f'games-room-next.html: missing game marker {marker}')
+    app_js = (ROOT / 'app.js').read_text(encoding='utf-8')
+    worker = re.search(r'''serviceWorkerPath:\s*['"]([^'"]+)['"]''', app_js)
+    if not worker or not (ROOT / worker.group(1)).is_file():
+        failures.append('app.js: configured notification worker is missing')
     if failures:
         print('FAILED static smoke checks:')
         for f in failures:
