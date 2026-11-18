@@ -11,12 +11,10 @@ const current = new URL(location.href);
 const welcome = new URL('index.html', current);
 welcome.search = current.search;
 welcome.hash = current.hash;
-signIn.href = welcome.href;
 
 const legacyVenue = new URLSearchParams(current.hash.slice(1)).get('venue');
 const section = current.searchParams.get('section');
 const locationPage = legacyVenue ? 'venues' : section === 'Buy, Sell or Give Away' ? 'marketplace' : 'home';
-const page = incoming?.page || locationPage;
 const memberDestination = (section && locationPage === 'home') ||
   current.searchParams.has('game') || current.searchParams.has('venue-return') ||
   /^(?:#tables$|#join-(?:private|community)=)/.test(current.hash);
@@ -35,8 +33,17 @@ const guestPages = {
   photos: ['Photos & Videos', 'Discover community galleries and shared moments.'],
   tickets: ['Tickets & Bookings', 'Discover events, tickets and venue activities.']
 };
+const page = incoming?.page || current.searchParams.get('page') || locationPage;
 const isPublicPage = !memberDestination && Object.hasOwn(guestPages, page) && !incoming?.group &&
   (!incoming?.published || incoming.source === 'club');
+if (isPublicPage) {
+  // Guest previews can have different names from their signed-in destinations.
+  const memberDestinations = { challenges: 'tournaments', rewards: 'venues', friends: 'community', tickets: 'events' };
+  const destination = Object.hasOwn(memberDestinations, page) ? memberDestinations[page] : null;
+  if (destination) welcome.searchParams.set('page', destination);
+}
+signIn.href = welcome.href;
+
 const [title, intro] = isPublicPage ? guestPages[page] : ['Log in to open this page', 'You can log in to follow the link or browse the public pages as a guest.'];
 
 document.getElementById('guest-title').textContent = title;
