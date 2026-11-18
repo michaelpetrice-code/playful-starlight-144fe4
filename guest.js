@@ -24,7 +24,7 @@ const guestPages = {
   events: ['What’s on', 'See public events, dates and prizes.'],
   marketplace: ['Buy, Sell or Give Away', 'Log in to browse live listings, contact sellers or post an item.'],
   tables: ['Virtual Pub Tables', 'See how members meet and chat around virtual tables.'],
-  games: ['Games Room', 'Explore games and challenges available to members.'],
+  games: ['Games Room', 'Play 14 browser games, including pool, darts and solitaire.'],
   trades: ['Local Tradesmen', 'Discover local trades and services.'],
   challenges: ['Challenges & Competitions', 'See the activities members can take part in.'],
   rewards: ['Rewards & Membership', 'Learn about participating venue rewards.'],
@@ -124,7 +124,7 @@ if (!isPublicPage) {
 // v209: informative guest previews for features requiring membership.
 const guestPreview = {
   tables: ['Virtual Pub Tables', 'Join conversations and invite friends once you have an account.'],
-  games: ['Games Room', 'Games and multiplayer availability depend on the current release. Sign in to access member games.'],
+  games: ['Games Room', 'Try the public arcade. Play against the computer or practise on your own.'],
   trades: ['Local Tradesmen', 'Browse local services when public listings are available. Sign in to contact providers.'],
   challenges: ['Challenges & Competitions', 'Sign in to join challenges and track your progress.'],
   rewards: ['Rewards & Membership', 'Participating venues can offer rewards to registered members.'],
@@ -140,7 +140,13 @@ if (isPublicPage && guestPreview[page]) {
   const h = document.createElement('h2'); h.textContent = heading;
   const p = document.createElement('p'); p.textContent = description;
   const login = document.createElement('a'); login.className = 'guest-button';
-  login.href = signIn.href; login.textContent = 'Log in or create an account';
+  if (page === 'games') {
+    login.href = 'games-room-next.html';
+    login.textContent = 'Play in the Games Room';
+  } else {
+    login.href = signIn.href;
+    login.textContent = 'Log in or create an account';
+  }
   const back = document.createElement('a'); back.href = 'guest.html'; back.textContent = '← Explore all features';
   panel.append(h, p, login, back);
   content.replaceChildren(panel);
