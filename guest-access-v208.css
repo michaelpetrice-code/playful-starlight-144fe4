@@ -1,0 +1,5 @@
+/* v208: prominent guest entry on the first screen; no login required. */
+#tl-auth-gate #tl-continue-guest.tl208-guest-cta:not([hidden]){display:flex!important;align-items:center;justify-content:center;gap:.55rem;min-height:54px;width:100%;box-sizing:border-box;margin:14px 0 18px;padding:14px 18px;border:2px solid #e4c47a;border-radius:12px;background:#f4d489;color:#15372e!important;text-decoration:none;font-size:1.06rem;font-weight:850;box-shadow:0 5px 18px #0002;opacity:1;visibility:visible}
+#tl-auth-gate #tl-continue-guest.tl208-guest-cta:hover{background:#ffe4a1}
+#tl-auth-gate #tl-continue-guest.tl208-guest-cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#tl-auth-gate #tl-continue-guest[hidden]{display:none!important}
