@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head><script>
+const tablePageParams = new URLSearchParams(location.search);
+if (tablePageParams.has('embedded')) {
+  document.documentElement.classList.add('tl122-embedded');
+}
+if (tablePageParams.get('shortcut') === '1' && !tablePageParams.has('embedded')) {
+  document.documentElement.classList.add('tl-table-shortcut-page');
+}
+</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#052b21"><title>Virtual Pub Tables | The Local</title><link rel="icon" type="image/png" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png"><link rel="stylesheet" href="secure-tables.css?v=169"><link rel="stylesheet" href="platform-design-v135.css?v=135"><link rel="stylesheet" href="controls-v150.css?v=150"><link rel="stylesheet" href="local-v194-refinement.css?v=194"></head><body><header><a href="index.html?section=tables" id="tableBackLink">← The Local</a><img src="assets/branding/the-local-transparent-v150.png" alt="The Local official logo"><h1>Virtual Pub Tables</h1><p>Pull up a chair · Your groups, conversations and events</p></header><section class="tl135-section-art" aria-label="Virtual Pub Tables promotional banner"><img src="assets/feature-slides/virtual-pub-tables.webp" alt="Virtual Pub Tables photograph"><div class="tl135-art-caption">Virtual Pub Tables <small>THE LOCAL · THE COMPLETE VENUE PLATFORM</small></div></section><main><div id="notice" role="status" aria-live="polite"></div><section id="signin" hidden class="panel"><h2>Sign in to open your table</h2><p>Sign in to The Local to open the chat.</p><a id="tableSignIn" href="index.html?section=tables">Sign in to The Local</a></section><section id="tables" class="panel" hidden><h2>Choose your venue</h2><label for="tableVenue">Venue</label><select id="tableVenue"><option value="">Select a venue</option></select><div id="venueTables" hidden><div class="table-quick-actions"><button type="button" id="showCreateTable">+ Create a Table</button><span>Start a new conversation at your chosen venue</span></div><h3>Tables at <span id="venueHeading"></span></h3><div id="tableList"></div><details id="createTablePanel"><summary>Set up a new table</summary><form id="newTable"><label>New table name<input name="name" minlength="3" maxlength="90" required placeholder="e.g. Friday Night Regulars"></label><label>Description<input name="description" maxlength="1000" placeholder="What is this table for?"></label><button type="submit">Create Table &amp; Pull Up a Chair</button></form></details><details><summary>Join with an invitation</summary><form id="redeemInvite"><label>Have an invitation code?<input name="token" placeholder="Paste your invitation code" required></label><button>Pull up a chair</button></form></details><details id="unplaced" hidden><summary>Place my existing tables</summary><div id="unplacedList"></div></details></div></section><section id="tableDetail" hidden><button id="back">← All tables</button><div class="panel"><h2 id="tableName"></h2><p id="tableVenueName"></p><p id="tableDescription"></p><p id="memberState"></p><div id="joinArea"></div><div class="table-share"><button type="button" id="shareTable">✉ Invite Friends · Pull Up a Chair</button><p class="muted">Share by WhatsApp, Facebook, email or any app on your phone. Private invitations are one-use.</p><div id="shareFeedback" role="status" aria-live="polite"></div></div></div><div id="memberArea" hidden><section class="pub-scene" aria-label="The table and its members"><div class="tl162-scene-heading"><span>🍻 Pull Up a Chair</span><span id="tl162Online" aria-live="polite">Checking who is here…</span></div><div class="tl162-table" aria-label="Virtual pub table"><div class="tl162-table-top"><span>THE LOCAL</span><strong id="tl162TableLabel">Your table</strong><small>Good company starts here</small></div><div class="pub-seats" id="pubSeats"></div></div><div class="tl162-scene-foot"><span id="tl162Members">Table members</span><button type="button" id="tl162Invite">Invite a friend</button></div></section><nav class="switch"><button data-tab="feed" class="active">Chat</button><button data-tab="events">Who's Up for It?</button><button data-tab="manage" id="manageTab" hidden>Manage table</button></nav><section id="feed" class="panel pub-chat" aria-labelledby="tableChatHeading">
+<div class="chat-head"><h3 id="tableChatHeading">Table chat <span id="chatCount" aria-label="Number of messages"></span></h3><span id="chatLive" role="status" aria-live="polite">● Checking updates</span><button type="button" id="tl163Settings" aria-expanded="false" aria-controls="tl163Preferences">⚙ Chat settings</button><button type="button" id="toggleTableChatScreen" aria-controls="feed" aria-pressed="false">Full screen</button></div>
+<details id="tableShortcutHelp" class="table-shortcut-help">
+ <summary>Chat shortcut</summary>
+ <p id="tableShortcutInstructions"></p>
+ <div class="table-shortcut-actions">
+  <a id="openTableShortcut" class="share-action" target="_blank" rel="noopener">Open shortcut page</a>
+  <button type="button" id="copyTableShortcut">Copy shortcut link</button>
+ </div>
+ <input type="text" id="tableShortcutAddress" aria-label="Chat shortcut link" readonly hidden>
+ <p id="tableShortcutStatus" role="status"></p>
+</details>
+<section id="tableVideo" class="table-video" aria-label="Table video" hidden>
+ <div class="table-video-controls">
+  <button type="button" data-video="call" hidden>Start video call</button>
+  <button type="button" data-video="stream" hidden>Go live</button>
+  <button type="button" data-video="join" hidden>Join video call</button>
+  <button type="button" data-video="mic" hidden>Mute mic</button>
+  <button type="button" data-video="camera" hidden>Camera off</button>
+  <button type="button" data-video="leave" hidden>Leave session</button>
+ </div>
+ <p data-video="status" role="status"></p>
+ <video data-video="self" autoplay playsinline muted aria-label="Your camera" hidden></video>
+ <div data-video="remote" class="table-video-grid"></div>
+</section>
+<div id="tl163Preferences" class="tl163-preferences" hidden><h4>Chat notifications & privacy</h4><label><input type="checkbox" id="tl163Mute"> Mute notifications for this table</label><label><input type="checkbox" id="tl163Browser"> Enable browser notifications</label><label><input type="checkbox" id="tl163HidePresence"> Hide my online presence</label><p id="tl163Status" role="status" aria-live="polite">Notifications require browser permission. Settings are saved on this device.</p></div><label class="pub-search">Search recent messages<input id="searchChat" type="search" placeholder="Search this chat"></label>
+<div id="postList" aria-label="Recent messages" tabindex="0"></div>
+<form id="postForm">
+<div id="replyPreview" hidden><span id="replyText"></span><button id="clearReply" type="button">Cancel reply</button></div>
+<div class="chat-tools"><button type="button" id="emojiToggle" aria-expanded="false" aria-controls="emojiPanel">☺ Emoji</button><button type="button" id="jumpLatest">↓ Latest</button><span class="chat-hint">Enter to send · Shift+Enter for a new line</span></div><div id="emojiPanel" class="emoji-panel" hidden aria-label="Choose emoji"></div><label for="chatBody">Message</label><textarea id="chatBody" name="body" maxlength="5000" rows="2" placeholder="Write a message…"></textarea>
+<div class="pub-compose"><label>Attach a file<input type="file" name="media" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,audio/webm,audio/ogg,audio/mp4,audio/mpeg,application/pdf"></label><button id="voiceNote" type="button" hidden>Record voice note</button><button type="submit">Send</button></div>
+<small id="voiceStatus" role="status"></small>
+</form></section><section id="events" class="panel" hidden><h3>Who's Up for It?</h3><form id="eventForm" hidden><input name="title" required minlength="3" maxlength="140" placeholder="Event name"><input name="starts" required type="datetime-local"><textarea name="details" placeholder="Event details"></textarea><button>Create table event</button></form><div id="eventList"></div></section><section id="manage" class="panel" hidden><h3>Table management dashboard</h3><form id="editTable"><label>Table name<input name="name" required minlength="3" maxlength="90"></label><label>Description<textarea name="description" maxlength="1000"></textarea></label><button>Save details (owner only)</button></form><h4>Member requests & permissions</h4><div id="memberList"></div><h4>Invite someone to your table</h4><button type="button" id="makeInvite">Create one-use invitation code</button><div id="inviteLink" aria-live="polite"></div><h4>Member reports</h4><div id="reportList"></div><h4>Management audit log</h4><div id="auditList"></div><p>Moderators can approve, remove and ban members or hide posts. Only the owner can appoint moderators.</p></section></div></section></main><script src="config.js"></script><script type="module" src="secure-tables.js?v=169"></script><script>
+if (document.documentElement.classList.contains('tl122-embedded') && parent !== window) {
+  const content = document.querySelector('main');
+  let lastHeight = 0;
+  const sendHeight = () => {
+    const height = Math.ceil(content.getBoundingClientRect().bottom + window.scrollY);
+    if (height === lastHeight) return;
+    lastHeight = height;
+    parent.postMessage({ type: 'tl122-table-height', height }, location.origin);
+  };
+  new ResizeObserver(sendHeight).observe(content);
+  addEventListener('load', sendHeight, { once: true });
+}
+</script><script defer src="platform-icons-v135.js?v=135"></script></body></html>

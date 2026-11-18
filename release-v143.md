@@ -1,0 +1,1 @@
+v143 slideshow layout correction based on uploaded v142. The original images still contain embedded logo bands; CSS masks these bands in the homepage slideshow, preserving original assets and all existing app code. Check all slides on desktop/mobile staging. For perfect image reconstruction, artwork should be regenerated without baked-in logos.

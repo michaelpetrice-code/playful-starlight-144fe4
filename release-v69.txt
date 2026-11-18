@@ -1,0 +1,1 @@
+v69: Rebuilt beer mug logo with a continuous handle placed behind the mug, removing the top-right visual defect. Updated header, homepage, page eyebrow, bottom navigation, favicons, PWA icons, and cache. Game assets and functionality unchanged.

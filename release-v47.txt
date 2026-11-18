@@ -1,0 +1,7 @@
+THE LOCAL V47 — MODERN PUB WEBSITE EDITION
+
+Photo-led modern pub-style homepage with a full-width hero, venue and entertainment feature tiles, improved typography, responsive layout and premium navigation. Existing features and Supabase configuration preserved.
+
+Deploy the lads-local-pwa folder to Netlify. Refresh or clear cached site files if the old appearance persists.
+
+Photography is loaded from Unsplash URLs and requires internet access; gradients remain as a fallback. Verify photo usage and suitability before commercial launch.

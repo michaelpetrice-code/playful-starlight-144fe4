@@ -1,0 +1,12 @@
+THE LOCAL v43 — APPROVE / DECLINE VENUE APPLICATIONS
+
+1. Ensure VENUE-PLATFORM-SETUP.sql from v42 has been run in Supabase.
+2. Run VENUE-APPROVALS-V43.sql in the same project SQL Editor.
+3. In Supabase Authentication > Users, copy the UUID of your own trusted administrator account.
+4. In SQL Editor run: insert into public.local_venue_admins(user_id) values ('YOUR-VERIFIED-USER-UUID');
+5. Deploy the lads-local-pwa folder to Netlify.
+6. Sign in with the administrator account and open Venue Applications (or Account > Open venue approvals).
+7. Approve publishes a directory listing; Decline marks the application rejected. Neither action charges a venue.
+8. Sign in with a regular account to confirm it cannot view applications or decide them.
+
+IMPORTANT: Approving does not verify ownership or charge a subscription. Check that applicants represent their venues before approval. Existing browser tabs may need refreshing to show newly approved venues.

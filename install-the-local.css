@@ -1,0 +1,29 @@
+.tl-app-installed .tl-install-control,
+.tl-install-control [hidden] {
+  display: none !important;
+}
+
+.tl-auth-card .tl-install-control {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.tl-auth-card .tl-install-control button {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 16px;
+  border: 1px solid #12634d;
+  border-radius: 11px;
+  background: #e8f4ed;
+  color: #123e31;
+  font-weight: 750;
+}
+
+.tl-auth-card .tl-install-control button:hover {
+  background: #d7ecdf;
+}
+
+.tl-auth-card .tl-install-control p {
+  margin: 9px 0 0;
+  color: #254e42;
+}

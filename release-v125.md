@@ -1,0 +1,1 @@
+The Local v125 — desktop header and homepage layout fix. Removes redundant header action buttons; retains access via app navigation and homepage. Centres logo, hero and feature grid. Shows main tabs on desktop Home and hides mobile bottom navigation there. No SQL changes. Test on Netlify staging first.

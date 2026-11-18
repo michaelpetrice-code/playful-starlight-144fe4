@@ -1,0 +1,8 @@
+/* v133: photographic slides, preserve all pixels, responsive */
+.tl126-showcase{width:min(calc(100% - 24px),1200px)!important;max-width:1200px!important;height:auto!important;min-height:0!important;margin:16px auto!important;overflow:hidden!important;border:2px solid #d5aa47!important;border-radius:18px!important;background:#061e16!important;padding:0!important}
+.tl126-slides{position:relative!important;height:auto!important;min-height:0!important;overflow:hidden!important}
+.tl126-slide{display:none!important;height:auto!important;min-height:0!important;overflow:hidden!important;padding:0!important;margin:0!important}
+.tl126-slide.tl126-active{display:block!important}
+.tl126-slide img.tl127-slide-image{display:block!important;position:static!important;width:100%!important;height:auto!important;max-height:none!important;min-height:0!important;aspect-ratio:8/3!important;object-fit:contain!important;object-position:center!important;transform:none!important;clip-path:none!important;border:0!important}
+.tl126-controls,.tl126-slide-copy{display:none!important}
+@media(max-width:650px){.tl126-showcase{width:calc(100% - 16px)!important;border-radius:12px!important}}

@@ -1,0 +1,1 @@
+v77 Premium Arcade Visual Pass: richer in-game visuals for cue sports, battleships, blocks, word search, crossword, Klondike, Ludo and multiplayer UI. Existing game rules and engines retained, not replaced. Not equivalent to the tile artwork or commercial 3D games. Deploy and test on device before release.

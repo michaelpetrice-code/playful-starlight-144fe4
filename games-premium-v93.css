@@ -1,0 +1,42 @@
+/* v93 Games Room — game-first presentation and legibility */
+#gr63{background:#fffaf0!important;color:#1c392c!important;border:1px solid #dac7a3!important;padding:clamp(12px,3vw,26px)!important;box-shadow:0 20px 55px #1c33251a!important}
+#gr63 .gr63-head{background:linear-gradient(115deg,#073928,#13543b)!important;border:1px solid #1c674c!important;border-radius:18px!important;padding:clamp(16px,3vw,28px)!important;margin-bottom:14px;box-shadow:0 9px 20px #0e3e2a28}
+#gr63 .gr63-head h2{font:700 clamp(30px,5vw,47px) Georgia,serif!important;color:#ffe9b5!important}
+#gr63 .gr63-head p{color:#f7f0d8!important;font-size:16px!important}
+#gr63 .gr63-head small{color:#d6b56f!important;font-size:12px!important}
+#gr63 .gr63-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:clamp(10px,1.6vw,20px)!important}
+#gr63 .gr63-grid[hidden],#gr63 .gr63-filters[hidden]{display:none!important}
+#gr63 .gr63-card{background:#fff!important;border:1px solid #deded2!important;border-radius:16px!important;overflow:hidden!important;box-shadow:0 6px 17px #1639261c!important;transition:transform .18s ease,box-shadow .18s ease!important;min-width:0!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;padding:0!important}
+#gr63 .gr63-card[hidden]{display:none!important}
+#gr63 .gr63-card:hover,#gr63 .gr63-card:focus-visible{transform:translateY(-5px)!important;box-shadow:0 15px 28px #143d2b35!important;outline:3px solid #b68c40!important;outline-offset:2px!important}
+#gr63 .gr63-scene{height:clamp(115px,14vw,195px)!important;background:#122b22!important;overflow:hidden!important;position:relative!important;display:block!important}
+#gr63 .gr64-photo{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;filter:saturate(1.12) contrast(1.06)!important;transition:transform .2s!important}
+#gr63 .gr63-card:hover .gr64-photo{transform:scale(1.055)!important}
+#gr63 .gr63-art{display:none!important}
+#gr63 .gr63-scene:after{content:'';position:absolute;inset:65% 0 0;background:linear-gradient(transparent,#08271a55);pointer-events:none}
+#gr63 .gr63-card strong{font-size:clamp(15px,1.6vw,19px)!important;line-height:1.3!important;color:#123e2a!important;padding:14px 14px 3px!important}
+#gr63 .gr63-card small{font-size:13px!important;color:#47634f!important;padding:4px 14px 14px!important;margin-top:auto!important}
+#gr63 .gr63-card small span{color:#95611b!important;font-size:23px!important}
+#gr63 .gr63-filters{display:flex;flex-wrap:wrap;gap:9px!important;padding:14px 0 20px!important;overflow-x:auto}
+#gr63 .gr63-filters button{background:#f1f3ea!important;color:#194b35!important;border:1px solid #b5cbb8!important;border-radius:999px!important;padding:11px 16px!important;font-size:15px!important;font-weight:800!important;min-height:46px}
+#gr63 .gr63-filters button.active{background:#0e5539!important;color:#fff!important;border-color:#0e5539!important}
+#gr63 .gr63-info{background:#eff3e8!important;color:#2c5338!important;border:1px solid #cfdbcb!important;border-radius:12px!important;font-size:14px!important;padding:13px 16px!important}
+#gr93-stage{background:#0a211b;border-radius:20px;border:1px solid #bb995a;overflow:hidden;margin-top:18px;box-shadow:0 20px 45px #001b1570}
+#gr93-stage[hidden]{display:none!important}
+#gr93-stage .gr93-toolbar{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;background:linear-gradient(90deg,#0b3d2b,#176147);border-bottom:2px solid #c49d59;padding:12px 16px}
+#gr93-stage .gr93-title{font:700 clamp(19px,2.6vw,29px) Georgia,serif;color:#ffdf9d}
+#gr93-stage .gr93-tools{display:flex;flex-wrap:wrap;gap:8px}
+#gr93-stage .gr93-toolbar button{background:#f7e9c8!important;color:#174531!important;border:1px solid #d7ba79!important;min-height:44px!important;border-radius:10px!important;font-size:14px!important;font-weight:800!important;padding:9px 12px!important}
+#gr93-stage .gr93-toolbar button:hover{background:#fff9e9!important}
+#gr93-stage #gr93-instructions{background:#fff7e7;color:#193b2a;padding:15px 20px;font-size:16px;line-height:1.6;border-bottom:2px solid #cfab67}
+#gr93-stage #gr93-instructions[hidden]{display:none!important}
+#gr93-stage #gr63-new-game{padding:clamp(8px,2vw,22px)!important;background:radial-gradient(circle at 50% 0%,#214b37,#071d19 78%)!important;min-height:230px}
+#gr93-stage #gr63-new-game .arc73,#gr93-stage #gr63-new-game .v74,#gr93-stage #gr63-new-game .gr71-game{background:linear-gradient(140deg,#173b2d,#081c19)!important;border:1px solid #b59655!important;box-shadow:0 12px 30px #0008!important;border-radius:16px!important}
+#gr93-stage #gr63-new-game .arc73-head strong,#gr93-stage #gr63-new-game .v74-head h2{color:#ffe0a0!important;font-size:clamp(17px,2.4vw,24px)!important}
+#gr93-stage #gr63-new-game .arc73 canvas{border:clamp(3px,.9vw,9px) solid #8b532b!important;box-shadow:0 0 0 2px #d6b56b,0 15px 40px #000b!important;border-radius:12px!important;max-height:75vh!important}
+#gr93-stage #gr63-new-game button{min-height:45px;font-size:15px!important}
+#gr93-stage:fullscreen{overflow:auto;background:#071a16;padding:12px;display:flex;flex-direction:column}
+#gr93-stage:fullscreen #gr63-new-game{flex:1;display:grid;align-content:center}
+@media(max-width:850px){#gr63 .gr63-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:620px){#gr63 .gr63-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}#gr63 .gr63-scene{height:clamp(105px,29vw,155px)!important}#gr63 .gr63-card strong{font-size:15px!important;padding:10px 10px 2px!important}#gr63 .gr63-card small{font-size:12px!important;padding:3px 10px 10px!important}#gr93-stage .gr93-toolbar{padding:10px;gap:8px}#gr93-stage .gr93-title{order:-1;width:100%;text-align:center}#gr93-stage .gr93-tools{margin-left:auto}#gr93-stage .gr93-toolbar button{font-size:12px!important;padding:8px!important}}
+@media(prefers-reduced-motion:reduce){#gr63 .gr63-card,#gr63 .gr64-photo{transition:none!important}}

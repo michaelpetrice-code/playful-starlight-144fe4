@@ -1,0 +1,4 @@
+/* v142 official brand consistency */
+.tl-header-logo img,.tl-login-gold-logo{object-fit:contain!important;object-position:center!important;max-width:min(92vw,540px)!important;height:auto!important}
+.tl134-page-banner img{object-fit:contain!important}
+@media(max-width:640px){.tl-header-logo img{max-width:88vw!important}}

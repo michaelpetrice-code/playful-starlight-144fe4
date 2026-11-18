@@ -1,0 +1,33 @@
+/* The Local v194: compact branding and consistent premium finish.
+   A final, low-specificity layer that preserves page-specific layout and game engines. */
+:root{--tl194-emerald:#092d27;--tl194-emerald-2:#124638;--tl194-gold:#d9b66c;--tl194-cream:#f5f0e3;--tl194-muted:#d2dccf;--tl194-line:rgba(218,183,107,.32);--tl194-radius:16px}
+html{scroll-behavior:smooth;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+/* Compact official logo: overrides the old 540px desktop and 88vw mobile rules. */
+body header .tl-header-logo{min-height:0!important;max-height:62px!important;margin:0 auto 4px!important;padding:0!important}
+body header .tl-header-logo img{width:clamp(132px,18vw,200px)!important;max-width:200px!important;max-height:52px!important;height:auto!important;object-fit:contain!important}
+body .tl-auth-brand .tl-login-gold-logo{width:min(66vw,245px)!important;max-width:245px!important;max-height:115px!important;height:auto!important;object-fit:contain!important;margin:0 auto 10px!important}
+body .top .brand .tl-gold-full-logo{width:clamp(125px,15vw,180px)!important;max-width:180px!important;max-height:50px!important;object-fit:contain!important}
+body .tl-admin-gold-logo{width:min(46vw,175px)!important;max-width:175px!important;max-height:66px!important;object-fit:contain!important}
+body .phone-brand .tl-phone-gold-logo,body .phone-brand .tl-preview-gold-logo{width:min(70%,150px)!important;max-width:150px!important;max-height:48px!important;object-fit:contain!important}
+body .tl135-logo{max-width:170px!important;width:min(42vw,170px)!important;height:auto!important}
+body .tl65-hero .tl65-logo{width:64px!important;height:64px!important}
+/* Readability and consistent interaction. Avoid global dimensions on game canvases. */
+:where(main,section,article,.card,.panel,.tile,.feature-card){min-width:0}
+:where(main,section,article,.card,.panel) :where(h1,h2,h3){text-wrap:balance;letter-spacing:-.018em}
+:where(main,section,article,.card,.panel) :where(p,li){line-height:1.55}
+:where(button,[role="button"],input,select,textarea){font:inherit}
+:where(button,[role="button"],a){-webkit-tap-highlight-color:transparent}
+:where(button,[role="button"],a,input,select,textarea):focus-visible{outline:3px solid var(--tl194-gold)!important;outline-offset:3px!important}
+:where(button,[role="button"]):not(:disabled){cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){:where(button,[role="button"]):not(:disabled):hover{filter:brightness(1.08);transform:translateY(-1px)}}
+:where(.card,.feature-card,.tl135-card,.tl65-tile){border-radius:var(--tl194-radius)}
+:where(input:not([type="checkbox"]):not([type="radio"]),select,textarea){max-width:100%;border-radius:10px}
+:where(img,video){max-width:100%}
+:where(.feature-card,.card,.tile) img{object-fit:cover}
+/* Maintain gold-and-emerald visual identity across independent pages. */
+body:not(.tl-light-theme) :where(.card,.panel,.feature-card){border-color:var(--tl194-line)}
+body:not(.tl-light-theme) :where(.card,.panel,.feature-card) :where(h2,h3){color:var(--tl194-cream)}
+body:not(.tl-light-theme) :where(.card,.panel,.feature-card) :where(p,small){color:var(--tl194-muted)}
+@media(max-width:640px){body header .tl-header-logo{max-height:53px!important}body header .tl-header-logo img{width:145px!important;max-width:145px!important;max-height:43px!important}body .tl-auth-brand .tl-login-gold-logo{width:min(58vw,195px)!important;max-height:88px!important}body .top .brand .tl-gold-full-logo{width:135px!important}body .tl-admin-gold-logo{width:140px!important}body .tl65-hero .tl65-logo{width:54px!important;height:54px!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}:where(button,[role="button"]){transition:none!important}}

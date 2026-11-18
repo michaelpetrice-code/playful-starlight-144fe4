@@ -1,0 +1,84 @@
+/* v136 photographic feature cards: preserve existing data-go navigation */
+.ref-below .tl124-feature-grid{gap:clamp(14px,1.6vw,26px)!important}
+.ref-below .tl124-feature.tl136-photo-card{
+ position:relative!important;isolation:isolate;overflow:hidden;
+ min-height:clamp(265px,22vw,350px)!important;
+ padding:clamp(22px,2.4vw,34px)!important;
+ display:flex!important;flex-direction:column!important;justify-content:flex-end!important;
+ gap:10px!important;border:1px solid #d6ae5b!important;
+ border-radius:22px!important;text-align:left!important;
+ background:#063b2c!important;box-shadow:0 15px 34px #0006!important;
+ transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important;
+}
+.ref-below .tl124-feature.tl136-photo-card::before{
+ content:"";position:absolute;inset:0;z-index:-2;
+ background-image:var(--tl136-image);background-size:cover;background-position:center;
+ transform:scale(1.01);transition:transform .4s ease;
+}
+.ref-below .tl124-feature.tl136-photo-card::after{
+ content:"";position:absolute;inset:0;z-index:-1;
+ background:linear-gradient(180deg,rgba(0,23,15,.10) 0%,rgba(0,28,20,.18) 32%,rgba(0,24,17,.88) 73%,#001a14 100%);
+}
+.ref-below .tl124-feature.tl136-photo-card:hover,.ref-below .tl124-feature.tl136-photo-card:focus-visible{
+ transform:translateY(-6px)!important;border-color:#ffe2a0!important;
+ box-shadow:0 22px 44px #0009,0 0 0 1px #d4a64b!important;
+}
+.ref-below .tl124-feature.tl136-photo-card:hover::before{transform:scale(1.07)}
+.ref-below .tl124-feature.tl136-photo-card>.tl124-icon{
+ width:40px!important;height:40px!important;padding:9px;
+ box-sizing:content-box;background:rgba(2,40,30,.83);border:1px solid #e5bd69;
+ border-radius:14px;color:#ffe3a2!important;filter:drop-shadow(0 3px 5px #0006)
+}
+.ref-below .tl124-feature.tl136-photo-card>strong{
+ font-size:clamp(20px,1.55vw,27px)!important;line-height:1.15!important;
+ color:#ffe5a8!important;text-shadow:0 2px 5px #000e!important
+}
+.ref-below .tl124-feature.tl136-photo-card>span:not(.tl136-card-action){
+ font-size:clamp(14px,1vw,16px)!important;color:#fff!important;
+ line-height:1.4!important;text-shadow:0 2px 4px #000e
+}
+.ref-below .tl124-feature.tl136-photo-card .tl136-card-action{
+ display:inline-flex;align-items:center;justify-content:space-between;gap:12px;
+ margin-top:10px;align-self:flex-start;padding:9px 13px;
+ background:linear-gradient(#ffe19a,#d6a33e);border:1px solid #ffdf87;
+ border-radius:11px;color:#092b21!important;font-weight:800;font-size:13px!important;
+ text-shadow:none!important
+}
+.ref-below .tl124-feature.tl136-photo-card .tl136-card-action span{font-size:18px;line-height:1}
+@media(max-width:650px){
+ .ref-below .tl124-feature.tl136-photo-card{min-height:270px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .ref-below .tl124-feature.tl136-photo-card,
+ .ref-below .tl124-feature.tl136-photo-card::before{transition:none!important}
+}
+/* v137 compact cards: four per row on wide desktop, while preserving image-led styling */
+.ref-below .tl124-feature-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;max-width:1450px!important;gap:14px!important}
+.ref-below .tl124-feature.tl136-photo-card{min-height:215px!important;padding:16px!important;gap:6px!important;border-radius:16px!important}
+.ref-below .tl124-feature.tl136-photo-card>.tl124-icon{width:26px!important;height:26px!important;padding:7px!important;border-radius:10px!important}
+.ref-below .tl124-feature.tl136-photo-card>strong{font-size:clamp(17px,1.25vw,21px)!important}
+.ref-below .tl124-feature.tl136-photo-card>span:not(.tl136-card-action){font-size:13px!important;line-height:1.3!important}
+.ref-below .tl124-feature.tl136-photo-card .tl136-card-action{font-size:12px!important;margin-top:4px;padding:6px 10px;border-radius:8px}
+@media(max-width:1100px){.ref-below .tl124-feature-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:760px){.ref-below .tl124-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.ref-below .tl124-feature.tl136-photo-card{min-height:205px!important;padding:13px!important}}
+@media(max-width:420px){.ref-below .tl124-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ref-below .tl124-feature.tl136-photo-card{min-height:190px!important;padding:10px!important}.ref-below .tl124-feature.tl136-photo-card>strong{font-size:16px!important}.ref-below .tl124-feature.tl136-photo-card>span:not(.tl136-card-action){font-size:12px!important}}
+
+/* v138: place feature icons in the bottom-right of each compact tile */
+.ref-below .tl124-feature.tl136-photo-card{position:relative!important;padding-bottom:64px!important}
+.ref-below .tl124-feature.tl136-photo-card>.tl124-icon{position:absolute!important;right:14px!important;bottom:14px!important;left:auto!important;top:auto!important;margin:0!important;z-index:2!important;pointer-events:none!important}
+.ref-below .tl124-feature.tl136-photo-card .tl136-card-action{position:absolute!important;left:14px!important;bottom:16px!important;right:auto!important;max-width:calc(100% - 88px)!important}
+@media(max-width:420px){.ref-below .tl124-feature.tl136-photo-card>.tl124-icon{right:9px!important;bottom:11px!important}.ref-below .tl124-feature.tl136-photo-card .tl136-card-action{left:9px!important;bottom:12px!important;max-width:calc(100% - 69px)!important;font-size:10px!important;padding:5px 6px!important}}
+
+/* v139: consistent cards without duplicate readable headings baked into promotional art */
+.ref-below .tl124-feature.tl136-photo-card{min-height:210px!important;padding:17px 16px 70px!important;gap:7px!important;justify-content:flex-end!important;contain:layout paint}
+.ref-below .tl124-feature.tl136-photo-card::before{filter:blur(9px) brightness(.72) saturate(.8);transform:scale(1.12)!important;background-position:center 65%;transition:none!important}
+.ref-below .tl124-feature.tl136-photo-card::after{background:linear-gradient(180deg,rgba(0,30,22,.40),rgba(0,25,18,.84) 47%,#001b15 100%)!important}
+.ref-below .tl124-feature.tl136-photo-card>strong{font-size:clamp(17px,1.45vw,22px)!important;line-height:1.2!important;position:relative;z-index:1}
+.ref-below .tl124-feature.tl136-photo-card>span:not(.tl136-card-action){font-size:13px!important;line-height:1.35!important;position:relative;z-index:1;max-width:95%}
+.ref-below .tl124-feature.tl136-photo-card>.tl124-icon{width:26px!important;height:26px!important;padding:8px!important;border-radius:12px!important;right:13px!important;bottom:13px!important;background:#073a2e!important}
+.ref-below .tl124-feature.tl136-photo-card .tl136-card-action{left:13px!important;bottom:16px!important;font-size:12px!important;min-height:19px;max-width:calc(100% - 87px)!important}
+.ref-below .tl124-feature.tl136-photo-card:hover::before{transform:scale(1.12)!important}
+@media(max-width:600px){.ref-below .tl124-feature.tl136-photo-card{min-height:210px!important;padding:12px 10px 66px!important}.ref-below .tl124-feature.tl136-photo-card>span:not(.tl136-card-action){font-size:12px!important}.ref-below .tl124-feature.tl136-photo-card .tl136-card-action{left:9px!important;bottom:12px!important;font-size:10px!important;padding:6px!important}.ref-below .tl124-feature.tl136-photo-card>.tl124-icon{right:9px!important;bottom:10px!important}}
+/* Uniform gold outline icons and interaction styles across feature/admin sections */
+.tl124-icon,.tl135-icon,.local-ui-icon svg{stroke:#f5cb72;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#view button:focus-visible,#view a:focus-visible,.admin-card:focus-visible{outline:3px solid #ffe19a!important;outline-offset:3px}

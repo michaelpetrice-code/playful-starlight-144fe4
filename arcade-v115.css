@@ -1,0 +1,18 @@
+/* v115 shared arcade treatment, applies to original engines and game surfaces */
+#gr63{--arc-gold:#f5c66d;--arc-deep:#031b17;--arc-panel:#092c25;color:#fff3d8}
+#gr63 .gr63-card{position:relative;isolation:isolate;overflow:hidden;border:1px solid #b88a42!important;border-radius:18px!important;background:linear-gradient(160deg,#164b3d,#05231d 75%)!important;box-shadow:0 16px 40px #0009,inset 0 1px #ffe6a342!important;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+#gr63 .gr63-card:hover,#gr63 .gr63-card:focus-within{transform:translateY(-5px);box-shadow:0 24px 55px #000b,0 0 24px #d8aa4a38!important;border-color:#f6d48c!important}
+#gr63 .gr63-card:focus-within{outline:2px solid #ffe0a0;outline-offset:3px}
+#gr63 .gr63-card img{filter:saturate(1.15) contrast(1.07);transition:transform .35s ease,filter .35s ease}
+#gr63 .gr63-card:hover img{transform:scale(1.045);filter:saturate(1.28) contrast(1.08)}
+#gr63 button,#gr63 select,#gr63 input{accent-color:#e5b656}
+#gr63 button:focus-visible,#gr63 input:focus-visible,#gr63 select:focus-visible{outline:3px solid #ffda84;outline-offset:3px}
+#gr63 canvas{max-width:100%;height:auto;touch-action:manipulation;border-radius:10px;box-shadow:0 10px 32px #0008}
+#gr63 .tl115-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 20px;padding:12px 14px;border:1px solid #9e7c3d;border-radius:14px;background:linear-gradient(110deg,#103e32,#041d19);box-shadow:0 8px 22px #0005}
+#gr63 .tl115-tools strong{font-size:13px;letter-spacing:.12em;color:#f5cf7c;text-transform:uppercase}
+#gr63 .tl115-tools button{cursor:pointer;border:1px solid #d2a85d;background:linear-gradient(#eecb80,#bb8536);color:#17241d;font-weight:800;border-radius:9px;padding:8px 12px}
+#gr63 .tl115-tools button[aria-pressed=true]{background:#124d3f;color:#ffdf91}
+#gr63 .tl115-tools .tl115-hint{font-size:12px;color:#e7dbc2;flex:1;min-width:180px}
+#gr63 .tl115-played{font-variant-numeric:tabular-nums;color:#fff3d8;font-size:12px}
+@media(max-width:640px){#gr63 .tl115-tools{gap:8px;padding:10px}#gr63 .gr63-card{border-radius:13px!important}}
+@media(prefers-reduced-motion:reduce){#gr63 .gr63-card,#gr63 .gr63-card img{transition:none!important}#gr63 .gr63-card:hover{transform:none}}

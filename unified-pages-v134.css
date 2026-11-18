@@ -1,0 +1,19 @@
+/* The Local v134: shared visual system on every internal app section */
+:root{--tl134-emerald:#052c22;--tl134-panel:#0b3b2e;--tl134-gold:#edc46a;--tl134-border:#9c804a}
+#view{width:min(100%,1500px);margin-inline:auto;box-sizing:border-box}
+#view>.tl134-page-banner{position:relative;display:block;isolation:isolate;width:calc(100% - 32px);max-width:1360px;margin:20px auto 28px;border:2px solid var(--tl134-gold);border-radius:20px;overflow:hidden;background:var(--tl134-emerald);box-shadow:0 16px 38px #0005}
+.tl134-page-banner img{display:block;width:100%;height:auto;aspect-ratio:8/3;object-fit:contain;object-position:center;background:#051d16}
+.tl134-page-banner-copy{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 20px;padding:16px clamp(16px,3vw,35px);background:linear-gradient(110deg,#002a20,#0d4837);border-top:1px solid #b39455}
+.tl134-page-banner-copy span{display:block;flex-basis:100%;font-size:.72rem;letter-spacing:.13em;color:#edc46a;font-weight:750}
+.tl134-page-banner-copy h2{font-size:clamp(1.3rem,2.3vw,2.1rem);line-height:1.2;margin:0;color:#ffe3a1!important;font-weight:800}
+.tl134-page-banner-copy p{margin:0;color:#f3eee0!important;font-size:clamp(.88rem,1.1vw,1.03rem)}
+#view .panel,#view .card,#view .tile,#view .feature-card{border-radius:16px;border-color:var(--tl134-border)}
+#view button:not(.tl126-prev):not(.tl126-next):not(.tl126-toggle):not([disabled]),#view .btn,#view a.button{border-radius:12px;font-weight:700;transition:transform .15s ease,box-shadow .15s ease}
+#view button:not([disabled]):hover,#view a.button:hover{transform:translateY(-1px);box-shadow:0 4px 12px #0003}
+#view button:focus-visible,#view a:focus-visible{outline:3px solid #ffdc8a;outline-offset:3px}
+#view input,#view textarea,#view select{border-radius:10px}
+#view svg{vertical-align:middle}
+#view .tl134-page-banner+section{margin-top:0}
+@media(min-width:950px){#view>.panel,#view>.section{max-width:1360px;margin-left:auto;margin-right:auto}}
+@media(max-width:680px){#view>.tl134-page-banner{width:calc(100% - 16px);margin:10px auto 16px;border-radius:12px}.tl134-page-banner-copy{padding:12px 15px;gap:4px}.tl134-page-banner-copy span{font-size:.58rem;letter-spacing:.06em}.tl134-page-banner-copy p{font-size:.82rem}}
+@media(prefers-reduced-motion:reduce){#view button,#view a.button{transition:none!important}}

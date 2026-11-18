@@ -1,0 +1,1 @@
+v21: Replaced the optional games module with a newly structured implementation; corrected the missing Private Chats navigation icon. Updated the service worker cache and app module version. Existing database setup remains unchanged. Deploy the whole lads-local-pwa folder to Netlify. Test live with real accounts.

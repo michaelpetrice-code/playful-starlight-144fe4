@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="110" fill="#062f29"/>
+<circle cx="256" cy="237" r="185" fill="#0c463a" stroke="#e6b65c" stroke-width="12"/>
+<g fill="none" stroke="#f6d38a" stroke-width="17" stroke-linecap="round" stroke-linejoin="round">
+<path d="M173 178h152l-17 163H190z"/>
+<path d="M324 199h30q38 0 35 42t-57 41"/>
+<path d="M182 178q-21-28 2-48 18-18 42-2 26-25 52-1 31-13 49 13 12 18-2 38"/>
+<path d="M224 207v100M273 207v100"/>
+</g>
+<path d="M187 242h127l-10 90H197z" fill="#c88a2c" opacity=".6"/>
+<text x="256" y="420" font-family="Georgia,serif" font-size="56" text-anchor="middle" font-weight="bold" fill="#f7e7c4">THE LOCAL</text>
+</svg>

@@ -1,0 +1,1 @@
+v131: correct slideshow sizing and replace Virtual Pub Tables slide with photorealistic artwork. Other slides remain existing artwork pending individual photorealistic replacements. Stage and test before production.

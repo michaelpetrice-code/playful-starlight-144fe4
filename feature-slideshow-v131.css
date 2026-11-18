@@ -1,0 +1,10 @@
+
+/* v131: preserve entire image without clipping at every viewport width */
+.tl126-showcase{height:auto!important;overflow:visible!important;max-width:1200px!important}
+.tl126-slides{height:auto!important;overflow:visible!important}
+.tl126-slide,.tl126-slide.tl126-active{aspect-ratio:auto!important;height:auto!important;min-height:0!important;overflow:visible!important;display:none!important}
+.tl126-slide.tl126-active{display:block!important}
+.tl127-slide-image{display:block!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:auto!important;object-fit:contain!important;object-position:center!important}
+.tl126-slide-copy,.tl126-controls{display:none!important}
+@media(min-width:1000px){.tl126-slide,.tl126-slide.tl126-active{aspect-ratio:auto!important}}
+@media(max-width:650px){.tl126-slide,.tl126-slide.tl126-active{aspect-ratio:auto!important}}

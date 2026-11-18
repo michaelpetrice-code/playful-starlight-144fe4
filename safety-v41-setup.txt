@@ -1,0 +1,11 @@
+THE LOCAL V41 — COMMITTEE SAFETY HARDENING
+1. Run SAFETY-REPORTING-SETUP.sql from v40 if not previously installed.
+2. Run SAFETY-V41-HARDENING.sql in The Local Supabase SQL Editor.
+3. Add vetted committee reviewers to public.local_safety_committee by verified auth.users UID.
+4. Deploy the entire lads-local-pwa folder to Netlify.
+5. Test with two separate accounts: a member submits a report with a small image, an approved reviewer reads it and changes its status. Confirm a regular member cannot open the Committee Safety Inbox or read evidence.
+6. Review the privacy notice, who can review reports, incident response process, retention period and appeals before inviting members.
+
+IMPLEMENTED: private evidence uploads (5 files max, 10 MB each); committee-only signed viewing links; restricted committee review RPC; immutable original report content through client permissions; review audit entries; confidential form and status tracking.
+NOT IMPLEMENTED: automatic emails, automatic escalation, automatic purging, moderation of live chat, evidence virus scanning. Urgent flags require a human to check the inbox. Do not claim the system is monitored 24/7.
+For production, configure appropriate email notifications with a secure server-side provider, never a secret key in browser code. Decide retention and an independent route for complaints about committee members.

@@ -1,0 +1,10 @@
+/* v66: gold filled symbols based on supplied reference */
+.tl65-hero .tl65-logo{width:105px!important;height:105px!important;object-fit:contain;filter:drop-shadow(0 3px 7px #000b)!important}
+body>header .pub-brand-mark{object-fit:contain;filter:drop-shadow(0 2px 4px #000a)}
+.tl65-tile svg{fill:#f4c36a!important;color:#f4c36a!important;stroke:none!important;width:58px!important;height:58px!important;filter:drop-shadow(0 2px 3px #0009)}
+.tl65-tile svg [stroke]{stroke:#073728}
+.tl66-nav-icon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;color:#f4c36a}
+.tl66-nav-icon svg{width:26px;height:26px;fill:currentColor;display:block}
+#bottomNav .bottom-icon{display:flex;justify-content:center;align-items:center;min-height:28px}
+.local55-icon svg,.local-ui-icon svg{color:#f1c46c!important;stroke-width:2.4!important}
+@media(max-width:420px){.tl65-tile svg{width:46px!important;height:46px!important}.tl65-hero .tl65-logo{width:88px!important;height:88px!important}}

@@ -1,0 +1,1 @@
+Arcade Edition v72: enhanced styling, sound toggle, fullscreen, mobile accessibility. Original games preserved; not deployed.

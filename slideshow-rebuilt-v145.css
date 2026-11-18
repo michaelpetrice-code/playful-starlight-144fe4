@@ -1,0 +1,9 @@
+/* v145: slides are fully reconstructed with their title in a dedicated, uncropped top band. */
+.tl126-showcase .tl126-slides{position:relative!important;height:auto!important;aspect-ratio:auto!important;overflow:visible!important;min-height:0!important}
+.tl126-showcase .tl126-slide{position:relative!important;inset:auto!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;overflow:visible!important;display:none!important}
+.tl126-showcase .tl126-slide.tl126-active{display:block!important}
+.tl126-showcase .tl126-slide img.tl127-slide-image{position:static!important;inset:auto!important;display:block!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:auto!important;object-fit:contain!important;object-position:center!important;transform:none!important;clip-path:none!important}
+.tl126-showcase .tl126-slide-copy{position:relative!important;inset:auto!important;display:flex!important;min-height:0!important;height:auto!important;align-items:center!important;padding:10px 18px!important;background:#06291f!important;pointer-events:auto!important}
+.tl126-showcase .tl126-slide-copy .tl126-visit{position:static!important;display:inline-flex!important;pointer-events:auto!important}
+.tl126-showcase .tl126-controls{display:none!important}
+@media(max-width:650px){.tl126-showcase .tl126-slide img.tl127-slide-image{width:100%!important;left:auto!important;top:auto!important;transform:none!important}}

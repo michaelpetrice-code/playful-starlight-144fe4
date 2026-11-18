@@ -1,0 +1,41 @@
+
+/* The Local v55 — reference-image inspired cohesive emerald / gold UI */
+:root{--local55-bg:#061c17;--local55-panel:#092e25;--local55-panel2:#103d30;--local55-gold:#efc675;--local55-line:#9f8250;--local55-cream:#f9f0dd}
+body{background:#061c17!important;color:var(--local55-cream)!important}
+header{background:linear-gradient(145deg,#06281f,#031a16)!important;border-bottom:1px solid #b7955a!important;box-shadow:0 6px 24px #0005!important}
+header h1{font-family:Georgia,serif!important;color:#f4cf86!important;letter-spacing:.025em!important;display:flex;align-items:center;gap:9px}
+header h1 .pub-brand-mark{height:42px!important;width:42px!important;object-fit:contain}
+header small{color:#decda8!important;letter-spacing:.04em}
+.local55-mini-brand{height:24px;width:24px;vertical-align:middle;object-fit:contain;margin-right:7px;border-radius:6px}
+.local55-hero-logo{display:block;width:68px;height:68px;object-fit:contain;margin:0 auto 10px;filter:drop-shadow(0 4px 14px #0008)}
+.local55-nav-logo{height:25px;width:25px;object-fit:contain}
+.local50-page-hero{min-height:235px!important}.local50-hero-inner{padding-top:28px!important;padding-bottom:25px!important}
+.local50-page-hero h1{font-size:clamp(32px,5vw,54px)!important}.local50-page-hero p{font-size:clamp(14px,2vw,18px)!important}
+.local50-page-body{background:linear-gradient(160deg,#061e18,#082d23 40%,#061b16)!important}
+.local50-page-body :is(.panel,.card,.item,fieldset,.modal,.dialog),.local55-form-card{background:linear-gradient(155deg,#103c30,#08291f)!important;border:1px solid #a68b5866!important;border-radius:15px!important;box-shadow:0 8px 28px #0003}
+/* Forms: unify every feature, including modules and owner studio */
+#view :is(form,.panel,fieldset){color:#f7ecd7}
+#view :is(form label,.form-label){display:block;color:#f5e9d0;font-size:13px;font-weight:650;line-height:1.45;margin-bottom:6px}
+#view :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),textarea,select){box-sizing:border-box;max-width:100%;background:#072b23!important;color:#fff1da!important;border:1px solid #67836f!important;border-radius:9px!important;padding:12px 13px!important;min-height:43px;box-shadow:inset 0 2px 5px #0002;outline:none;accent-color:#e9bd6d;font:inherit}
+#view :is(input,textarea,select)::placeholder{color:#b7c9bb!important;opacity:.85}
+#view :is(input,textarea,select):focus-visible{border-color:#f0c575!important;outline:2px solid #e4ba655c!important;outline-offset:1px}
+#view textarea{min-height:100px;resize:vertical}
+#view input[type=file]{display:block;max-width:100%;padding:13px;border:1px dashed #c4a56e;border-radius:10px;background:#0a3329;color:#f4e4c5}
+#view :is(input[type=checkbox],input[type=radio]){accent-color:#e6bf75}
+#view :is(button,.btn,input[type=submit]){border-radius:9px;min-height:38px;transition:filter .16s ease,transform .16s ease}
+#view :is(button,.btn,input[type=submit]):hover{filter:brightness(1.12)}
+#view :is(button,.btn,input[type=submit]):focus-visible{outline:2px solid #f4cd84;outline-offset:3px}
+#view :is(button.primary,.btn.gold,button[type=submit],input[type=submit],.local45-primary){background:linear-gradient(180deg,#f9d991,#e8b45e)!important;color:#08261e!important;border:1px solid #e5c07a!important;font-weight:800}
+#view :is(button.secondary,.btn.secondary){background:#153c31!important;color:#f4dbab!important;border:1px solid #a78b59!important}
+#view :is(h1,h2,h3){overflow-wrap:anywhere}#view :is(h2,h3){color:#f2d59b}
+#view :is(.v33-tile,.local46-moods button){background:linear-gradient(145deg,#103c2d,#08261e)!important;border:1px solid #a88b55!important;border-radius:13px!important}
+#view .v33-tile-icon,#view .local-ui-icon{color:#e9bd6e!important}
+#view :is(.v33-tile-icon,.local46-mood-icon) svg{stroke:#efc675}
+#bottomNav{background:#06231c!important;border-top:1px solid #bd9656!important}
+#bottomNav button{color:#dfd9c4!important}#bottomNav button.active{color:#f3c77a!important}
+#moreDrawer{background:#092a22!important;color:#f6e9d0!important}
+#moreMenu button{border-bottom:1px solid #a78a5038!important}
+.local55-icon{display:inline-flex;align-items:center;justify-content:center;color:#eec475;vertical-align:-.17em;margin-right:.25em;flex:none}
+.local55-icon svg{height:1.25em;width:1.25em;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:600px){header h1 .pub-brand-mark{height:35px!important;width:35px!important}.local50-page-hero{min-height:210px!important}.local50-hero-inner{padding:24px 17px!important}#view :is(input,textarea,select){font-size:16px!important}#view :is(form,.panel){max-width:100%}}
+@media(prefers-reduced-motion:reduce){#view button{transition:none!important}}

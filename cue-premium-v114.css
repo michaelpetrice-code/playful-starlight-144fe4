@@ -1,0 +1,11 @@
+/* v114: cue-sports table presentation, independent of game logic */
+.arc73{max-width:1160px;margin:12px auto 28px;padding:clamp(12px,2.5vw,30px)!important;background:radial-gradient(ellipse at 50% -20%,#1b5340 0%,#082b23 55%,#031914 100%)!important;border:1px solid #a78347!important;border-radius:22px!important;box-shadow:0 22px 65px #0008,inset 0 1px #ffdf8b45!important;color:#fff4d6}
+.arc73-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px!important;padding:8px 0 16px;border-bottom:1px solid #b99a5a66}
+.arc73-head strong{font-size:clamp(1.1rem,2vw,1.75rem)!important;letter-spacing:.065em;color:#ffe1a2!important;text-shadow:0 2px 3px #000}
+.arc73-score{background:#052b24!important;border:1px solid #b38d4b!important;color:#ffe2a5!important;border-radius:50px;padding:10px 16px;line-height:1.5}
+.arc73 canvas{display:block;width:100%!important;height:auto!important;max-width:100%;border:1px solid #b18a49!important;border-radius:17px!important;background:#0c251c!important;box-shadow:0 14px 34px #0009,0 0 0 4px #2c2018!important;touch-action:none}
+.arc73-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:18px}
+.arc73-actions button{background:linear-gradient(180deg,#ffe5a5,#c99a42)!important;color:#17291d!important;border:1px solid #ffe6aa!important;border-radius:12px!important;font-weight:800!important;min-height:44px;padding:10px 18px;box-shadow:0 3px 0 #65471c}
+.arc73-actions button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.arc73 p{color:#e7e3d3!important;line-height:1.6}
+@media(max-width:700px){.arc73{border-radius:12px!important;padding:10px!important}.arc73-head{align-items:flex-start}.arc73-score{font-size:.8rem}.arc73-actions button{flex:1 1 130px}}

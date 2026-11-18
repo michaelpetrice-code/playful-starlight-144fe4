@@ -1,0 +1,14 @@
+#tl-continue-coombe {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  margin: 0 0 14px;
+  padding: 8px 14px;
+  border: 1px solid #16614e;
+  border-radius: 10px;
+  background: #e8f4ed;
+  color: #133f32;
+  font-weight: 750;
+}
+
+#tl-continue-coombe:disabled { opacity: .65; }

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08251b">
+<meta name="description" content="Build a branded community app for your pub or social club with The Local.">
+<title>The Local for pubs & clubs</title>
+<link rel="icon" href="icons/the-local-pint-v149.png">
+<link rel="stylesheet" href="product-v149.css?v=149">
+<link rel="stylesheet" href="controls-v150.css?v=150"><link rel="stylesheet" href="venue-signup.css?v=154"><link rel="stylesheet" href="page-polish.css?v=172"><link rel="stylesheet" href="analytics.css?v=174"><script src="config.js"></script><script type="module" src="analytics-track.js?v=174"></script><link rel="stylesheet" href="local-v194-refinement.css?v=194"></head>
+<body class="tl149-public">
+<a class="tl149-skip" href="#main">Skip to content</a>
+<header class="tl149-public-header">
+ <a href="for-venues.html"><img src="assets/branding/the-local-transparent-v150.png" alt="The Local" width="1858" height="447"></a>
+ <nav aria-label="Venue site"><button type="button" class="tl172-share" data-tl172-public-share>Share page</button><a href="#features">Features</a><a href="#plans">Pricing</a><a href="#demo">Preview</a><a href="index.html">Member sign-in</a><a class="tl149-action" href="#contact">Contact Us</a></nav>
+</header>
+<main id="main" class="tl149-public-main">
+ <section class="tl149-home-intro">
+  <div><h1>Your venue. Your own app.</h1><p>Put what’s on, room hire and member updates in one place. Build a branded app for your pub or club and share it with your community.</p>
+   <div class="tl149-actions"><a class="tl149-action" href="#plans">Start your 14-day trial</a><a href="#demo">Preview a venue app</a></div></div>
+  <img src="assets/feature-slides/discover-venues.webp" alt="A British pub with hanging flower baskets at dusk" width="504" height="333">
+ </section>
+ <section id="features" aria-labelledby="feature-heading"><h2 id="feature-heading">What your venue app can do</h2>
+  <div class="tl149-features">
+   <article class="tl149-feature"><img src="assets/feature-slides/whos-up-for-it.webp" alt="" width="504" height="333"><div><h3>What’s on and tickets</h3><p>Publish events and link to your ticket provider.</p></div></article>
+   <article class="tl149-feature"><img src="assets/feature-slides/virtual-pub-tables.webp" alt="" width="504" height="333"><div><h3>Room hire and enquiries</h3><p>Show what you offer and receive enquiries in your venue inbox.</p></div></article>
+   <article class="tl149-feature"><img src="assets/feature-slides/games-room.webp" alt="" width="504" height="333"><div><h3>Games and kids’ bingo</h3><p>Share The Local’s Games Room and give members an interactive bingo ticket.</p></div></article>
+   <article class="tl149-feature"><img src="assets/feature-slides/rewards-membership.webp" alt="" width="504" height="333"><div><h3>Your branding and content</h3><p>Use your logo and colours. Get AI suggestions and review them before you publish.</p></div></article>
+  </div>
+ </section>
+ <section id="plans" aria-labelledby="plans-heading">
+  <span id="pricing" aria-hidden="true"></span>
+  <h2 id="plans-heading">Choose your venue plan</h2>
+  <p>Try the Venue App Builder free for 14 days. Both plans include your branded public app and enquiry inbox.</p>
+  <form class="tl-plan-picker" action="index.html" method="get">
+   <input type="hidden" name="section" value="billing">
+   <fieldset>
+    <legend>Billing frequency</legend>
+    <label class="tl-plan-option"><input type="radio" name="plan" value="monthly" checked><span><strong>Monthly</strong><span>£29.99 per month after trial</span></span></label>
+    <label class="tl-plan-option"><input type="radio" name="plan" value="annual"><span><strong>Annual</strong><span>£299 per year after trial</span></span></label>
+   </fieldset>
+   <p>No payment today. Stripe asks for a payment method to start your trial. Your plan renews automatically unless you cancel before the trial ends.</p>
+   <button class="tl149-action tl-signup-primary" type="submit">Continue with my plan</button>
+  </form>
+ </section>
+ <section id="demo" aria-labelledby="demo-heading"><h2 id="demo-heading">Try a venue preview</h2>
+  <div class="tl149-demo"><form id="venue-preview-form" class="tl149-panel">
+   <label>Venue name<input name="name" value="The Oak Social Club" maxlength="90" required></label>
+   <label>Venue type<select name="type"><option>Social club</option><option>Pub</option><option>Sports club</option><option>Community venue</option></select></label>
+   <label>Theme<select name="theme"><option value="emerald">Emerald</option><option value="burgundy">Burgundy</option><option value="navy">Navy</option><option value="charcoal">Charcoal</option></select></label>
+   <button class="tl149-action" type="submit">Update preview</button>
+   <p id="venue-preview-status" role="status"></p>
+   <a href="index.html?section=venue-app-builder">Open Venue App Builder</a>
+  </form><div id="venue-preview" class="vb-public"></div></div>
+ </section>
+ <section class="tl149-home-owner"><div><h2>Bring your venue into The Local</h2><p>Apply to appear in the venue directory. You can include a question about venue setup.</p></div><a class="tl149-action" href="index.html?section=venue-applications">Open venue applications</a></section>
+ <section id="contact" class="tl149-home-owner" aria-labelledby="contact-heading">
+  <div><h2 id="contact-heading">Contact Us</h2><p>Get in touch with The Local for help or venue enquiries.</p></div>
+  <div class="tl149-actions">
+   <a class="tl149-action" href="mailto:info@thelocal.me.uk">Email info@thelocal.me.uk</a>
+   <a class="tl149-action" href="tel:+447852179803">Call 07852 179803</a>
+  </div>
+ </section>
+</main>
+<footer class="tl149-public-footer"><a href="index.html">Open the member app</a><a href="index.html?section=billing">Manage venue billing</a></footer>
+<link rel="stylesheet" href="venue-app-builder.css?v=147">
+<script type="module" src="product-venue-preview.js?v=149"></script>
+<script type="module" src="public-share.js?v=172"></script>
+</body></html>

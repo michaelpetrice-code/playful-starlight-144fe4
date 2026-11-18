@@ -1,0 +1,12 @@
+/* v197 Admin workspace */
+.tl197-admin{max-width:1280px;margin:0 auto;padding:clamp(16px,3vw,36px);background:linear-gradient(155deg,#0b342d,#092820);border:1px solid #bba05c55;border-radius:22px;color:#f4f2e8}
+.tl197-admin-intro{padding:16px 8px 22px}.tl197-kicker{letter-spacing:.16em;color:#e5c475;font-size:11px;font-weight:800}.tl197-admin-intro h2{font-size:clamp(24px,3vw,34px);margin:8px 0}.tl197-admin-intro p{color:#c4d6ce}
+.tl197-admin [data-admin-menu]{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:9px;margin-bottom:24px;padding:12px;background:#041c18;border-radius:16px;border:1px solid #bba05c33}
+.tl197-admin [data-admin-menu] button{min-height:56px;text-align:left;border:1px solid #8eaa9b55;border-radius:11px;padding:12px 14px;background:#123b32;color:#f1eee0;font-size:14px;font-weight:650;cursor:pointer}
+.tl197-admin [data-admin-menu] button[aria-pressed=true]{border-color:#e6c677;background:#285342;color:#fff;box-shadow:inset 3px 0 #e6c677}
+.tl197-admin [data-admin-menu] button:hover{background:#265a49}.tl197-admin [data-admin-content]{min-width:0}.tl197-admin [data-admin-content] :is(input,select,textarea){max-width:100%}.tl197-admin [data-admin-content] :is(button,a){touch-action:manipulation}
+.tl197-ai-landing{padding:26px;border:1px solid #bba05c66;border-radius:16px;background:#123b32}.tl197-ai-landing button{padding:13px 19px;border-radius:10px;background:#e3c477;color:#142d25;font-weight:800}
+.tl197-map-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(230px,1fr);gap:18px;margin-top:12px}.tl197-map svg{width:100%;height:auto;max-height:620px}.tl197-map-list{max-height:540px;overflow:auto;padding:12px;border-radius:12px;background:#0b302a}.tl197-map-row{padding:10px;border-bottom:1px solid #ffffff20}.tl197-map-row:hover{background:#ffffff14}.tl197-map-controls{display:flex;align-items:center;gap:10px}.tl197-map-controls select{padding:8px;border-radius:8px}
+@media(max-width:760px){.tl197-map-layout{grid-template-columns:1fr}.tl197-admin [data-admin-menu]{grid-template-columns:repeat(2,minmax(0,1fr))}.tl197-admin{padding:12px}}
+/* Analytics belongs inside the permission-checked administration workspace, not the bottom navigation. */
+#bottomNav [data-tab="Analytics"],#bottomNav [data-tab="Administration"],#bottomNav [data-tab="Platform Analytics"],.bottom-nav [href*="analytics"]{display:none!important}

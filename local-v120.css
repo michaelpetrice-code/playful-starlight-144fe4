@@ -1,0 +1,8 @@
+/* v120 brand alignment */
+.tl-header-logo img,.tl-login-gold-logo,.tl-gold-full-logo{max-width:100%;object-fit:contain}
+.ref-phone-brand img{width:90%;height:65px;object-fit:contain}
+.local-hub-manager{border:1px solid #c9a75e;background:#092d24;padding:16px;border-radius:15px;margin:16px 0;color:#f7e7bb}
+.local-hub-manager h3{color:#f8d782}.local-hub-manager button{margin:5px}
+.local-hub-plan .local-hub-scope{display:inline-block;border:1px solid #bc9854;border-radius:20px;padding:3px 9px;margin:5px 0}
+.table-shared-video{max-width:100%;max-height:300px;border-radius:12px}
+@media(max-width:550px){.tl-login-gold-logo{max-height:115px}.local-hub-manager{padding:12px}}

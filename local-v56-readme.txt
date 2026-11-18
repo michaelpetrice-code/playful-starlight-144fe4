@@ -1,0 +1,1 @@
+The Local v56 companion deep links: ?section=Buy%2C%20Sell%20or%20Give%20Away and ?section=Trades%20%26%20Services. All original v55 marketplace/trades code and backend configuration retained. Deploy to the existing The Local Netlify site.

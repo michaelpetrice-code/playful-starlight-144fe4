@@ -1,0 +1,7 @@
+The Local administrator notification recipient
+
+ADMIN_ALERT_EMAILS=michaelpetrice@gmail.com
+
+Set this as a server-side Supabase Edge Function secret. Do not put RESEND_API_KEY, WORKER_TOKEN or SUPABASE_SERVICE_ROLE_KEY in website files.
+
+This package does not activate delivery; see NOTIFICATIONS-v101-SETUP.md.

@@ -1,0 +1,20 @@
+/* v128: preserve entire original 1200x450 artwork on every screen. */
+.tl126-showcase{max-width:1200px!important;width:calc(100% - 32px)!important;margin:14px auto 24px!important;overflow:hidden!important;border-radius:18px!important}
+.tl126-slides{width:100%!important}
+.tl126-slide,.tl126-slide.tl126-active{aspect-ratio:1200/450!important;min-height:0!important;height:auto!important;padding:0!important;overflow:hidden!important}
+.tl127-slide-image{display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center center!important}
+.tl126-slide-copy{inset:0!important;padding:0!important;background:none!important;pointer-events:none!important;align-items:flex-end!important;justify-content:flex-end!important}
+.tl126-visit{pointer-events:auto!important;position:absolute!important;right:12px!important;bottom:12px!important;z-index:2!important;padding:7px 12px!important;font-size:13px!important;opacity:.95!important}
+.tl126-controls{display:flex!important;justify-content:center!important;align-items:center!important;gap:10px!important;padding:7px 12px!important;background:#041e18!important}
+.tl126-controls button{min-height:32px!important;min-width:36px!important;padding:4px 11px!important}
+@media(max-width:650px){.tl126-showcase{width:calc(100% - 14px)!important;border-radius:12px!important;margin:8px auto 14px!important}.tl126-visit{right:5px!important;bottom:4px!important;font-size:10px!important;padding:4px 7px!important}.tl126-controls{gap:7px!important}}
+/* Only the existing left-hand admin cog remains visible. */
+#tl82-admin{display:none!important}
+#tl-venue-admin-cog{left:12px!important;right:auto!important;bottom:calc(76px + env(safe-area-inset-bottom,0px))!important;z-index:9600!important}
+@media(min-width:900px){#tl-venue-admin-cog{bottom:22px!important}}
+#tl128-admin-menu[hidden]{display:none!important}
+#tl128-admin-menu{position:fixed;z-index:9601;left:12px;bottom:calc(132px + env(safe-area-inset-bottom,0px));width:min(310px,calc(100vw - 24px));padding:14px;background:#08291f;border:1px solid #d9b85d;border-radius:15px;box-shadow:0 12px 35px #000a;color:#f8e7b6;font-family:inherit}
+#tl128-admin-menu h3{margin:0 0 8px;font-size:17px;color:#f7d781}
+#tl128-admin-menu a,#tl128-admin-menu button{box-sizing:border-box;display:block;width:100%;text-align:left;padding:11px 12px;margin:6px 0;border:1px solid #ac8b47;border-radius:9px;background:#123e31;color:#ffe6a4;font-size:14px;font-weight:650;text-decoration:none;cursor:pointer}
+#tl128-admin-menu p{font-size:12px;line-height:1.4;margin:8px 0 0;color:#d7c9a7}
+@media(min-width:900px){#tl128-admin-menu{bottom:77px}}

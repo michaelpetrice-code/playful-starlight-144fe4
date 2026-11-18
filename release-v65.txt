@@ -1,0 +1,4 @@
+THE LOCAL v65 — Reference-style homepage and site polish
+Original beer glass brand, nine home tiles, Games Room navigation label, pub-green/gold styling.
+Existing page and multiplayer logic retained. Visual recreation is approximate, not a pixel-perfect copy.
+Deploy contents of lads-local-pwa to Netlify. Test all interactive flows on live site.

@@ -1,0 +1,17 @@
+/* The Local v112: cohesive premium arcade presentation. */
+#gr63{--arcade-gold:#f5c969;--arcade-dark:#031e17;background:radial-gradient(ellipse at 70% 0%,#12543e 0%,#062c22 46%,#031a15 100%)!important;color:#fff5d8!important;border:1px solid #a78642!important;border-radius:22px!important;box-shadow:0 24px 70px #0008!important}
+#gr63 .gr63-head{background:linear-gradient(120deg,#061e18,#12503b)!important;border:1px solid #c6a052!important}
+#gr63 .gr63-head h2{color:#ffda84!important;text-shadow:0 2px 18px #0008!important}
+#gr63 .gr63-grid{gap:clamp(12px,2vw,22px)!important}
+#gr63 .gr63-card{background:linear-gradient(145deg,#104633,#05261e)!important;color:#fff4d6!important;border:1px solid #a78540!important;border-radius:18px!important;box-shadow:0 8px 22px #0006!important}
+#gr63 .gr63-card h3,#gr63 .gr63-card strong,#gr63 .gr63-card .gr63-title{color:#ffda83!important}
+#gr63 .gr63-card p,#gr63 .gr63-card small{color:#f2e9cf!important}
+#gr63 .gr63-card:hover{transform:translateY(-4px) scale(1.015)!important;box-shadow:0 16px 35px #0009,0 0 0 1px #f2c96d!important}
+#gr63 button:not(.gr63-card),#gr63 select{accent-color:#d7ad53}
+#gr63 button:focus-visible,#gr63 a:focus-visible{outline:3px solid #ffe29b!important;outline-offset:3px!important}
+#gr63 .gr63-filters{color:#fff2d4!important}
+#tl-arcade-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 18px;padding:12px 14px;background:#031e18;border:1px solid #a58343;border-radius:14px;color:#fbe8ba;font:600 13px system-ui,sans-serif}
+#tl-arcade-tools button{background:linear-gradient(#f8d67f,#d5a349);color:#09271d;border:0;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}
+#tl-arcade-tools .tl-arcade-status{margin-left:auto;font-weight:500;color:#f0dfbd}
+@media(max-width:650px){#gr63 .gr63-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}#tl-arcade-tools .tl-arcade-status{margin-left:0;width:100%}}
+@media(prefers-reduced-motion:reduce){#gr63 *,#gr63 *::before,#gr63 *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

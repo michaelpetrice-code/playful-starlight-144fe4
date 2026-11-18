@@ -1,0 +1,11 @@
+THE LOCAL v42 — VENUE PARTNER PLATFORM
+
+1. Run VENUE-PLATFORM-SETUP.sql in The Local Supabase SQL Editor.
+2. Deploy the entire lads-local-pwa folder to your existing Netlify project.
+3. Sign in as a member and open Venue Hub. Test a venue application and the dropdown.
+4. Applications are private and are NOT auto-approved. Review pending applications using the Supabase Table Editor with a trusted project administrator. Verify that the applicant controls the venue before publishing.
+5. To publish a verified venue, insert its approved name, type, town, description, website and status='approved' in local_venue_directory using the trusted SQL Editor. Do not expose a service-role key in browser JavaScript.
+6. Share a venue page from the Venue Hub. Links use #venue=<venue-id>. They open the venue's page and let patrons join that venue's virtual tables.
+7. Coombe Social Club is included as a sample featured venue, not proof of a paid subscription or verified owner. Remove or edit the sample before public commercial launch if needed.
+
+IMPORTANT: This release does NOT include payments, subscription billing, automated entitlement expiry, automated ownership verification, a nationwide pub database or automatic venue admin provisioning. Add secure server-side Stripe webhooks and a controlled approval workflow before charging venues. Test on at least two phones before inviting members.

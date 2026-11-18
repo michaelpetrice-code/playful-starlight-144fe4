@@ -1,0 +1,11 @@
+
+.v88-darts .v88-scoreboard{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:14px;margin:12px 0;background:linear-gradient(120deg,#0b2629,#175342);border:1px solid #c7a666;border-radius:15px;color:#fff}
+.v88-scoreboard>div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.v88-scoreboard strong{font-size:clamp(28px,6vw,48px);color:#ffe4a5;font-variant-numeric:tabular-nums}
+.v88-scoreboard small{font-size:11px;letter-spacing:.08em;color:#b7e7d6}
+.v88-options{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.v88-options label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700}
+.v88-options select{padding:9px;border:1px solid #c6a36e;border-radius:8px;background:#e9f3ec;color:#102c28}
+.v88-matchlog{margin:12px 0;max-height:130px;overflow:auto;padding:10px;background:#102b2b;color:#f9e5b4;border-radius:10px;font-size:13px}
+.v88-matchlog div{padding:3px 0;border-bottom:1px solid #ffffff16}
+.arc73 canvas{touch-action:manipulation;max-width:100%;height:auto}

@@ -1,0 +1,9 @@
+THE LOCAL v67 — Games Room image layout repair
+
+- Forces all game thumbnails to fill and centre in their cards, on desktop and mobile.
+- Normalises card alignment, sizing and label placement.
+- Re-encodes and gently sharpens existing artwork at 2x resolution. This improves rendering but cannot restore photographic detail absent from the originals.
+- Preserves all existing gameplay and Supabase code.
+- Refreshes the service-worker cache name.
+
+Deploy the CONTENTS of lads-local-pwa to Netlify. Hard refresh and/or clear the old installed PWA cache.

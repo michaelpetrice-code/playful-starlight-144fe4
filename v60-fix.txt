@@ -1,0 +1,1 @@
+The Local v60: Fixed missing template literal terminator in Home renderer introduced in v59. Restores Home feature tiles and navigation while leaving the three removed bottom sections absent. Updated app.js cache-busting query and service worker cache name.

@@ -1,0 +1,1 @@
+v68: Replaced 12 game thumbnail assets with newly generated higher resolution artwork (1080x540), centred in cards. Replaced raster beer logo references with a clean vector beer mug icon. Existing game mechanics and Supabase settings unchanged. Verify visually after Netlify deploy.

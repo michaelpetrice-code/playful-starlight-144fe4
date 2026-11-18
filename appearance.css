@@ -1,0 +1,39 @@
+/* Theme engine: variable-driven overrides for original blue/light styling */
+:root{--accent:#0866ff;--accent-soft:#e8f1ff;--accent-on:#fff;--app-bg:#f2f5fa;--surface:#fff;--surface-alt:#f3f6fa;--ink:#172b4d;--ink-soft:#344760;--border:#e3e8f0;--muted:#63738b;--input-border:#cfd9e7;--shadow:#1d3a6210;color-scheme:light}
+:root[data-appearance="dark"]{--app-bg:#101923;--surface:#1c2836;--surface-alt:#273647;--ink:#edf3fb;--ink-soft:#d0deeb;--border:#38485a;--muted:#aabbd0;--input-border:#4b5d71;--shadow:#00000035;color-scheme:dark}
+html,body{background:var(--app-bg)!important;color:var(--ink)!important}
+header,.panel,#bottomNav,#moreDrawer,nav,.market-card{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--border)!important}
+header{box-shadow:0 2px 10px var(--shadow)!important}
+h1,.panel h2,.market-price,.admin-stats b{color:var(--accent)!important}
+.panel{box-shadow:0 4px 18px var(--shadow)!important}
+small,.muted,.market-card-body small,.admin-stats span{color:var(--muted)!important}
+button:not(.theme-choice):not(.theme-reset){background:var(--accent);color:var(--accent-on)}
+button:not(.theme-choice):not(.theme-reset):hover{filter:brightness(.93)}
+#bottomNav button,#moreMenu button,.more-drawer-header button,nav button{background:var(--surface-alt)!important;color:var(--ink-soft)!important}
+#bottomNav button.active,#moreMenu button.active,nav button.active{background:var(--accent-soft)!important;color:var(--accent)!important}
+#bottomNav button:not(.active){background:transparent!important;color:var(--muted)!important}
+input,textarea,select{background:var(--surface-alt)!important;color:var(--ink)!important;border-color:var(--input-border)!important}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;outline:2px solid var(--accent-soft)}
+input[type="checkbox"],input[type="radio"]{accent-color:var(--accent)}
+.item,.market-card{border-color:var(--border)!important}
+.pill,.install-note,.mini-games-menu button,.mini-memory button,.poll-choice button,.admin-stats>div{background:var(--accent-soft)!important;color:var(--accent)!important}
+.market-photo,.market-compose,.market-detail,.market-filters,.market-card-body{background:var(--surface)!important;color:var(--ink)!important}
+.market-grid .market-card{background:var(--surface)!important}
+a{color:var(--accent)!important}
+footer#status{color:var(--muted)!important}
+#toast{background:var(--surface-alt)!important;color:var(--ink)!important;border:1px solid var(--border);bottom:88px}
+.theme-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0 17px}
+.theme-choice{display:flex;align-items:center;gap:10px;text-align:left;background:var(--surface-alt)!important;color:var(--ink)!important;border:2px solid var(--border);padding:12px 10px;border-radius:12px;font-size:13px}
+.theme-choice.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.theme-dot{width:23px;height:23px;flex-shrink:0;border-radius:50%;background:var(--swatch);border:2px solid #ffffff99}
+.theme-reset{background:var(--surface-alt);color:var(--ink);border:1px solid var(--border);font-size:13px}
+:root[data-appearance="dark"] .warn{background:#3c3020;color:#ffe0ac;border-color:#705329}
+:root[data-appearance="dark"] .market-sold{color:#f9a8a8}
+:root[data-appearance="dark"] .mini-memory button:disabled{background:#204735!important;color:#a5f0c2!important}
+@media(max-width:390px){.theme-choices{grid-template-columns:1fr}}
+
+/* Preserve dark surfaces for supporting modules */
+:root[data-appearance="dark"] .market-compose,:root[data-appearance="dark"] .market-detail,:root[data-appearance="dark"] .market-filters,:root[data-appearance="dark"] .market-photo{border-color:var(--border)!important}
+:root[data-appearance="dark"] .item{background:var(--surface-alt)!important;color:var(--ink)!important}
+:root[data-appearance="dark"] .market-card-body strong,:root[data-appearance="dark"] .market-detail h3{color:var(--ink)!important}
+:root[data-appearance="dark"] .market-card-body small{color:var(--muted)!important}

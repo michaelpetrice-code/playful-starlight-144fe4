@@ -1,0 +1,53 @@
+:root {
+  --tl-bottom-clearance: calc(84px + env(safe-area-inset-bottom, 0px));
+}
+
+html {
+  scroll-padding-bottom: var(--tl-bottom-clearance);
+}
+
+body {
+  padding-bottom: var(--tl-bottom-clearance);
+}
+
+body > #bottomNav,
+body > #moreDrawer {
+  box-sizing: border-box;
+  left: 0 !important;
+  right: 0 !important;
+  margin-inline: auto !important;
+  transform: none !important;
+}
+
+body > #bottomNav {
+  width: min(100%, 780px) !important;
+  max-width: none !important;
+  max-height: none;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  padding: 5px max(4px, env(safe-area-inset-right, 0px))
+    calc(5px + env(safe-area-inset-bottom, 0px))
+    max(4px, env(safe-area-inset-left, 0px)) !important;
+}
+
+body > #bottomNav button {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  justify-content: center;
+  overflow-wrap: anywhere;
+  line-height: 1.18;
+}
+
+body > #moreDrawer {
+  width: min(calc(100% - 12px), 620px) !important;
+  bottom: var(--tl-bottom-clearance) !important;
+  max-height: min(70dvh, calc(100dvh - var(--tl-bottom-clearance)));
+}
+
+body > #tl-venue-admin-cog {
+  bottom: var(--tl-bottom-clearance) !important;
+}

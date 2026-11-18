@@ -1,0 +1,20 @@
+THE LOCAL v58 — VENUE APP PARTNER PROGRAMME
+
+The Local is the main discovery hub. Venues apply through the existing Venue Partners page.
+There are TWO independent application forms:
+1. List your venue (existing local_venue_applications).
+2. Request your own branded pub/club app (new local_venue_app_requests).
+
+INSTALL
+1. In your existing Supabase project, run VENUE-APP-REQUESTS-v58.sql.
+2. Deploy the contents of lads-local-pwa to The Local Netlify site.
+3. Sign in to The Local and open Venue Partners; complete a test application.
+4. In Supabase Table Editor, review local_venue_app_requests.
+
+IMPORTANT LIMITATIONS
+- Requesting an app does not automatically create or deploy an app.
+- Approval, pricing, ownership verification and deployment are manual.
+- No shared sign-in: each venue app should have separate session storage and venue-scoped authorisation.
+- For multiple venues in one Supabase project, add venue_id and strict RLS to every private venue-specific table BEFORE onboarding a second venue. Never reuse Coombe admin privileges for another venue.
+- Only publish approved, public news/events/ticket metadata to The Local. Keep private member and transaction data scoped to each venue.
+- Existing Coombe and The Local features are preserved.

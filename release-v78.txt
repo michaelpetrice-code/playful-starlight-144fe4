@@ -1,0 +1,1 @@
+v78: improved arcade visuals and crossword gameplay with corrected grids, keyboard input and answer checking. Existing pool, snooker, darts, solitaire, Ludo and multiplayer engines preserved. Not commercial 3D game replacements. Test on mobile before release.

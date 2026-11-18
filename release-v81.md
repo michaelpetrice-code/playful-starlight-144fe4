@@ -1,0 +1,1 @@
+The Local v81: new premium game graphics for Pool, Snooker, Darts, Battleships, Blocks, Word Search, Crossword, Solitaire and Ludo. Existing game engines and data preserved. Graphics update only, not true 3D rendering. Browser testing required before deployment.

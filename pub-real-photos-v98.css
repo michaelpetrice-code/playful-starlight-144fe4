@@ -1,0 +1,17 @@
+/* V98: REAL licensed photographs from Pexels, externally hosted. No generated art. */
+.tl65-hero{background-image:linear-gradient(90deg,rgba(2,24,18,.88),rgba(2,30,20,.13) 80%),url("https://images.pexels.com/photos/5662826/pexels-photo-5662826.jpeg?auto=compress&cs=tinysrgb&w=1800")!important;background-position:center 49%!important;background-size:cover!important}
+#tl-auth-gate{background-image:linear-gradient(90deg,rgba(3,25,18,.75),rgba(3,25,18,.34)),url("https://images.pexels.com/photos/5662826/pexels-photo-5662826.jpeg?auto=compress&cs=tinysrgb&w=1800")!important;background-position:center!important;background-size:cover!important}
+.local50-interior .local50-page-hero,.local50-page-hero{background-image:linear-gradient(90deg,rgba(2,28,19,.84),rgba(2,30,20,.27)),url("https://images.pexels.com/photos/5662826/pexels-photo-5662826.jpeg?auto=compress&cs=tinysrgb&w=1600")!important;background-position:center!important;background-size:cover!important}
+.tl65-tile::before{background-color:#1a3d30!important;background-size:cover!important;background-position:center!important;filter:none!important}
+.tl65-tile svg{display:none!important}
+.tl65-tile::after{background:linear-gradient(0deg,rgba(0,25,16,.13),transparent 75%)!important}
+.tl65-tile:nth-child(1)::before{background-image:url("https://images.pexels.com/photos/5054658/pexels-photo-5054658.jpeg?auto=compress&cs=tinysrgb&w=900")!important}
+.tl65-tile:nth-child(2)::before{background-image:url("https://images.pexels.com/photos/6816891/pexels-photo-6816891.jpeg?auto=compress&cs=tinysrgb&w=900")!important}
+.tl65-tile:nth-child(3)::before{background-image:url("https://images.pexels.com/photos/7016022/pexels-photo-7016022.jpeg?auto=compress&cs=tinysrgb&w=900")!important}
+.tl65-tile:nth-child(4)::before{background-image:url("https://images.pexels.com/photos/32376368/pexels-photo-32376368.jpeg?auto=compress&cs=tinysrgb&w=900")!important}
+.tl65-tile:nth-child(5)::before{background-image:url("https://images.pexels.com/photos/1872888/pexels-photo-1872888.jpeg?auto=compress&cs=tinysrgb&w=900")!important}
+.tl65-tile:nth-child(6)::before{background-image:url("https://images.pexels.com/photos/5662826/pexels-photo-5662826.jpeg?auto=compress&cs=tinysrgb&w=900")!important}
+.tl65-tile:nth-child(7)::before{background-image:url("https://images.pexels.com/photos/1872888/pexels-photo-1872888.jpeg?auto=compress&cs=tinysrgb&w=900")!important}
+.tl65-tile:nth-child(8)::before{background-image:url("https://images.pexels.com/photos/6816907/pexels-photo-6816907.jpeg?auto=compress&cs=tinysrgb&w=900")!important}
+.tl65-tile:nth-child(9)::before{background-image:url("https://images.pexels.com/photos/5054661/pexels-photo-5054661.jpeg?auto=compress&cs=tinysrgb&w=900")!important}
+.tl65-tile strong{background:#fffef9!important;color:#123b29!important}.tl65-tile:hover::before{filter:saturate(1.08)!important}

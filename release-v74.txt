@@ -1,0 +1,1 @@
+v74 replaces Battleships, Word Search, Crossword and Blocks with offline playable engines. Solitaire and Ludo retain existing v71 playable engines; online multiplayer retains existing member-games integration and requires database/sign-in. No live deployment or full browser QA.

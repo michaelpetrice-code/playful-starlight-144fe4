@@ -1,0 +1,1 @@
+v70: Installed the user-approved corrected beer mug image as the logo throughout the app, including header, home, navigation and PWA icons. Removed green background from the logo artwork to preserve transparent rendering. No changes to app logic, games or Supabase.

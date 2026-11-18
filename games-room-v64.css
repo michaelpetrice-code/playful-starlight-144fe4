@@ -1,0 +1,21 @@
+/* The Local v64 — photographic Games Room presentation */
+.gr63{background:radial-gradient(ellipse at 50% 0%,#175b46 0%,#05251d 43%,#031b17 100%);border-color:#c69b52;box-shadow:0 24px 70px #0009,inset 0 1px #ffe2a04d}
+.gr63-head{background:linear-gradient(90deg,#041c18,#123b2c);margin:-12px -12px 8px;padding:18px;border-radius:17px 17px 0 0}
+.gr63-head .gr63-icon{font-size:27px;filter:sepia(1) saturate(2) hue-rotate(345deg)}
+.gr63-head h2{font-family:Georgia,serif;letter-spacing:.3px;text-shadow:0 3px 10px #000b}
+.gr63-filters button{background:#05261e;border-color:#85643a;color:#f1e2c3}
+.gr63-filters button.active{background:linear-gradient(#ffe7a2,#d4a14b);color:#15291f}
+.gr63-grid{gap:12px}
+.gr63-card{background:#06281f;border:1px solid #c49a53;box-shadow:0 7px 20px #0009;position:relative}
+.gr63-card:hover{box-shadow:0 10px 25px #000d,0 0 0 1px #f5d78c}
+.gr63-scene{position:relative;display:block;overflow:hidden;height:clamp(105px,14vw,178px);background:linear-gradient(135deg,#241810,#073b2e)}
+.gr64-photo{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(1.1) contrast(1.1);transition:transform .25s}
+.gr63-card:hover .gr64-photo{transform:scale(1.045)}
+.gr63-scene:after{content:'';position:absolute;inset:50% 0 0;background:linear-gradient(transparent,#001a15c7);pointer-events:none}
+.gr64-fallback{display:none}
+.gr63-card strong{font-size:clamp(13px,1.5vw,17px);font-weight:800;color:#fff1cb;padding:10px 11px 0}
+.gr63-card small{padding:5px 11px 11px}
+.gr63-mini{box-shadow:0 10px 30px #0007}
+.gr63-info{border-color:#9e7b43}
+@media(max-width:520px){.gr63-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.gr63-scene{height:88px}.gr63-card strong{font-size:11px;padding:6px 6px 0}.gr63-card small{font-size:9px;padding:3px 6px 7px}.gr63{padding:11px}}
+@media(max-width:355px){.gr63-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gr63-scene{height:115px}}

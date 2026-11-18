@@ -1,0 +1,8 @@
+/* v68: high-definition game artwork and clean vector brand */ 
+#view .gr63-grid .gr63-card .gr64-photo{object-fit:cover!important;object-position:center center!important;image-rendering:auto!important;filter:none!important}
+#view .gr63-grid .gr63-card .gr63-scene{aspect-ratio:2/1!important;background:#08281f!important}
+#view .gr63-grid .gr63-card{border:1px solid #c9a251!important;box-shadow:0 6px 18px #0005!important}
+#view .gr63-grid .gr63-card strong{padding:10px 7px 2px!important}
+.tl65-hero .tl65-logo{width:110px!important;height:110px!important;object-fit:contain!important}
+body>header .pub-brand-mark,.local55-mini-brand,.local55-nav-logo{object-fit:contain!important}
+@media(max-width:650px){#view .gr63-grid .gr63-card .gr63-scene{aspect-ratio:1.6/1!important}}

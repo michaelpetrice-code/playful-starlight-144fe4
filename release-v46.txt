@@ -1,0 +1,3 @@
+THE LOCAL V46 — RETURN VISIT EDITION
+A lively premium home with a time-aware welcome, four direct-action mood cards, venue spotlight, interactive hover treatments and mobile layouts. Existing v45 functionality is retained. No invented online user counts or fictitious events.
+DEPLOY: upload lads-local-pwa to Netlify; hard refresh. Backend setup unchanged.

@@ -1,0 +1,40 @@
+import { sharedPage, publishedShareButton, focusSharedItem } from './page-share.js?v=173';
+const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const types={announcement:'Announcement',event:'Event',competition:'Competition'};
+const fmt=d=>d?new Date(d).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}):'Not set';
+export function studioView(){return `<section class="owner-studio"><div class="owner-studio-title"><span>✦ SIMPLE CONTENT MANAGEMENT</span><h3>Content Studio</h3><p>Create announcements, events and competitions, upload a poster, or schedule a post for later.</p></div><form id="studioForm"><div class="studio-fields"><label>Content type<select name="kind" id="studioKind"><option value="announcement">Announcement</option><option value="event">Event</option><option value="competition">Competition</option></select></label><label>Title<input name="title" maxlength="120" required placeholder="e.g. Friday Night Live"></label></div><label>What would you like to say?<textarea name="body" rows="5" maxlength="5000" required placeholder="Write your message here…"></textarea></label><div class="studio-fields"><label>Event or competition date (optional)<input name="event_at" type="datetime-local"></label><label>Publish on (leave blank for now)<input name="publish_at" type="datetime-local"></label></div><label>Poster or photo (optional)<input id="studioImage" type="file" accept="image/jpeg,image/png,image/webp"/><small>JPG, PNG or WebP, maximum 5 MB. Uploaded to your Supabase storage.</small></label><div class="studio-image-preview" id="studioPreview"></div><div class="owner-action-row"><button type="submit" data-studio-action="publish">Publish / Schedule</button><button type="submit" data-studio-action="draft">Save draft</button><button type="reset">Clear form</button></div><p id="studioStatus" role="status" aria-live="polite"></p></form><div class="owner-studio-title"><h3>Your content</h3><p>Drafts, scheduled items and published posts.</p></div><div id="studioItems" role="status">Loading content…</div></section>`}
+export function bindStudio({sb}){
+ const form=document.querySelector('#studioForm');if(!form||!sb)return;
+ const status=document.querySelector('#studioStatus'),items=document.querySelector('#studioItems'),fileInput=document.querySelector('#studioImage'),preview=document.querySelector('#studioPreview');
+ let editId=null,oldImage=null,objectUrl=null;
+ function reset(){editId=null;oldImage=null;if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=null;preview.innerHTML='';status.textContent='';}
+ form.addEventListener('reset',()=>setTimeout(reset,0));
+ fileInput.addEventListener('change',()=>{if(objectUrl)URL.revokeObjectURL(objectUrl);preview.innerHTML='';const f=fileInput.files?.[0];if(f){objectUrl=URL.createObjectURL(f);const img=document.createElement('img');img.src=objectUrl;img.alt='Selected poster preview';preview.append(img)}});
+ async function reload(){const {data,error}=await sb.rpc('local_owner_content_list');if(error){items.textContent=error.message;return}items.innerHTML=(data||[]).map(x=>`<article class="studio-item"><div><span class="studio-tag">${escapeHtml(types[x.kind]||x.kind)}</span> <span class="studio-tag">${x.status==='draft'?'Draft':x.publish_at&&new Date(x.publish_at)>new Date()?'Scheduled':'Published'}</span><h4>${escapeHtml(x.title)}</h4><p>${escapeHtml(x.body).slice(0,220)}</p><small>Publish: ${escapeHtml(fmt(x.publish_at))}${x.event_at?' · Event: '+escapeHtml(fmt(x.event_at)):''}</small></div><div class="owner-action-row"><button data-edit="${x.id}">Edit</button><button data-toggle="${x.id}" data-next="${x.status==='draft'?'published':'draft'}">${x.status==='draft'?'Publish':'Unpublish'}</button><button data-delete="${x.id}">Delete</button></div></article>`).join('')||'<p>No content yet. Create your first announcement above.</p>';
+ items.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{const x=(data||[]).find(v=>v.id===b.dataset.edit);if(!x)return;editId=x.id;oldImage=x.image_path;for(const name of ['kind','title','body'])form.elements[name].value=x[name]||'';for(const name of ['event_at','publish_at'])form.elements[name].value=x[name]?new Date(new Date(x[name]).getTime()-new Date(x[name]).getTimezoneOffset()*60000).toISOString().slice(0,16):'';preview.textContent=oldImage?'Existing image will be retained unless a new file is selected.':'';form.scrollIntoView({behavior:'smooth'});status.textContent='Editing: '+x.title});
+ items.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=async()=>{const {error}=await sb.rpc('local_owner_content_status',{p_id:b.dataset.toggle,p_status:b.dataset.next});if(error)alert(error.message);else reload()});
+ items.querySelectorAll('[data-delete]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete this content permanently?'))return;const {error}=await sb.rpc('local_owner_content_delete',{p_id:b.dataset.delete});if(error)alert(error.message);else reload()});}
+ form.addEventListener('submit',async e=>{e.preventDefault();const action=e.submitter?.dataset.studioAction||'draft',fd=new FormData(form);const f=fileInput.files?.[0];status.textContent='Saving…';try{
+ let imagePath=oldImage;
+ if(f){if(!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>5*1024*1024)throw Error('Choose a JPG, PNG or WebP under 5 MB.');const extension=({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'})[f.type];const path=`${crypto.randomUUID()}.${extension}`;const {error}=await sb.storage.from('local-content-images').upload(path,f,{contentType:f.type,upsert:false});if(error)throw error;imagePath=path;}
+ const eventAt=fd.get('event_at')?new Date(fd.get('event_at')).toISOString():null;
+ const publishAt=fd.get('publish_at')?new Date(fd.get('publish_at')).toISOString():null;
+ const {error}=await sb.rpc('local_owner_content_save',{p_id:editId,p_kind:fd.get('kind'),p_title:fd.get('title'),p_body:fd.get('body'),p_event_at:eventAt,p_publish_at:publishAt,p_image_path:imagePath,p_status:action==='draft'?'draft':'published'});if(error)throw error;
+ form.reset();status.textContent=action==='draft'?'Draft saved.':publishAt&&new Date(publishAt)>new Date()?'Scheduled successfully.':'Published successfully.';await reload();
+ }catch(err){status.textContent='Could not save: '+err.message}});
+ reload();
+}
+const focusedStudioItems=new Set();
+export async function renderPublicStudioContent(sb,notify){if(!sb)return;const target=document.querySelector('.local50-page-body')||document.querySelector('#view');if(!target)return;const {data,error}=await sb.rpc('local_public_content');if(error||!data?.length||!target.isConnected)return;const sec=document.createElement('section');sec.className='local-studio-public';sec.innerHTML='<div class="local-studio-header"><span>✦ FROM THE LOCAL</span><h2>What’s happening</h2></div>';
+ const link=sharedPage();
+ let sharedArticle;
+ for(const x of data){const a=document.createElement('article');a.className='local-studio-public-item';const tag=document.createElement('span');tag.className='studio-tag';tag.textContent=types[x.kind]||x.kind;const title=document.createElement('h3');title.textContent=x.title;const body=document.createElement('p');body.textContent=x.body;a.append(tag,title,body);if(x.event_at){const date=document.createElement('small');date.textContent='Date: '+fmt(x.event_at);a.append(date)}if(x.image_path){const {data:url}=sb.storage.from('local-content-images').getPublicUrl(x.image_path);if(url?.publicUrl){const img=document.createElement('img');img.loading='lazy';img.alt='Event or announcement poster';img.src=url.publicUrl;a.append(img)}}const share=publishedShareButton({page:x.kind==='event'?'events':'updates',item:x.id,title:x.title,notify});
+ if(share)a.append(share);
+ if(link?.source==='studio'&&link.published===x.id)sharedArticle=a;
+ sec.append(a)}
+ target.prepend(sec);
+ if(sharedArticle && !document.documentElement.classList.contains('tl-auth-locked') && !focusedStudioItems.has(link.published)){
+   focusedStudioItems.add(link.published);
+   focusSharedItem(sharedArticle);
+ }
+}

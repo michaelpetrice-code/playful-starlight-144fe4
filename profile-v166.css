@@ -1,0 +1,28 @@
+#view .local-profile-panel .local-profile-summary strong,
+#view .local-profile-panel #profileForm label {
+  color: #173b30 !important;
+  opacity: 1;
+}
+
+#view .local-profile-panel p.muted {
+  color: #3e5549 !important;
+  opacity: 1;
+}
+
+#view .local-profile-panel #profilePhoto {
+  color: #173b30 !important;
+}
+
+#view .local-profile-panel #profileSaveStatus[hidden] {
+  display: none !important;
+}
+
+#view .local-profile-panel #profileSaveStatus {
+  color: #172f27 !important;
+  background: #e8f2e8 !important;
+}
+
+#view .local-profile-panel #profileSaveStatus[data-kind="error"] {
+  color: #fff4e6 !important;
+  background: #642626 !important;
+}

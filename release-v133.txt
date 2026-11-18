@@ -1,0 +1,1 @@
+The Local v133: photographic feature slideshow. Eight separate 1600x600 WebP images under assets/feature-slides. Based on v132. All original site features preserved. Test on staging before production. Note: seven tiles were individually extracted from a generated photographic montage and resized with non-cropping containment. No database migration.

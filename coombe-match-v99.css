@@ -1,0 +1,53 @@
+/* The Local v99 — visual parity with supplied Coombe Social Club v42 theme */
+:root{--coombe-forest:#052a1e;--coombe-forest-light:#086342;--coombe-gold:#e9b95b;--coombe-cream:#fff9e9;--coombe-ink:#173a2b}
+body{background:radial-gradient(ellipse at 12% 0%,#166449 0,transparent 43%),radial-gradient(ellipse at 100% 25%,#164a53 0,transparent 45%),linear-gradient(165deg,#073e2d,#02271f 75%)!important;color:#fff5de!important}
+body>header{background:linear-gradient(115deg,#003b2b,#0b6348 52%,#063525)!important;border-bottom:2px solid #e9b95b!important;box-shadow:0 7px 25px #0007!important}
+body>header h1{color:#fff5d5!important;text-shadow:0 2px 0 #8a5e18,0 0 15px #f2cb5944!important;letter-spacing:.035em!important}
+body>header button{background:linear-gradient(135deg,#ffe69a,#e6ad4b)!important;border:1px solid #a77d37!important;color:#173322!important;border-radius:12px!important;box-shadow:0 3px 0 #805f24!important}
+#tabs{background:linear-gradient(110deg,#03291e,#07432f)!important;border-bottom:2px solid #d1a250!important;box-shadow:0 4px 18px #0005!important}
+#tabs button{color:#f8edce!important;border-radius:10px!important;font-weight:750!important}
+#tabs button:hover{background:#ffffff1d!important}
+#tabs button.active{background:linear-gradient(135deg,#ffe69a,#e6ad4b)!important;color:#173322!important;border:1px solid #b48c43!important}
+#view{color:#fff5e0!important}
+#view .panel{background:#fff9e9!important;color:#173a2b!important;border:2px solid #e6c67c!important;border-radius:18px!important;box-shadow:0 9px 24px #0005!important}
+#view .panel h2,#view .panel h3{color:#063c2b!important}
+#view button:not(.tl65-tile):not(.gr63-card):not(.kids-cell):not(.arc73 button):not(.oc90 button){border-radius:11px}
+#view button:not(.secondary):not(.gr63-card):not(.tl65-tile):not(.gr63-filters button):not(.arc73 button):not(.oc90 button){background:linear-gradient(135deg,#159b6b,#05734b);color:#fff9e9;border:1px solid #0d6647;box-shadow:0 3px 0 #00432f;font-weight:750}
+#view button.secondary{background:#fff8e6!important;color:#163e2c!important;border:1px solid #caa861!important}
+#view input,#view select,#view textarea{border-color:#b5ad93!important;background:#fffefa!important;color:#153c2a!important}
+.tl65-hero{border:2px solid #f5ca69!important;border-radius:20px!important;box-shadow:0 12px 30px #0007!important}
+.tl65-hero h2{color:#fff5d5!important;text-shadow:0 2px 5px #000a!important}
+.tl65-tiles{gap:13px!important}
+.tl65-tile{border:2px solid #d5ad5f!important;border-radius:17px!important;background:#064832!important;box-shadow:0 5px 0 #001e16,0 12px 20px #0005!important}
+.tl65-tile::after{background:linear-gradient(180deg,#062f2111,#001e16a3)!important}
+.tl65-tile strong{background:linear-gradient(130deg,#086342,#002f23)!important;color:#fff5dd!important;border-top:2px solid #d6a65a!important}
+.tl65-tile em{color:#e9d8ae!important}
+.tl65-tile svg{color:#ffe3a0!important;fill:#ffe3a0!important;stroke:#ffe3a0!important}
+.tl65-tile:hover{transform:translateY(-3px)!important;box-shadow:0 8px 0 #001e16,0 16px 24px #0007!important}
+.local50-page-hero{border:2px solid #d7a85a!important;box-shadow:0 10px 26px #0006!important}
+.local50-page-outro{background:linear-gradient(135deg,#075b40,#00291e)!important;border:2px solid #d9ae5e!important}
+.gr63{background:#fff9e9!important;border:2px solid #e6c67c!important;border-radius:18px!important}
+.gr63-card{background:#fff9e9!important;border:2px solid #c9a55f!important;border-radius:14px!important;box-shadow:0 5px 0 #d4c4a1,0 8px 15px #0002!important}
+.gr63-card strong{color:#073b2b!important}
+.gr63-filters button.active{background:linear-gradient(135deg,#159b6b,#05734b)!important;color:white!important}
+#bottomNav{background:linear-gradient(115deg,#003b2b,#064d35)!important;border-top:2px solid #d5a54d!important;box-shadow:0 -4px 18px #0007!important}
+#bottomNav button{color:#fff2d1!important}#bottomNav button.active{color:#ffdb82!important}
+#tl-auth-gate{background-color:#052a1e!important}
+.tl-auth-card{background:#fff9e9!important;border:2px solid #e6c67c!important;box-shadow:0 15px 40px #0009!important}
+#tl-auth-submit{background:linear-gradient(135deg,#159b6b,#05734b)!important;box-shadow:0 4px 0 #00432f!important}
+/* Registered venue profile */
+.coombe-profile{scroll-margin-top:90px;margin:16px 0 23px;background:#fff9e9;color:#173a2b;border:2px solid #e6c67c;border-radius:19px;overflow:hidden;box-shadow:0 10px 28px #0006}
+.coombe-profile-hero{min-height:235px;background:linear-gradient(90deg,#002419ed,#003b29a8 68%,#001a1480),url('assets/coombe/venue-banner.jpg') center 35%/cover;display:flex;align-items:end;padding:clamp(18px,3vw,30px)}
+.coombe-profile-heading{max-width:780px}.coombe-kicker{color:#ffdf8a;font-size:12px;font-weight:900;letter-spacing:1.4px}.coombe-profile h2{font:700 clamp(28px,4vw,43px) Georgia,serif!important;color:#ffedbd!important;margin:8px 0!important}.coombe-profile-hero p{color:#fff7e3;font-size:16px;line-height:1.5}
+.coombe-profile-actions,.coombe-card-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px;align-items:center}
+.coombe-profile-actions a,.coombe-card-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 16px;border-radius:11px;font-weight:850;text-decoration:none}
+.coombe-gold-link{background:linear-gradient(135deg,#ffe69a,#e6ad4b)!important;color:#173322!important;border:1px solid #b58a42!important;box-shadow:0 3px 0 #886526!important}
+.coombe-outline-link{background:#fdf4dc!important;color:#063d2c!important;border:1px solid #d5ae60!important}
+.coombe-profile-actions button{min-height:44px!important}
+.coombe-photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;padding:17px}
+.coombe-photo-grid figure{margin:0;border:1px solid #e2c993;border-radius:12px;overflow:hidden;background:#fff}
+.coombe-photo-grid img{display:block;width:100%;height:clamp(170px,23vw,265px);object-fit:cover}
+.coombe-photo-grid figcaption{padding:9px 12px;font-weight:750;color:#15432d}
+.coombe-profile-foot{padding:0 18px 16px}.coombe-profile-foot p{color:#2b4736}.coombe-note{font-size:12px;color:#617260!important}
+.coombe-feature-card{border:2px solid #d5ae60!important}.coombe-card-photo{height:170px;overflow:hidden}.coombe-card-photo img{width:100%;height:100%;object-fit:cover}.coombe-feature-card .venue-eyebrow{color:#9b701f;font-weight:900}.coombe-feature-card .venue-premium-body{padding:15px}
+@media(max-width:600px){.coombe-photo-grid{grid-template-columns:1fr}.coombe-photo-grid img{height:205px}.coombe-profile-hero{min-height:250px}.coombe-profile-actions a{width:100%}.tl65-tile strong{font-size:14px!important}}

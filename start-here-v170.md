@@ -1,0 +1,15 @@
+# The Local v170 · Venue member sign-in
+
+The Local and Coombe Social Club use separate Supabase projects. Continue with Coombe verifies an existing Coombe account against Coombe’s Auth service. The Local then creates or reuses a linked member profile in its own project and starts a Local session. It does not copy a password, club staff permissions or a Coombe session into Local storage. The member does not fill out a second registration form.
+
+## Installation order
+
+1. For staging, deploy the three files from the Coombe bridge ZIP to the root of a Coombe staging build. These files use the existing club config and shared client. Add the precise Local staging origin to the `localOrigins` allowlist in `continue-to-the-local.js`. Set `coombeOrigin` in The Local’s `venue-member-sign-in.js` to the precise Coombe staging origin. This integration verifies users against the existing Coombe Auth project; use a designated test account. Do not use test logins to inspect club member data.
+2. In The Local’s matching staging Supabase project, run `INSTALL-V170-VENUE-MEMBER-SIGN-IN.sql`. Set the Edge Function secrets `VENUE_MEMBER_LOCAL_ORIGIN` to the exact Local staging origin without a trailing slash, and `COOMBE_AUTH_PUBLISHABLE_KEY` to the publishable key of the approved Coombe project. The Local project supplies its own server-only service role key to the function.
+3. Deploy `venue-member-sign-in` using `supabase functions deploy venue-member-sign-in --project-ref YOUR_LOCAL_PROJECT_REF --no-verify-jwt`. The login occurs before a Local session exists. The function instead checks the approved browser origin and verifies the incoming Coombe access token through Coombe’s Auth service before touching the Local database.
+4. Upload the Local build to Netlify staging and verify the complete flow. Test a confirmed Coombe account with no Local profile, returning use of that same account, and an email that already has an independent Local account. Check Samsung and iPhone popup behaviour. Check that club administrator rights are not carried across.
+5. For production, add the bridge files to the existing Coombe deploy, apply the SQL and deploy the function in The Local project, and upload the Local build. Restore the production origins in the two browser scripts and use the canonical Local origin for `VENUE_MEMBER_LOCAL_ORIGIN`.
+
+If the same email already belongs to an independent Local account, use its existing sign-in or Forgotten password. This release does not automatically merge independently created accounts. Venue apps already using The Local’s Supabase Auth can use the ordinary Local sign-in. External venue apps using other authentication systems need a separate verified connection before members can sign in through them.
+
+The two applications retain separate browser sessions. Coombe members access The Local through the verified bridge; they may occasionally need to sign in to Coombe again. Changes to venue membership do not automatically revoke a previously issued Local session. Simulated sign-in checks and local SQL tests ran successfully. Deployment and two-device verification are still required.

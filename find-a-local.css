@@ -1,0 +1,36 @@
+.tl173-directory, .tl173-owner, .tl173-venue-profile { margin: 0 auto 1rem; max-width: 1100px; }
+.tl173-filters { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,1fr); gap: .8rem; }
+.tl173-filters input, .tl173-filters select { min-height: 44px; }
+.tl173-meta { color: #e2cfaa !important; font-size: .92rem; }
+.tl173-venue-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,245px),1fr)); gap: 1rem; }
+.tl173-venue-card, .tl173-venue-profile, .tl173-owner {
+  border: 1px solid #8e754a; border-radius: 14px; background: #103128; color: #fff3d7;
+}
+.tl173-venue-card { overflow: hidden; display: flex; flex-direction: column; }
+.tl173-venue-card > img { width: 100%; height: auto; aspect-ratio: 2 / 1; object-fit: cover; }
+.tl173-venue-card > div, .tl173-venue-profile, .tl173-owner { padding: clamp(.85rem,2.5vw,1.5rem); }
+.tl173-venue-card > div { display: flex; flex: 1; flex-direction: column; align-items: start; }
+.tl173-venue-card h2 { margin: 0; line-height: 1.16; font-size: 1.4rem; }
+.tl173-venue-card .tl173-action { margin-top: auto; }
+.tl173-venue-profile h2 { font: 700 clamp(1.7rem,4vw,2.65rem)/1.16 Georgia,serif; margin: .2rem 0 .75rem; }
+.tl173-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem; }
+#view a.tl173-action, #view .tl173-actions a.tl172-share {
+  display: inline-flex; align-items: center; box-sizing: border-box; min-height: 44px;
+  border: 1px solid #c4a264; border-radius: 9px; padding: .55rem .85rem;
+  background: #f3ce83; color: #09261d !important; font-weight: 700; text-decoration: none;
+}
+#view .tl173-actions a.tl172-share { background: #123a30; color: #f8ebd0 !important; }
+.tl173-install-help { margin-top: 1rem; border: 1px solid #8e754a; border-radius: 10px; padding: .9rem 1rem; }
+.tl173-install-help[hidden] { display: none !important; }
+.tl173-gallery { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .9rem; margin-top: 1rem; }
+.tl173-gallery figure { margin: 0; }
+.tl173-gallery img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; }
+.tl173-gallery figcaption { margin-top: .4rem; }
+.tl173-empty { padding: .8rem 0; }
+.tl173-owner { margin-top: 1rem; }
+.tl173-owner > summary { cursor: pointer; font-weight: 700; min-height: 44px; padding-block: .65rem; box-sizing: border-box; }
+.tl173-owner[open] > summary { margin-bottom: .65rem; }
+.tl173-sr { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
+@media(max-width: 560px) {
+  .tl173-filters, .tl173-gallery { grid-template-columns: minmax(0,1fr); }
+}

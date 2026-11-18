@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {simulateShot,judgeEightBall,judgeSnooker} from './cue-physics-v94.js';
+const ball=(number,x,y)=>({number,x,y,live:true});
+const s=simulateShot([ball(0,200,240),ball(1,280,240)],{angle:0,power:9});
+assert.equal(s.firstHit,1,'head-on collision');assert.ok(s.frames.length>3,'frames recorded');
+assert.equal(s.stopped,true,'shot settles');
+assert.ok(s.balls.every(b=>Number.isFinite(b.x)&&Number.isFinite(b.y)),'finite physics');
+assert.deepEqual(simulateShot([ball(0,200,240),ball(1,280,240)],{angle:0,power:9}).potted,s.potted,'deterministic');
+assert.equal(judgeEightBall({firstHit:8,potted:[8],group:'solids',ownRemaining:2,railAfterHit:true}).shooterWins,false);
+assert.equal(judgeEightBall({firstHit:8,potted:[8],group:'solids',ownRemaining:0,railAfterHit:true}).shooterWins,true);
+assert.equal(judgeEightBall({firstHit:1,potted:[1],group:null,railAfterHit:true}).assign,'solids');
+assert.equal(judgeEightBall({firstHit:1,potted:[],group:'solids',ownRemaining:2,railAfterHit:false}).foul,true);
+assert.equal(judgeSnooker({phase:'red',firstHit:2,potted:[2]}).foul,true);
+assert.equal(judgeSnooker({phase:'red',firstHit:1,potted:[1]}).points,1);
+assert.equal(judgeSnooker({phase:'clear',nextColour:3,firstHit:2,potted:[]}).penalty,4);
+console.log('11 physics/rules assertions passed');

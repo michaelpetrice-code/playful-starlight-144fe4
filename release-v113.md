@@ -1,0 +1,1 @@
+The Local v113: Premium arcade lobby. New cinematic lobby, responsive game cards, searchable games, stronger controls and accessible focus. Original game implementations preserved. This release does not implement new physics or server-authoritative multiplayer. Deploy to staging and test all games before production.

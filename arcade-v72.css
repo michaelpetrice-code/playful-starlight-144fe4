@@ -1,0 +1,24 @@
+
+/* v72: premium arcade presentation, scoped to game surfaces */
+#gr63-new-game,.mg-room,.premium-stage{--arc-cyan:#38e9fa;--arc-gold:#ffce72}
+#gr63-new-game{position:relative;isolation:isolate;border-radius:24px;background:radial-gradient(ellipse at 12% 0%,#18465a 0%,transparent 48%),radial-gradient(ellipse at 90% 20%,#342050 0%,transparent 50%),#06131e;padding:clamp(12px,2.8vw,26px)!important;border:1px solid #45dafa65;box-shadow:0 18px 55px #0008,inset 0 0 45px #16b4da10}
+#gr63-new-game:empty{display:none}
+#gr63-new-game button,.mg-room button,.premium-stage button{touch-action:manipulation;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease}
+#gr63-new-game button:not(:disabled):active,.mg-room button:not(:disabled):active,.premium-stage button:not(:disabled):active{transform:scale(.96)}
+#gr63-new-game button:focus-visible,.mg-room button:focus-visible,.premium-stage button:focus-visible{outline:3px solid #39e7f7;outline-offset:3px}
+#gr63-new-game h2,#gr63-new-game h3{letter-spacing:.025em;text-shadow:0 2px 14px #20cfe844}
+#gr63-new-game .gr71-game{border-color:#39e7f799;box-shadow:0 20px 50px #0009,inset 0 0 28px #38e9fa13;background:radial-gradient(ellipse at 15% 0,#17435c,#081923 75%)}
+#gr63-new-game .gr71-top h3{color:#fff3cf;font-family:system-ui,sans-serif;font-weight:900}
+#gr63-new-game .kl-board,#gr63-new-game .ludo-board{box-shadow:inset 0 0 38px #0008,0 10px 30px #0007}
+#gr63-new-game .kl-card{box-shadow:0 5px 12px #0007,inset 0 1px #fff}
+#gr63-new-game .kl-card.chosen{outline-color:#38e9fa;box-shadow:0 0 18px #38e9fa9c}
+#gr63-new-game .ludo-piece{box-shadow:0 2px 6px #0009,0 0 9px #fff6;border:1px solid #fff9}
+#gr63-new-game .gr71-top button,#gr63-new-game .ludo-actions button:not(:disabled){background:linear-gradient(145deg,#fff0b5,#e4a43e);box-shadow:0 3px 0 #77521b,0 7px 15px #0006}
+.arc72-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;padding:10px 12px;margin:0 0 16px;border-radius:14px;background:linear-gradient(110deg,#082a39,#17243f);border:1px solid #3cdde46b;color:#eafcff}
+.arc72-title{font:900 12px system-ui,sans-serif;letter-spacing:.13em;color:#6af4ff;margin-right:auto}
+.arc72-toolbar button{border:1px solid #66ddeb80;border-radius:9px;background:#12374a;color:#efffff;padding:9px 12px;font-weight:750;min-height:40px}
+.arc72-toolbar button:hover{background:#19556b;box-shadow:0 0 12px #32e5e866}
+.arc72-toolbar .arc72-status{font:600 11px system-ui;color:#b4dce4}
+#gr63-new-game:fullscreen{overflow:auto;background:#06131e;padding:20px;max-width:none!important}
+@media(prefers-reduced-motion:reduce){#gr63-new-game *, .mg-room *{animation:none!important;transition:none!important}}
+@media(max-width:480px){.arc72-toolbar{gap:6px}.arc72-title{width:100%}.arc72-toolbar button{flex:1}.arc72-status{width:100%;text-align:center}}

@@ -1,0 +1,8 @@
+/* v130: uncropped artwork, no bottom controls, complete slide frame */
+.tl126-showcase{height:auto!important;max-height:none!important;overflow:visible!important;border-radius:18px!important}
+.tl126-slides{height:auto!important;max-height:none!important;overflow:visible!important}
+.tl126-slide,.tl126-slide.tl126-active{height:auto!important;max-height:none!important;min-height:0!important;aspect-ratio:auto!important;overflow:visible!important;padding:0!important;margin:0!important;display:none!important}
+.tl126-slide.tl126-active{display:block!important}
+.tl126-slide img.tl127-slide-image{display:block!important;position:static!important;inset:auto!important;width:100%!important;height:auto!important;max-width:100%!important;max-height:none!important;aspect-ratio:1200/520!important;object-fit:contain!important;transform:none!important;clip-path:none!important}
+.tl126-controls,.tl126-slide-copy{display:none!important}
+@media(max-width:650px){.tl126-showcase{width:calc(100% - 16px)!important}}

@@ -1,0 +1,76 @@
+.tl-plan-picker {
+  display: grid;
+  gap: 1rem;
+  max-width: 36rem;
+}
+
+.tl-plan-picker fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: .65rem;
+  min-width: 0;
+}
+
+.tl-plan-picker legend {
+  padding: 0;
+  margin-bottom: .65rem;
+  font-weight: 700;
+}
+
+.tl-plan-option {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: .9rem 1rem;
+  border: 1px solid var(--tl149-line);
+  border-radius: 12px;
+  background: var(--tl149-panel);
+  color: var(--tl149-ink);
+  cursor: pointer;
+}
+
+.tl-plan-option:has(input:checked) {
+  border-color: #b88735;
+  box-shadow: inset 0 0 0 1px #b88735;
+}
+
+.tl-plan-option input {
+  margin: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: #11634f;
+}
+
+.tl-plan-option span {
+  display: grid;
+  gap: .2rem;
+}
+
+.tl-plan-picker > p {
+  margin: 0;
+}
+
+.tl-signup-primary {
+  width: 100%;
+  min-height: 48px;
+}
+
+.tl-venue-plan-summary {
+  max-width: 36rem;
+}
+
+#tl-venue-auth-plan {
+  padding: .7rem .85rem;
+  border-radius: 9px;
+  background: #e6f3eb;
+  color: #174e3d;
+  font-weight: 700;
+}
+
+#tl-venue-auth-plan[hidden],
+#tl-venue-auth-email-actions[hidden],
+#tl-auth-form[hidden] {
+  display: none;
+}

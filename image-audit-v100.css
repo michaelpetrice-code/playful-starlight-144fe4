@@ -1,0 +1,16 @@
+/* v100: ensure every home tile has a unique background image */
+.tl65-tile:nth-child(5)::before{background-image:url('assets/pub-v97/marketplace.webp')!important}
+.tl65-tile:nth-child(6)::before{background-image:url('https://images.pexels.com/photos/1872888/pexels-photo-1872888.jpeg?auto=compress&cs=tinysrgb&w=900')!important}
+.tl65-tile:nth-child(7)::before{background-image:url('assets/coombe/venue-banner.jpg')!important}
+/* Preserve light, readable text across all dark home surfaces */
+#view .tl65-home .tl65-hero h2,#view .tl65-home .tl65-hero p{color:#fff5de!important}
+#view .tl65-home .tl65-tile strong{color:#fff5de!important}
+#view .tl65-home .tl65-tile strong em{color:#f3dca7!important}
+#view .tl65-home .venue-home-promo,#view .tl65-home .venue-home-promo h2,#view .tl65-home .venue-home-promo p{color:#fff5de!important}
+#view .tl65-home .coombe-profile-hero h2,#view .tl65-home .coombe-profile-hero p{color:#fff5de!important}
+/* Images always occupy their slot and show a branded illustration if network image fails */
+#view .gr63 .gr63-card .gr64-photo{width:100%!important;height:100%!important;object-fit:cover!important;display:block}
+#view .gr63 .gr63-card .gr64-photo[hidden]{display:none!important}
+#view .gr63 .gr63-card .gr64-fallback.gr100-show-fallback{display:flex!important;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,#0e5a42,#082b24)!important}
+#view .gr63 .gr63-card .gr64-fallback.gr100-show-fallback svg{width:85%!important;height:85%!important}
+#view .gr63 .gr63-card .gr63-scene{background:linear-gradient(135deg,#0e5a42,#082b24)!important}

@@ -1,0 +1,1 @@
+v75 hotfix: repaired malformed Games Room JavaScript branch that prevented app initialization. Cache version updated. Upload the ZIP directly to Netlify.

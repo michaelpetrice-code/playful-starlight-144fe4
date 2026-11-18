@@ -1,0 +1,1 @@
+The Local v109: Rebuilt member Home screen to closely match the supplied four-panel reference. Home hero and interactive phone-style tiles use existing app tabs. Upload to Netlify STAGING only. Existing backend and features are unchanged. Browser visual testing still required.

@@ -1,0 +1,10 @@
+THE LOCAL v55 — Beer Glass Identity + Unified Premium Screens
+
+Reference: user-selected second mockup image (visual inspiration, not an exact screenshot).
+- Original The Local beer glass SVG retained in global header and added to interior page headers and Home nav. No crowns introduced.
+- Unified emerald/gold inputs, textareas, selects, file uploads, focus, buttons and cards across existing feature modules.
+- Replaces many decorative emojis with one gold line icon style, while leaving member-generated messages untouched.
+- Preserves v54 owner dashboard, content studio, venue and community functions.
+- Service worker cache bumped for deployment.
+
+Upload contents of lads-local-pwa to Netlify. Verify sign-in, forms, owner permissions and Supabase features in the deployed environment. No external system has been modified.
