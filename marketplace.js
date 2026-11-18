@@ -30,7 +30,7 @@ const teaserItems=[
 export function marketTeaserHTML({guest=false}={}){
  return `<section class="market-teaser" aria-label="Example marketplace listings">
  <div class="market-teaser-header"><div><span class="market-demo-tag">EXAMPLE LISTINGS · NOT FOR SALE</span><h3>See what you could find on The Local</h3><p>Example items with illustrative images. They cannot be purchased or reserved.</p></div></div>
- <div class="market-teaser-grid">${teaserItems.map(x=>`<article class="market-teaser-card"><div class="market-teaser-art"><img src="assets/marketplace-samples/${x.photo}.webp" width="480" height="480" alt="" loading="lazy" decoding="async"></div><div class="market-teaser-info"><strong>${safe(x.title)}</strong><b>${safe(x.price)}</b><small>${safe(x.category)} · ${safe(x.condition)}</small><span class="market-sample-badge">Sample item</span></div></article>`).join('')}</div>
+ <div class="market-teaser-grid">${teaserItems.map(x=>`<article class="market-teaser-card"><div class="market-teaser-art"><img src="assets/marketplace-samples/${x.photo}.svg" width="480" height="480" alt="Illustration of ${safe(x.title)}" loading="lazy" decoding="async"></div><div class="market-teaser-info"><strong>${safe(x.title)}</strong><b>${safe(x.price)}</b><small>${safe(x.category)} · ${safe(x.condition)}</small><span class="market-sample-badge">Sample item</span></div></article>`).join('')}</div>
  <div class="market-teaser-cta"><p>Have something to sell, swap or give away? Post a real listing with your own photos.</p>${guest ? '<a class="tl173-action" href="index.html?page=marketplace">Log in to use the marketplace</a>' :
    `<button type="button" data-teaser="create">${marketIcon('plus')} Create your listing</button>`}</div>
  </section>`
