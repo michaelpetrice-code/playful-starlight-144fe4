@@ -47,6 +47,22 @@ function venueCard(venue, browse) {
     <a class="tl173-action" href="${esc(browse('venues',{venue:venue.id}))}">View profile<span class="tl173-sr"> for ${esc(venue.name)}</span></a></div>
   </article>`;
 }
+const savedVenueKey = 'the-local-saved-venues';
+function savedVenueIds() {
+  try {
+    const ids = JSON.parse(localStorage.getItem(savedVenueKey));
+    return Array.isArray(ids) ? ids : [];
+  } catch {
+    return [];
+  }
+}
+function savedVenueLinks(browse) {
+  const ids = savedVenueIds();
+  const saved = venues.filter(venue => visible(venue) && ids.includes(venue.id));
+  if (!saved.length) return '';
+  return `<section aria-label="Saved venues"><h2>Saved venues</h2><ul>${saved.map(venue =>
+    `<li><a href="${esc(browse('venues',{venue:venue.id}))}">${esc(venue.name)}</a></li>`).join('')}</ul></section>`;
+}
 function venueProfile(venue, browse, guest) {
   const featured = coombe(venue);
   const app = appLink(venue);
@@ -61,6 +77,7 @@ function venueProfile(venue, browse, guest) {
       <button type="button" class="tl172-share" id="tl173-install" aria-expanded="false" aria-controls="tl173-install-help">${app.standalone ? 'Install venue app' : 'Add venue to home screen'}</button>` : ''}
       ${website ? `<a class="tl172-share" href="${esc(website)}" target="_blank" rel="noopener noreferrer">Venue website</a>` : ''}
       <button type="button" class="tl172-share" id="tl173-share">Share profile</button>
+      ${guest ? `<button type="button" class="tl172-share" id="tl173-save" aria-pressed="${savedVenueIds().includes(venue.id)}">Save venue on this device</button>` : ''}
       ${guest ? `<a class="tl172-share" href="${esc(memberPageUrl('tables'))}">Sign in to join pub tables</a>` :
         '<button type="button" class="tl172-share" id="tl173-tables">Find pub tables</button>'}
     </div>
@@ -100,6 +117,7 @@ export function venueDirectoryView(api) {
   const types = [...new Set(venues.filter(visible).map(venue => venue.type))].sort();
   return `<section class="tl173-directory" aria-label="Registered venues">
     ${selected ? '<p class="tl173-empty" role="status">This venue profile is unavailable.</p>' : ''}
+    ${api.guest ? savedVenueLinks(browse) : ''}
     <div class="tl173-filters">
       <label for="tl173-venue-filter">Name or town<input id="tl173-venue-filter" type="search" placeholder="Search registered venues" value="${esc(filter)}"></label>
       <label for="tl173-type">Venue type<select id="tl173-type"><option value="">All venue types</option>${types.map(value => `<option ${type===value?'selected':''}>${esc(value)}</option>`).join('')}</select></label>
@@ -154,6 +172,20 @@ export function bindVenueDirectory(api) {
       title: venue.name+' · The Local', message: 'Take a look at '+venue.name+' on The Local.',
       url: memberPageUrl('venues',{venue:venue.id}), notify:api.notice, copied:'Venue profile link copied.'
     });
+    const save = profile.querySelector('#tl173-save');
+    if (save) save.onclick = () => {
+      const ids = new Set(savedVenueIds());
+      const wasSaved = ids.has(venue.id);
+      if (wasSaved) ids.delete(venue.id);
+      else ids.add(venue.id);
+      try {
+        localStorage.setItem(savedVenueKey, JSON.stringify([...ids]));
+        save.setAttribute('aria-pressed', String(!wasSaved));
+        api.notice(wasSaved ? 'Venue removed from your saved venues.' : 'Venue saved. Find it under Saved venues in Find a Local.');
+      } catch {
+        api.notice('This browser could not save the venue on this device.');
+      }
+    };
     const tables = profile.querySelector('#tl173-tables');
     if (tables) tables.onclick = () => api.openVenueTables(venue.directoryId || venue.id);
     const install = profile.querySelector('#tl173-install');
