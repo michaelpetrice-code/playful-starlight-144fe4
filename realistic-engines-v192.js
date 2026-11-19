@@ -50,14 +50,28 @@ function reset(){score=bot=start;throws=0;turn=0;done=false;visitStart=start;sta
 function hit(x,y){const dx=x-280,dy=y-280,r=Math.hypot(dx,dy);if(r>220)return{points:0,double:false,label:'Miss'};if(r<=18)return{points:50,double:true,label:'Bullseye'};if(r<=37)return{points:25,double:false,label:'Outer bull'};let angle=(Math.atan2(dy,dx)+Math.PI/2+Math.PI*2)%(Math.PI*2);let index=Math.floor((angle+Math.PI/20)%(Math.PI*2)/(Math.PI/10)),n=order[index],mult=r>=183&&r<=198?2:r>=105&&r<=120?3:1;return{points:n*mult,double:mult===2,label:`${mult===3?'Treble':mult===2?'Double':'Single'} ${n}`}}
 function apply(current,h){const rem=current-h.points;if(rem<0||rem===1||(rem===0&&!h.double))return{score:current,bust:true,win:false};return{score:rem,bust:false,win:rem===0}}
 function botVisit(){
- const starting=bot;let landed=0,bust=false,won=false;
- const options=[20,19,18,17,16,15,14,13,12,10,8,6,4,2,1];
+ const starting=bot;let bust=false,won=false;
+ const doubles=Array.from({length:20},(_,i)=>({points:(i+1)*2,double:true,label:'Double '+(i+1)}));
+ doubles.push({points:50,double:true,label:'Bullseye'});
+ const singles=Array.from({length:20},(_,i)=>({points:i+1,double:false,label:'Single '+(i+1)}));
+ const trebles=Array.from({length:20},(_,i)=>({points:(i+1)*3,double:false,label:'Treble '+(i+1)}));
+ const candidates=[...doubles,...singles,...trebles,{points:25,double:false,label:'Outer bull'}];
+ const isCheckout=n=>doubles.some(h=>h.points===n);
+ function choose(remaining,dartsLeft){
+   const direct=doubles.find(h=>h.points===remaining);if(direct)return direct;
+   if(dartsLeft>1){
+     const setup=candidates.filter(h=>h.points<remaining&&isCheckout(remaining-h.points));
+     if(setup.length)return setup.sort((x,y)=>y.points-x.points)[0];
+   }
+   const safe=candidates.filter(h=>remaining-h.points>=2&&remaining-h.points!==1);
+   if(!safe.length)return {points:0,double:false,label:'Miss'};
+   return safe.sort((x,y)=>Math.abs(remaining-h.points-40)-Math.abs(remaining-x.points-40))[0];
+ }
  for(let dart=0;dart<3;dart++){
-   let h;if(bot===50)h={points:50,double:true,label:'Bullseye'};
-   else if(bot<=40&&bot%2===0)h={points:bot,double:true,label:'Double '+(bot/2)};
-   else {const n=options[Math.floor(Math.random()*options.length)];h={points:n*(bot>100?3:1),double:false,label:'Computer dart'}}
-   const result=apply(bot,h);if(result.bust){bot=starting;bust=true;break}
-   bot=result.score;landed++;if(result.win){won=true;break}
+   const h=choose(bot,3-dart),result=apply(bot,h);
+   if(result.bust){bot=starting;bust=true;break}
+   bot=result.score;
+   if(result.win){won=true;break}
  }
  if(won){done=true;record('losses');say('Computer wins this leg with a double-out.')}
  else say('Computer visit: '+(bust?'bust, no score':(starting-bot)+' points')+'. Your turn.');
