@@ -4,28 +4,28 @@
 const E=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n};
 const btn=(label,fn)=>{const b=E('button','v192-btn',label);b.type='button';b.onclick=fn;return b};
 function cue({root,say,record,coach,registerCleanup},kind){
-let alive=true, raf=0, balls=[],turn=0,shots=0,scored=0,aim={x:0,y:0},drag=null;
+let alive=true, raf=0, balls=[],turn=0,shots=0,scored=0,aim={x:0,y:0},drag=null,settling=false,pendingRespots=[];
 const sn=kind==='snooker',W=840,H=450,R=sn?10:12;
 const panel=E('div','v192-panel');const info=E('div','v192-status');
 const canvas=E('canvas','v192-table');canvas.width=W;canvas.height=H;canvas.setAttribute('aria-label',sn?'Snooker table with draggable cue aiming':'Pool table with draggable cue aiming');
 const controls=E('div','v192-actions');const power=E('input');power.type='range';power.min=15;power.max=100;power.value=57;power.setAttribute('aria-label','Shot power');controls.append(E('span','', 'Power'),power,btn('Reset rack',setup));panel.append(info,canvas,controls);root.append(panel);
 const ctx=canvas.getContext('2d');const color=['#ffffff','#f6d647','#2862b6','#c32f42','#7a3bb2','#e58c2c','#237e55','#1b1b22','#f6d647','#2862b6','#c32f42','#7a3bb2','#e58c2c','#237e55','#1b1b22','#1b1b22'];
 function add(x,y,n){balls.push({x,y,vx:0,vy:0,n,alive:true,spot:{x,y}})}
-function setup(){cancelAnimationFrame(raf);balls=[];shots=0;scored=0;turn=0;add(215,225,0);if(sn){for(let row=0;row<5;row++)for(let j=0;j<=row;j++)add(540+row*19,225+(j-row/2)*21,1);[[300,225,2],[370,225,3],[440,225,4],[490,225,5],[730,225,6],[240,225,7]].forEach(([x,y,n])=>add(x,y,n))}
+function setup(){cancelAnimationFrame(raf);pendingRespots=[];settling=false;balls=[];shots=0;scored=0;turn=0;add(215,225,0);if(sn){for(let row=0;row<5;row++)for(let j=0;j<=row;j++)add(540+row*19,225+(j-row/2)*21,1);[[300,225,2],[370,225,3],[440,225,4],[490,225,5],[730,225,6],[240,225,7]].forEach(([x,y,n])=>add(x,y,n))}
 else {let k=1;for(let row=0;row<5;row++)for(let j=0;j<=row;j++)add(520+row*24,225+(j-row/2)*25,k++);}
 info.textContent=sn?'Snooker practice · Pot reds and colours · Drag back from the white ball to shoot':'Pool physics practice · Drag back from the cue ball to aim and release';say('Aim by dragging away from the target direction.');render()}
 function pocket(b){const pts=[[37,37],[W/2,27],[W-37,37],[37,H-37],[W/2,H-27],[W-37,H-37]];return pts.some(([x,y])=>Math.hypot(b.x-x,b.y-y)<23)}
 function frame(){if(!alive)return;let moving=false;for(let sub=0;sub<3;sub++){
 for(const b of balls){if(!b.alive)continue;b.x+=b.vx/3;b.y+=b.vy/3;b.vx*=.989;b.vy*=.989;if(Math.abs(b.vx)<.015)b.vx=0;if(Math.abs(b.vy)<.015)b.vy=0;
 if(b.vx||b.vy)moving=true;
-if(pocket(b)){b.alive=false;if(b.n===0){say('Cue ball potted — foul. Ball in hand.');setTimeout(()=>{if(alive){b.x=215;b.y=225;b.vx=b.vy=0;b.alive=true;render()}},700)}else{scored++;say('Ball potted: '+scored);if(sn&&b.n>1)setTimeout(()=>{if(alive){b.x=b.spot.x;b.y=b.spot.y;b.vx=b.vy=0;b.alive=true;render()}},900)}continue}
+if(pocket(b)){b.alive=false;b.vx=b.vy=0;pendingRespots.push(b);if(b.n===0)say('Cue ball potted — foul. Ball in hand after the shot.');else{scored++;say('Ball potted: '+scored)}continue}
 if(b.x<R+34){b.x=R+34;b.vx=Math.abs(b.vx)*.86}if(b.x>W-R-34){b.x=W-R-34;b.vx=-Math.abs(b.vx)*.86}
 if(b.y<R+33){b.y=R+33;b.vy=Math.abs(b.vy)*.86}if(b.y>H-R-33){b.y=H-R-33;b.vy=-Math.abs(b.vy)*.86}
 
 }
 for(let i=0;i<balls.length;i++)for(let j=i+1;j<balls.length;j++){const a=balls[i],b=balls[j];if(!a.alive||!b.alive)continue;let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.01;if(d>=2*R)continue;let nx=dx/d,ny=dy/d,over=2*R-d;a.x-=nx*over/2;b.x+=nx*over/2;a.y-=ny*over/2;b.y+=ny*over/2;let impulse=(a.vx-b.vx)*nx+(a.vy-b.vy)*ny;if(impulse>0){a.vx-=impulse*nx*.97;a.vy-=impulse*ny*.97;b.vx+=impulse*nx*.97;b.vy+=impulse*ny*.97}}
 }
-render();if(moving)raf=requestAnimationFrame(frame);else{info.textContent=`${sn?'Snooker':'Pool'} practice · ${shots} shots · ${scored} potted · Drag back from the white ball to shoot`}}
+render();if(moving)raf=requestAnimationFrame(frame);else{for(const b of pendingRespots){if(b.n!==0&&(!sn||b.n===1))continue;const target=b.n===0?{x:215,y:225}:b.spot;let x=target.x,y=target.y;for(let attempt=0;attempt<80&&balls.some(other=>other!==b&&other.alive&&Math.hypot(other.x-x,other.y-y)<2*R+1);attempt++){x=Math.max(50,Math.min(W-50,target.x+(attempt%9-4)*2*R));y=Math.max(50,Math.min(H-50,target.y+Math.floor(attempt/9)*2*R))}b.x=x;b.y=y;b.vx=b.vy=0;b.alive=true}pendingRespots=[];render();info.textContent=`${sn?'Snooker':'Pool'} practice · ${shots} shots · ${scored} potted · Drag back from the white ball to shoot`}}
 function render(){ctx.clearRect(0,0,W,H);const wood=ctx.createLinearGradient(0,0,W,H);wood.addColorStop(0,'#b18448');wood.addColorStop(.5,'#54321e');wood.addColorStop(1,'#c39b58');ctx.fillStyle=wood;ctx.fillRect(0,0,W,H);ctx.fillStyle='#093e34';ctx.fillRect(26,25,W-52,H-50);let felt=ctx.createRadialGradient(380,170,20,420,220,500);felt.addColorStop(0,'#237a61');felt.addColorStop(1,'#0b4d3e');ctx.fillStyle=felt;ctx.fillRect(35,34,W-70,H-68);ctx.strokeStyle='#a8cbb7';ctx.lineWidth=1;if(sn){ctx.beginPath();ctx.moveTo(240,35);ctx.lineTo(240,H-35);ctx.stroke();ctx.beginPath();ctx.arc(240,225,75,-Math.PI/2,Math.PI/2);ctx.stroke()}
 for(const [x,y] of [[37,37],[W/2,27],[W-37,37],[37,H-37],[W/2,H-27],[W-37,H-37]]){ctx.fillStyle='#061b1b';ctx.beginPath();ctx.arc(x,y,22,0,7);ctx.fill()}
 for(const b of balls){if(!b.alive)continue;ctx.beginPath();ctx.ellipse(b.x+3,b.y+4,R+1,R*.8,0,0,7);ctx.fillStyle='#061d19a8';ctx.fill();const grad=ctx.createRadialGradient(b.x-4,b.y-5,1,b.x,b.y,R);grad.addColorStop(0,'#ffffff');grad.addColorStop(.28,color[b.n%color.length]);grad.addColorStop(1,'#101f1c');ctx.beginPath();ctx.arc(b.x,b.y,R,0,7);ctx.fillStyle=grad;ctx.fill();if(!sn&&b.n){ctx.beginPath();ctx.arc(b.x,b.y,5,0,7);ctx.fillStyle='#f8f2dd';ctx.fill();ctx.fillStyle='#101d1a';ctx.font='bold 7px Arial';ctx.textAlign='center';ctx.fillText(b.n,b.x,b.y+2)}}
@@ -35,7 +35,7 @@ canvas.addEventListener('pointerdown',e=>{if(balls.some(b=>b.alive&&(Math.abs(b.
 canvas.addEventListener('pointermove',e=>{if(drag){drag=pos(e);render()}});
 canvas.addEventListener('pointerup',e=>{if(!drag)return;const q=balls[0];if(q.alive){let dx=q.x-drag.x,dy=q.y-drag.y,d=Math.hypot(dx,dy);if(d>10){let v=Math.min(16,Math.max(2,d/18))*Number(power.value)/65;q.vx=dx/d*v;q.vy=dy/d*v;shots++;frame()}}drag=null;render()});
 coach(()=>sn?'Use the white ball to pot a red, then a colour. This is physics practice, not full official snooker scoring.':'Drag away from your intended shot direction. Lower power gives better control of the cue ball.');
-registerCleanup(()=>{alive=false;cancelAnimationFrame(raf)});setup()
+registerCleanup(()=>{alive=false;pendingRespots=[];cancelAnimationFrame(raf)});setup()
 }
 function darts({root,say,record,coach,registerCleanup},start=501){
 let alive=true,score=start,bot=start,throws=0,turn=0,done=false,visitStart=start;
