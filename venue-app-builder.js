@@ -1,3 +1,4 @@
+import { venueSectors, sectorForType, featureLabel, sectorBrief } from './venue-sectors.js';
 import { blankApp, el, features, httpsUrl, renderVenue, slugify, themes } from './venue-app-content.js';
 
 export async function mountVenueBuilder(root, sb, user) {
@@ -304,6 +305,7 @@ export async function mountVenueBuilder(root, sb, user) {
     input.value = draft[key];
     input.addEventListener('input', () => {
       draft[key] = input.value;
+      if (key === 'type') drawModules();
       if (key === 'logo') input.setCustomValidity(input.value && !httpsUrl(input.value) ? 'Use a valid HTTPS link.' : '');
       if (key === 'name' && !slugEdited) slugInput.value = slugify(input.value);
       refreshPreview();
@@ -405,7 +407,8 @@ export async function mountVenueBuilder(root, sb, user) {
   }
   function drawModules() {
     modules.replaceChildren(el('legend', {}, 'Features and content'), template, eventCardAssistant());
-    for (const [key, feature] of Object.entries(features)) {
+    for (const [key, baseFeature] of Object.entries(features)) {
+      const feature = { ...baseFeature, label: featureLabel(draft.type, key, baseFeature.label) };
       const check = el('input', { type: 'checkbox' });
       check.checked = Object.hasOwn(draft.features, key);
       const panel = el('div', { className: 'vb-module' }, el('label', { className: 'vb-toggle' }, check, feature.label));
@@ -506,17 +509,8 @@ export async function mountVenueBuilder(root, sb, user) {
     { name:'Working Men’s Club', type:'Working men’s club', theme:'burgundy', keys:['events','room','draw','rewards','contact'] }
   ];
   // v200: industry-aware setup. All suggestions are reviewable and never publish automatically.
-  const industryProfiles = [
-    {id:'pub',name:'Pubs & Bars',type:'Pub',theme:'emerald',keys:['events','games','rewards','gallery','contact'],media:'Food & Drink',tables:'Virtual Pub Tables',intro:'Pull up a chair and meet your local community.'},
-    {id:'sports',name:'Sports Clubs',type:'Sports club',theme:'navy',keys:['events','gallery','games','contact'],media:'Sports',tables:'Team Clubhouse',intro:'Join your team, supporters and club conversations.'},
-    {id:'community',name:'Community Centres',type:'Community centre',theme:'emerald',keys:['events','room','gallery','contact'],media:'Community',tables:'Community Circles',intro:'Connect with neighbours, volunteers and local groups.'},
-    {id:'veterans',name:'Veterans & Associations',type:'Veterans association',theme:'burgundy',keys:['events','gallery','contact'],media:'Community',tables:'Comrades’ Mess',intro:'Reconnect with comrades and association members.'},
-    {id:'charity',name:'Charities & Nonprofits',type:'Charity',theme:'emerald',keys:['events','gallery','contact'],media:'Community',tables:'Supporter Circles',intro:'Bring supporters and volunteers together.'},
-    {id:'music',name:'Music & Entertainment',type:'Live music venue',theme:'charcoal',keys:['events','tickets','gallery','contact'],media:'Entertainment',tables:'Backstage Lounge',intro:'Talk about shows and connect with fans.'},
-    {id:'hospitality',name:'Cafés & Restaurants',type:'Cafe or restaurant',theme:'emerald',keys:['events','rewards','gallery','contact'],media:'Food & Drink',tables:'Coffee & Conversation',intro:'Meet other regulars and share recommendations.'},
-    {id:'retail',name:'Shops & Local Businesses',type:'Independent business',theme:'navy',keys:['events','gallery','contact'],media:'Community',tables:'Local Connections',intro:'Bring customers and the local community together.'}
-  ];
-  let selectedIndustry = industryProfiles.find(p => p.type.toLowerCase() === String(draft.type||'').toLowerCase()) || industryProfiles[0];
+  const industryProfiles = venueSectors;
+  let selectedIndustry = sectorForType(draft.type) || industryProfiles[0];
   const starterStatus = el('p',{role:'status'},'Choose a starting point. Your changes stay private until you publish.');
   const starterCards = el('div',{className:'vb199-starters'});
   for (const preset of starterSets) {
@@ -538,13 +532,14 @@ export async function mountVenueBuilder(root, sb, user) {
   const applyIndustry = el('button',{type:'button',className:'vb-primary'},'✨ Create my industry starter');
   const industryPreview = () => {
     const profile = industryProfiles.find(p=>p.id===industrySelect.value) || industryProfiles[0];
-    industryInfo.textContent = `${profile.name}: recommended features — ${profile.keys.map(k=>features[k].label).join(', ')}. Suggested community area: ${profile.tables}.`;
+    industryInfo.textContent = `${profile.name}: recommended features — ${profile.keys.map(k=>featureLabel(profile.type,k,features[k].label)).join(', ')}. Suggested community area: ${profile.tables}.`;
   };
   industrySelect.addEventListener('change',industryPreview);
   applyIndustry.addEventListener('click',()=>{
     const profile = industryProfiles.find(p=>p.id===industrySelect.value) || industryProfiles[0];
     if ((Object.keys(draft.features).length || draft.welcome) && !window.confirm('Add these industry features to your draft? Existing content will be kept.')) return;
     selectedIndustry = profile;
+    brief.value = sectorBrief(profile, draft.name, draft.town, setupGoal.value);
     draft.type = inputs.type.value = profile.type;
     draft.theme = theme.value = profile.theme;
     for(const key of profile.keys) draft.features[key] ||= [];
@@ -556,10 +551,12 @@ export async function mountVenueBuilder(root, sb, user) {
     el('p',{},'Your community area can be called Virtual Pub Tables, Team Clubhouse, Community Circles, Comrades’ Mess, Supporter Circles or Backstage Lounge. These are suggested names for The Local’s existing virtual tables feature.'),
     el('p',{},'Member permissions, moderation and organisation-specific table separation must be configured and tested before offering isolated tables in subscriber apps.'),
     el('a',{href:'secure-tables.html',target:'_blank',rel:'noopener'},'Preview existing virtual tables'));
+  const setupGoal = el('input', { maxlength: '200', placeholder: 'For example: more room hire enquiries', 'aria-label': 'Your main goal (optional)' });
   const industrySection = el('section',{className:'vb200-industry-section'},
-    el('h2',{},'AI-guided industry setup'),
+    el('h2',{},'Set up your kind of venue'),
     el('p',{},'Choose your industry. Apply a recommended starter in one click, then use the AI assistant to refine the wording. No app goes live without your approval.'),
-    industrySelect,applyIndustry,industryInfo,tablesHelp);
+    el('label', {}, 'What type of venue or organisation do you run?', industrySelect),
+    el('label', {}, 'What would you like help with first?', setupGoal), applyIndustry,industryInfo,tablesHelp);
   industryPreview();
   const starterSection = el('section',{className:'vb199-starter-section'},el('h2',{},'Start with a professional design'),
     el('p',{},'Choose a venue style and we will set up suggested sections, colours and welcome wording. You can change everything.'),starterCards,starterStatus);
@@ -579,7 +576,7 @@ export async function mountVenueBuilder(root, sb, user) {
       }
       suggestion = result.data;
       response.replaceChildren(el('p', {}, suggestion.note),
-        el('p', {}, `${suggestion.theme} · ${suggestion.features.map(key => features[key].label).join(', ')}`),
+        el('p', {}, `${suggestion.theme} · ${suggestion.features.filter(key => features[key]).map(key => featureLabel(draft.type, key, features[key].label)).join(', ')}`),
         el('blockquote', {}, suggestion.welcome));
       apply.hidden = false;
     } catch (err) { response.textContent = err.message; }
@@ -588,7 +585,7 @@ export async function mountVenueBuilder(root, sb, user) {
   apply.addEventListener('click', () => {
     draft.welcome = inputs.welcome.value = suggestion.welcome;
     draft.theme = theme.value = themes.includes(suggestion.theme) ? suggestion.theme : 'emerald';
-    for (const key of suggestion.features) draft.features[key] ||= [];
+    for (const key of suggestion.features.filter(key => features[key])) draft.features[key] ||= [];
     drawModules(); refreshPreview();
     apply.hidden = true;
     response.textContent = 'Suggestion applied. Review your draft before publishing.';
@@ -744,7 +741,7 @@ export async function mountVenueBuilder(root, sb, user) {
   // Beginner-friendly guided setup: uses the existing editor and AI endpoint.
   // It never publishes or sends content to the AI without an explicit click.
   const guideSteps = [
-    { title: 'Tell us about your venue', description: 'Start with the name of your pub, club or venue, what kind of place it is, and the town it is in.', tip: 'Example: The Oak Social Club · Social club · Coventry', target: () => inputs.name, action: 'Enter your venue name, type and town. You can change these later.' },
+    { title: 'Tell us about your venue', description: 'Choose your venue or organisation type, then add its name and town.', tip: 'Example: The Oak Social Club · Social club · Coventry', target: () => inputs.name, action: 'Enter your venue name, type and town. You can change these later.' },
     { title: 'Make it look like your venue', description: 'Upload your logo if you have one. Choose a colour theme and write a friendly welcome message.', tip: 'No logo? That is fine. You can add one later. A simple welcome is enough to start.', target: () => inputs.welcome, action: 'Choose a theme, add your logo and write a welcome message.' },
     { title: 'Choose what visitors can see', description: 'Tick the sections you need, such as events, room hire, tickets or contact details. You do not need every section.', tip: 'For a social club, start with Events, Room Hire and Contact. You can add more later.', target: () => modules.querySelector('input[type="checkbox"]'), action: 'Tick the features you want in your app.' },
     { title: 'Add pictures and information', description: 'Choose Add card in a section. Give each card a title and description. Add a photo, date, time, location or price when useful.', tip: 'Example: Friday Quiz Night · 7:30 pm · Main Lounge · £2 entry. Leave anything that does not apply blank.', target: () => modules.querySelector('.vb-cards input'), action: 'Add at least one card to a chosen section.' },

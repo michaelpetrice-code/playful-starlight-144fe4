@@ -1,3 +1,4 @@
+import { featureLabel, sectorForType } from './venue-sectors.js';
 export const features = {
   events: { label: 'What’s On', image: 'assets/feature-slides/whos-up-for-it.webp', action: 'Event details' },
   tickets: { label: 'Events & Tickets', image: 'assets/feature-slides/whos-up-for-it.webp', action: 'Open ticket provider' },
@@ -82,7 +83,7 @@ export function renderVenue(app, { preview = false, enquire } = {}) {
     const cards = app.features[key];
     if (!preview && !cards.length && !['room', 'contact', 'games', 'bingo'].includes(key)) continue;
     const section = el('section', { className: 'vb-feature' },
-      el('img', { src: info.image, alt: '', loading: 'lazy' }), el('h3', {}, info.label));
+      el('img', { src: (key !== 'games' && sectorForType(app.type)?.image) || info.image, alt: '', loading: 'lazy' }), el('h3', {}, featureLabel(app.type, key, info.label)));
     for (const card of cards) {
       const url = httpsUrl(card.url);
       const article = el('article', {}, el('h4', {}, card.title), card.detail && el('p', {}, card.detail));
