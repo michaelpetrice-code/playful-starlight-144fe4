@@ -44,83 +44,25 @@ function blocks(){coachHint=()=> 'Keep your highest-value tile in one corner. Av
 function reversi(){coachHint=()=> 'Corners are powerful because they cannot be flipped. Avoid giving the computer easy access to a corner.';let a=Array(64).fill(0),turn=1,done=false,recorded=false;a[27]=a[36]=2;a[28]=a[35]=1;let board=el('div','reversi-grid');root.append(board);let cells=a.map((_,i)=>{let b=el('button','reversi-cell');b.onclick=()=>play(i);board.append(b);return b});const dirs=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];function flips(i,p){if(a[i])return [];let r=i>>3,c=i%8,out=[];for(let [dr,dc] of dirs){let rr=r+dr,cc=c+dc,cap=[];while(rr>=0&&rr<8&&cc>=0&&cc<8&&a[rr*8+cc]===3-p){cap.push(rr*8+cc);rr+=dr;cc+=dc}if(cap.length&&rr>=0&&rr<8&&cc>=0&&cc<8&&a[rr*8+cc]===p)out.push(...cap)}return out}function moves(p){return a.map((_,i)=>flips(i,p).length?i:-1).filter(i=>i>=0)}function render(){if(done&&!recorded){recorded=true;let human=a.filter(v=>v===1).length,computer=a.filter(v=>v===2).length;record(human===computer?'draws':human>computer?'wins':'losses')}let legal=moves(1);a.forEach((v,i)=>{cells[i].textContent=v===1?'●':v===2?'●':'';cells[i].className='reversi-cell '+(v===1?'rv-player':v===2?'rv-bot':legal.includes(i)&&!done?'rv-hint':'')});let x=a.filter(v=>v===1).length,y=a.filter(v=>v===2).length;say(done?`Final score: You ${x} · Computer ${y}. ${x===y?'Draw':x>y?'You win! 🏆':'Computer wins.'}`:`You ${x} · Computer ${y} — ${turn===1?'Your turn':'Computer thinking'}`)}function apply(i,p){let f=flips(i,p);if(!f.length)return false;a[i]=p;f.forEach(j=>a[j]=p);return true}function advance(){let human=moves(1),bot=moves(2);if(!human.length&&!bot.length){done=true;render();return}if(!bot.length){turn=1;render();return}turn=2;let ranked=bot.map(i=>({i,score:flips(i,2).length+([0,7,56,63].includes(i)?30:0)-([1,6,8,9,14,15,48,49,54,55,57,62].includes(i)?9:0)})).sort((x,y)=>y.score-x.score);let choice=difficulty==='easy'?bot[Math.floor(Math.random()*bot.length)]:difficulty==='normal'?ranked[Math.floor(Math.random()*Math.min(3,ranked.length))].i:ranked[0].i;apply(choice,2);human=moves(1);bot=moves(2);if(!human.length&&!bot.length)done=true;else if(!human.length&&bot.length){advance();return}turn=1;render()}function play(i){if(done||turn!==1||!apply(i,1))return;advance()}render();say('You play green. Capture computer pieces by enclosing them in a straight line.')}
 function solitaire(){coachHint=()=> 'Reveal face-down tableau cards whenever possible. Avoid moving cards to foundations if you still need them to build sequences.';const suits=['♠','♥','♦','♣'],ranks=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];let deck=[];for(let suit=0;suit<4;suit++)for(let n=1;n<=13;n++)deck.push({s:suit,n,up:false});for(let i=deck.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}let cols=Array.from({length:7},()=>[]),stock=[],waste=[],found=[[],[],[],[]],pick=null,moves=0;for(let c=0;c<7;c++)for(let j=0;j<=c;j++){let card=deck.pop();card.up=j===c;cols[c].push(card)}stock=deck;let shell=el('div','solitaire-game'),top=el('div','sol-top'),bottom=el('div','sol-cols'),counter=el('div','sol-counter');shell.append(counter,top,bottom);root.append(shell);const red=c=>c.s===1||c.s===2;const label=c=>ranks[c.n]+suits[c.s];function reveal(col){if(col.length)col.at(-1).up=true}function validRun(cards){return cards.every((c,i)=>c.up&&(!i||(cards[i-1].n===c.n+1&&red(cards[i-1])!==red(c))))}function moveTo(type,idx){if(!pick)return;let src=pick.type==='w'?waste:cols[pick.idx],cards=pick.type==='w'?[src.at(-1)]:src.slice(pick.pos);if(!cards.length||!validRun(cards))return;let target=type==='f'?found[idx]:cols[idx];if(type==='f'){if(cards.length!==1||cards[0].s!==idx||cards[0].n!==(target.length?target.at(-1).n+1:1))return}else if(target.length?target.at(-1).n!==cards[0].n+1||red(target.at(-1))===red(cards[0]):cards[0].n!==13)return;if(pick.type==='w')src.pop();else src.splice(pick.pos);target.push(...cards);reveal(src);pick=null;moves++;draw();if(found.every(f=>f.length===13))say(`Solitaire won in ${moves} moves! 🏆`);else say(`Good move! ${moves} moves`)}function face(card,fn,chosen){let b=el('button','sol-card sol-face'+(red(card)?' sol-red':'')+(chosen?' sol-picked':''));b.setAttribute('aria-label',label(card));let tl=el('span','sol-corner',ranks[card.n]);tl.append(el('small','',suits[card.s]));let mid=el('span','sol-pip',suits[card.s]);let br=el('span','sol-corner sol-invert',ranks[card.n]);br.append(el('small','',suits[card.s]));b.append(tl,mid,br);b.onclick=fn;return b}function draw(){top.replaceChildren();bottom.replaceChildren();counter.textContent=`KLONDIKE SOLITAIRE · ${moves} MOVES`;let st=el('button','sol-card sol-stock',stock.length?'✦':'↻');st.setAttribute('aria-label',stock.length?'Draw a card':'Recycle waste pile');st.onclick=()=>{pick=null;if(stock.length){let c=stock.pop();c.up=true;waste.push(c)}else if(waste.length){stock=waste.reverse();stock.forEach(c=>c.up=false);waste=[]}moves++;draw()};top.append(st);let w=el('div','sol-slot');if(waste.length)w.append(face(waste.at(-1),()=>{pick={type:'w'};draw()},pick?.type==='w'));top.append(w);for(let i=0;i<4;i++){let slot=el('button','sol-found'+(found[i].length?' sol-filled':''));if(found[i].length){let c=found[i].at(-1);slot.append(el('span','sol-found-label',label(c)));if(red(c))slot.classList.add('sol-red')}else slot.textContent=suits[i];slot.setAttribute('aria-label',`Foundation ${suits[i]}`);slot.onclick=()=>moveTo('f',i);top.append(slot)}cols.forEach((col,i)=>{let column=el('div','sol-column');column.onclick=e=>{if(e.target===column)moveTo('c',i)};col.forEach((c,j)=>{let b;if(!c.up){b=el('div','sol-card sol-back','✦');b.setAttribute('aria-label','Face-down card')}else b=face(c,()=>{if(pick){moveTo('c',i)}else{const run=col.slice(j);if(validRun(run)){pick={type:'c',idx:i,pos:j};draw()}}},pick?.type==='c'&&pick.idx===i&&j>=pick.pos);b.style.top=(j*29)+'px';column.append(b)});if(!col.length){let empty=el('button','sol-empty','K');empty.onclick=()=>moveTo('c',i);column.append(empty)}bottom.append(column)})}draw();say('Select a card, then its destination. Stack alternating colours in descending order; move kings into empty columns. Draw from the stock at top left.')}
 function snake() {
-  const side = 16;
-  const board = el('div', 'snakeboard');
-  const cells = Array.from({length: side * side}, () => el('i'));
-  board.append(...cells);
-  board.setAttribute('aria-hidden', 'true');
-  const controls = el('div', 'row');
-  const start = el('button', '', 'Start Snake');
-  controls.append(start);
-  root.append(board, controls);
-
-  const directions = {ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0]};
-  let body = [8 * side + 7, 8 * side + 6, 8 * side + 5];
-  let direction = directions.ArrowRight;
-  let nextDirection = direction;
-  let food;
-  let timer;
-
-  function placeFood() {
-    const free = cells.map((_, i) => i).filter(i => !body.includes(i));
-    food = free[Math.floor(Math.random() * free.length)];
+  const side=16,board=el('div','snakeboard'),cells=Array.from({length:side*side},()=>el('i'));
+  board.append(...cells);board.setAttribute('role','img');board.setAttribute('aria-label','Snake playing field');
+  const controls=el('div','row'),start=el('button','','Start Snake'),speed=el('span','','');controls.append(start,speed);root.append(board,controls);
+  const directions={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
+  let body=[],direction=directions.ArrowRight,nextDirection=direction,food=null,timer=null,ended=false,score=0;
+  function placeFood(){const occupied=new Set(body),free=cells.map((_,i)=>i).filter(i=>!occupied.has(i));food=free.length?free[Math.floor(Math.random()*free.length)]:null}
+  function draw(){const occupied=new Set(body);cells.forEach((cell,i)=>cell.className=occupied.has(i)?'snake':i===food?'food':'');board.setAttribute('aria-label','Snake playing field. Score '+score)}
+  function stop(){if(timer!==null){clearInterval(timer);timer=null}}
+  function reset(){stop();body=[8*side+7,8*side+6,8*side+5];direction=directions.ArrowRight;nextDirection=direction;ended=false;score=0;placeFood();draw();start.textContent='Start Snake';say('Collect food using arrow keys or direction buttons.')}
+  function finish(won){stop();ended=true;start.textContent='Play again';record(won?'wins':'losses');say((won?'Board cleared! 🏆':'Game over.')+' Score: '+score)}
+  function step(){direction=nextDirection;const [dx,dy]=direction,x=body[0]%side+dx,y=Math.floor(body[0]/side)+dy,head=y*side+x,eating=head===food,occupied=eating?body:body.slice(0,-1);
+    if(x<0||x>=side||y<0||y>=side||occupied.includes(head)){finish(false);return}
+    body.unshift(head);if(eating){score++;placeFood()}else body.pop();draw();if(food===null){finish(true);return}say('Score: '+score)
   }
-  function draw() {
-    cells.forEach((cell, i) => {
-      cell.className = body.includes(i) ? 'snake' : i === food ? 'food' : '';
-    });
-  }
-  function stop() {
-    clearInterval(timer);
-    timer = undefined;
-  }
-  function step() {
-    direction = nextDirection;
-    const [dx, dy] = direction;
-    const x = body[0] % side + dx;
-    const y = Math.floor(body[0] / side) + dy;
-    const head = y * side + x;
-    const eating = head === food;
-    const occupied = eating ? body : body.slice(0, -1);
-    if (x < 0 || x >= side || y < 0 || y >= side || occupied.includes(head)) {
-      stop();
-      say('Game over. Score: ' + (body.length - 3) + '. Choose New game to try again.');
-      return;
-    }
-    body.unshift(head);
-    if (eating) placeFood();
-    else body.pop();
-    draw();
-    if (food === undefined) stop();
-    say((food === undefined ? 'Board complete. ' : '') + 'Score: ' + (body.length - 3));
-  }
-  function turn(key) {
-    const next = directions[key];
-    if (timer !== undefined && next[0] * direction[0] + next[1] * direction[1] === 0) nextDirection = next;
-  }
-  function keydown(event) {
-    if (timer === undefined || !Object.hasOwn(directions, event.key)) return;
-    event.preventDefault();
-    turn(event.key);
-  }
-  for (const [key, label] of Object.entries({ArrowUp: 'Up', ArrowDown: 'Down', ArrowLeft: 'Left', ArrowRight: 'Right'})) {
-    const button = el('button', '', label);
-    button.onclick = () => turn(key);
-    controls.append(button);
-  }
-  start.onclick = () => {
-    start.disabled = true;
-    say('Score: 0');
-    timer = setInterval(step, 180);
-  };
-  placeFood();
-  draw();
-  say('Start Snake, then use the arrow keys or direction buttons to collect food.');
-  coachHint = () => 'Give yourself space to turn as the snake grows.';
-  document.addEventListener('keydown', keydown);
-  cleanup = () => {
-    stop();
-    document.removeEventListener('keydown', keydown);
-  };
+  function turn(key){const next=directions[key];if(!next||timer===null)return;if(next[0]===-direction[0]&&next[1]===-direction[1])return;nextDirection=next}
+  function keydown(e){if(timer===null||!Object.hasOwn(directions,e.key))return;e.preventDefault();turn(e.key)}
+  for(const [key,label] of Object.entries({ArrowUp:'↑',ArrowLeft:'←',ArrowDown:'↓',ArrowRight:'→'})){const button=el('button','',label);button.setAttribute('aria-label',key.slice(5));button.onclick=()=>turn(key);controls.append(button)}
+  start.onclick=()=>{if(ended)reset();if(timer!==null)return;const interval=difficulty==='easy'?230:difficulty==='hard'?115:175;speed.textContent='Speed: '+(difficulty==='hard'?'Fast':difficulty==='easy'?'Relaxed':'Normal');start.textContent='Restart';stop();timer=setInterval(step,interval);say('Score: '+score)};
+  coachHint=()=> 'Avoid the edges, leave room to turn, and never reverse directly into your body.';
+  document.addEventListener('keydown',keydown);cleanup=()=>{stop();document.removeEventListener('keydown',keydown)};reset();
 }
 document.querySelector('#coach-tip')?.addEventListener('click',()=>{document.querySelector('#coach-answer').textContent=coachHint()});document.querySelector('#difficulty')?.addEventListener('change',e=>{difficulty=e.target.value;document.querySelector('#coach-answer').textContent='Difficulty changed. Start a new round to practise at this level.'});begin('connect')})();
