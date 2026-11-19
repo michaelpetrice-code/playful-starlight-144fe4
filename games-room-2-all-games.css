@@ -1,0 +1,32 @@
+/* Games Room 2.0 — shared responsive game surfaces */
+#tl191-play .play{background:linear-gradient(145deg,#10392f,#071e1c);box-shadow:0 20px 50px #0005}
+#tl191-play button:focus-visible,#tl191-library button:focus-visible{outline:3px solid #f8d27a;outline-offset:3px}
+#game-root .board,#game-root .reversi-grid,#game-root .blocks-grid,#game-root .snakeboard,#game-root .memory,#game-root .sea,#game-root .wordgrid{max-width:100%;box-shadow:0 14px 35px #0008}
+#game-root .board{background:linear-gradient(135deg,#1b5547,#0c332c);border-color:#9d7741;box-shadow:inset 0 0 0 2px #d7b77a,0 14px 35px #0008}
+#game-root .c4{gap:clamp(2px,.6vw,8px);grid-template-columns:repeat(7,minmax(0,1fr));width:min(100%,560px)}
+#game-root .c4 .cell{width:100%;min-width:0;aspect-ratio:1}
+#game-root .ttt{width:min(100%,380px);grid-template-columns:repeat(3,minmax(0,1fr))}
+#game-root .ttt .cell{font-family:Georgia,serif;aspect-ratio:1;font-size:clamp(35px,9vw,76px)}
+#game-root .reversi-grid{width:min(100%,480px);grid-template-columns:repeat(8,minmax(0,1fr));border:8px solid #8a6135;box-shadow:inset 0 0 0 2px #d2ac70,0 16px 35px #0008}
+#game-root .reversi-cell{min-width:0;font-size:clamp(14px,4vw,34px);background:radial-gradient(circle at 35% 20%,#2c986f,#176348);box-shadow:inset 0 0 0 1px #063d2e}
+#game-root .reversi-cell.rv-player{color:#f5f1df;text-shadow:1px 3px 4px #0009}
+#game-root .reversi-cell.rv-bot{color:#172725;text-shadow:1px 2px 2px #0009}
+#game-root .blocks-grid{grid-template-columns:repeat(4,minmax(0,1fr));width:min(100%,390px);background:#4b3a2c;border:8px solid #947045;box-shadow:inset 0 0 0 2px #c5a16b,0 14px 30px #0007}
+#game-root .block-cell{height:auto;aspect-ratio:1;font-size:clamp(18px,5vw,32px)}
+#game-root .memory{width:min(100%,450px);grid-template-columns:repeat(4,minmax(0,1fr))}
+#game-root .memory button{min-width:0;aspect-ratio:5/7;background:repeating-linear-gradient(45deg,#16445b 0 6px,#266a83 6px 12px);border:3px double #ead6a5;border-radius:9px;box-shadow:0 4px 8px #0007;font-size:clamp(22px,5vw,44px)}
+#game-root .memory button.open{background:#fff9e9;color:#19342d}
+#game-root .memory button.matched{background:#d6e7c7;border-color:#7bb77d}
+#game-root .snakeboard{width:min(100%,500px);background:#091e1a;border:9px solid #78502c;box-shadow:inset 0 0 0 2px #d2a765,0 14px 35px #0008}
+#game-root .snakeboard .snake{background:linear-gradient(135deg,#e2cc81,#b99a4c);box-shadow:inset 0 0 0 1px #f4dfa2}
+#game-root .snakeboard .food{background:radial-gradient(circle at 30% 25%,#ffcfb7,#d84337 70%);box-shadow:0 0 8px #e34d41}
+#game-root .wordgrid{width:min(100%,440px);grid-template-columns:repeat(8,minmax(0,1fr))}
+#game-root .wordgrid button{min-width:0;font-size:clamp(12px,3.5vw,22px);background:linear-gradient(135deg,#245d4d,#133d32)}
+#game-root .sea{width:min(100%,440px);grid-template-columns:repeat(6,minmax(0,1fr))}
+#game-root .sea button{min-width:0;background:radial-gradient(circle at 30% 20%,#397f9d,#1a4b66);font-size:clamp(14px,4vw,24px)}
+#game-root .v192-battle-grid{max-width:100%;box-shadow:0 12px 32px #0007}
+#game-root .v192-dartboard,#game-root .v192-cue-canvas{max-width:100%;height:auto;touch-action:none}
+#game-root .direction-controls,#game-root .controls{flex-wrap:wrap}
+#game-root button{touch-action:manipulation}
+@media(max-width:480px){#game-root{min-width:0}#game-root .board{padding:5px;border-width:5px}#game-root .memory{gap:5px}#game-root .memory button{border-width:2px}#game-root .wordgrid{gap:2px}#game-root .wordgrid button{padding:0}}
+@media(prefers-reduced-motion:reduce){#game-root *,#game-root *:before,#game-root *:after{animation:none!important;transition:none!important}}
