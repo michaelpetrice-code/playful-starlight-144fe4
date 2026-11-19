@@ -30,3 +30,10 @@
 #game-root button{touch-action:manipulation}
 @media(max-width:480px){#game-root{min-width:0}#game-root .board{padding:5px;border-width:5px}#game-root .memory{gap:5px}#game-root .memory button{border-width:2px}#game-root .wordgrid{gap:2px}#game-root .wordgrid button{padding:0}}
 @media(prefers-reduced-motion:reduce){#game-root *,#game-root *:before,#game-root *:after{animation:none!important;transition:none!important}}
+
+/* Games Room 2.0 puzzle controls */
+#game-root .tl2-memory-toolbar,#game-root .tl2-word-tools{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin:0 0 14px;color:#f6d9a0}
+#game-root .tl2-memory-toolbar button,#game-root .tl2-word-tools button{background:#194d3e;border:1px solid #c3a36a;color:#fff;border-radius:9px;padding:9px 15px;cursor:pointer}
+#game-root .wordgrid button.matched{background:#bbdba0!important;color:#153b2b!important;box-shadow:inset 0 0 0 2px #e6f6ce}
+#game-root .wordgrid button.chosen{outline:3px solid #ffdc75;outline-offset:-3px}
+#game-root .tl2-word-shell .words{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;font-weight:700;letter-spacing:.08em}
