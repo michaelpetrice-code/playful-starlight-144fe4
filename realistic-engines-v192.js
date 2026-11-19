@@ -49,7 +49,34 @@ for(const [r,c] of [[105,'#1b2521'],[37,'#217c5d'],[18,'#bb383d']]){ctx.beginPat
 function reset(){score=bot=start;throws=0;turn=0;done=false;visitStart=start;status.textContent=`You ${score} · Computer ${bot} · Tap a segment to throw`;say('Double-out rules apply.');draw()}
 function hit(x,y){const dx=x-280,dy=y-280,r=Math.hypot(dx,dy);if(r>220)return{points:0,double:false,label:'Miss'};if(r<=18)return{points:50,double:true,label:'Bullseye'};if(r<=37)return{points:25,double:false,label:'Outer bull'};let angle=(Math.atan2(dy,dx)+Math.PI/2+Math.PI*2)%(Math.PI*2);let index=Math.floor((angle+Math.PI/20)%(Math.PI*2)/(Math.PI/10)),n=order[index],mult=r>=183&&r<=198?2:r>=105&&r<=120?3:1;return{points:n*mult,double:mult===2,label:`${mult===3?'Treble':mult===2?'Double':'Single'} ${n}`}}
 function apply(current,h){const rem=current-h.points;if(rem<0||rem===1||(rem===0&&!h.double))return{score:current,bust:true,win:false};return{score:rem,bust:false,win:rem===0}}
-function throwAt(e){if(done||!alive)return;const r=canvas.getBoundingClientRect();const x=(e.clientX-r.left)*560/r.width,y=(e.clientY-r.top)*560/r.height;const h=hit(x,y),res=apply(score,h);score=res.bust?visitStart:res.score;throws++;if(res.bust) throws+= (3-throws%3)%3;say(`${h.label} · ${h.points} points${res.bust?' · BUST':''}`);if(res.win){done=true;record('wins');say('You win! Double-out achieved.')}if(!res.win&&throws%3===0){visitStart=score;const options=[20,19,18,17,16,15,14,13,12,10,8,6,4,2,1];let chosen=options[Math.floor(Math.random()*options.length)];let bh={points:chosen*3,double:false};if(bot<=40&&bot%2===0)bh={points:bot,double:true};const result=apply(bot,bh);bot=result.score;if(result.win){done=true;record('losses');say('Computer wins this leg.')}else say(`Your turn · Computer scored ${bh.points}${result.bust?' (bust)':''}`)}status.textContent=`You ${score} · Computer ${bot} · Darts thrown ${throws}`;}
+function botVisit(){
+ const starting=bot;let landed=0,bust=false,won=false;
+ const options=[20,19,18,17,16,15,14,13,12,10,8,6,4,2,1];
+ for(let dart=0;dart<3;dart++){
+   let h;if(bot===50)h={points:50,double:true,label:'Bullseye'};
+   else if(bot<=40&&bot%2===0)h={points:bot,double:true,label:'Double '+(bot/2)};
+   else {const n=options[Math.floor(Math.random()*options.length)];h={points:n*(bot>100?3:1),double:false,label:'Computer dart'}}
+   const result=apply(bot,h);if(result.bust){bot=starting;bust=true;break}
+   bot=result.score;landed++;if(result.win){won=true;break}
+ }
+ if(won){done=true;record('losses');say('Computer wins this leg with a double-out.')}
+ else say('Computer visit: '+(bust?'bust, no score':(starting-bot)+' points')+'. Your turn.');
+}
+function throwAt(e){
+ if(done||!alive)return;
+ const r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;
+ const x=(e.clientX-r.left)*560/r.width,y=(e.clientY-r.top)*560/r.height;
+ if(throws%3===0)visitStart=score;
+ const h=hit(x,y),res=apply(score,h);throws++;
+ score=res.bust?visitStart:res.score;
+ say(h.label+' · '+h.points+' points'+(res.bust?' · BUST':''));
+ if(res.win){done=true;record('wins');say('You win! Double-out achieved.')}
+ else if(res.bust||throws%3===0){
+   if(res.bust)throws+= (3-throws%3)%3;
+   botVisit();
+ }
+ status.textContent='You '+score+' · Computer '+bot+' · Darts thrown '+throws;
+}
 canvas.addEventListener('pointerup',throwAt);coach(()=>`Tap the board to aim. Double-out required; a checkout must finish on a double or inner bull. ${mode.value} is a practice reference: ring position determines actual score.`);registerCleanup(()=>{alive=false});reset()
 }
 window.TL192={cue,darts};
