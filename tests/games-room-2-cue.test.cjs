@@ -30,3 +30,14 @@ test('snooker shot outcome identifies colour respots',()=>{
  assert.equal(outcome.foul,false);assert.equal(outcome.objectBalls,3);
  assert.equal(Array.from(outcome.respots).join(','),'2,7');
 });
+
+test('first contact: legal target, wrong target, and miss',()=>{
+ assert.equal(rules.firstContactFoul(1,[1]),false);
+ assert.equal(rules.firstContactFoul(2,[1]),true);
+ assert.equal(rules.firstContactFoul(null,[1]),true);
+});
+test('shot outcome distinguishes scratch from no-contact foul',()=>{
+ const scratch=rules.outcome([0],false,1),miss=rules.outcome([],false,null);
+ assert.equal(scratch.foul,true);assert.equal(scratch.miss,false);
+ assert.equal(miss.foul,false);assert.equal(miss.miss,true);
+});
