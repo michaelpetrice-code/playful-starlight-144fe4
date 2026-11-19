@@ -33,6 +33,8 @@ jobs:
           find . -type f -name '*.js' -not -path './.git/*' -print0 | while IFS= read -r -d '' file; do
             node --check "$file"
           done
+      - name: Check venue sector compatibility and rendering
+        run: node venue-sectors.test.mjs
       - name: Check cue physics and referee rules
         run: |
           node cue-physics-v94.test.mjs
