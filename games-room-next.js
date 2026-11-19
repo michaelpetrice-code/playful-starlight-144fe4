@@ -61,7 +61,7 @@ function snake() {
   function turn(key){const next=directions[key];if(!next||timer===null)return;if(next[0]===-direction[0]&&next[1]===-direction[1])return;nextDirection=next}
   function keydown(e){if(timer===null||!Object.hasOwn(directions,e.key))return;e.preventDefault();turn(e.key)}
   for(const [key,label] of Object.entries({ArrowUp:'↑',ArrowLeft:'←',ArrowDown:'↓',ArrowRight:'→'})){const button=el('button','',label);button.setAttribute('aria-label',key.slice(5));button.onclick=()=>turn(key);controls.append(button)}
-  start.onclick=()=>{if(ended)reset();if(timer!==null)return;const interval=difficulty==='easy'?230:difficulty==='hard'?115:175;speed.textContent='Speed: '+(difficulty==='hard'?'Fast':difficulty==='easy'?'Relaxed':'Normal');start.textContent='Restart';stop();timer=setInterval(step,interval);say('Score: '+score)};
+  start.onclick=()=>{if(ended||timer!==null)reset();const interval=difficulty==='easy'?230:difficulty==='hard'?115:175;speed.textContent='Speed: '+(difficulty==='hard'?'Fast':difficulty==='easy'?'Relaxed':'Normal');start.textContent='Restart';stop();timer=setInterval(step,interval);say('Score: '+score)};
   coachHint=()=> 'Avoid the edges, leave room to turn, and never reverse directly into your body.';
   document.addEventListener('keydown',keydown);cleanup=()=>{stop();document.removeEventListener('keydown',keydown)};reset();
 }
