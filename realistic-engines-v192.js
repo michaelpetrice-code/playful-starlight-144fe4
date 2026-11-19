@@ -3,6 +3,20 @@
 'use strict';
 const E=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n};
 const btn=(label,fn)=>{const b=E('button','v192-btn',label);b.type='button';b.onclick=fn;return b};
+const cueRules={
+ pocket(b,W,H){return [[37,37],[W/2,27],[W-37,37],[37,H-37],[W/2,H-27],[W-37,H-37]].some(([x,y])=>Math.hypot(b.x-x,b.y-y)<23)},
+ collide(a,b,R){
+  if(!a.alive||!b.alive)return false;
+  const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.00001;
+  if(d>=2*R)return false;
+  const nx=dx/d,ny=dy/d,over=2*R-d;
+  a.x-=nx*over/2;b.x+=nx*over/2;a.y-=ny*over/2;b.y+=ny*over/2;
+  const impulse=(a.vx-b.vx)*nx+(a.vy-b.vy)*ny;
+  if(impulse>0){a.vx-=impulse*nx*.97;a.vy-=impulse*ny*.97;b.vx+=impulse*nx*.97;b.vy+=impulse*ny*.97}
+  return true;
+ },
+ outcome(potted,sn){return {foul:potted.some(n=>n===0),objectBalls:potted.filter(n=>n!==0).length,respots:potted.filter(n=>n===0||(sn&&n>1))}}
+};
 function cue({root,say,record,coach,registerCleanup},kind){
 let alive=true, raf=0, balls=[],turn=0,shots=0,scored=0,aim={x:0,y:0},drag=null,settling=false,pendingRespots=[];
 const sn=kind==='snooker',W=840,H=450,R=sn?10:12;
@@ -14,7 +28,7 @@ function add(x,y,n){balls.push({x,y,vx:0,vy:0,n,alive:true,spot:{x,y}})}
 function setup(){cancelAnimationFrame(raf);pendingRespots=[];settling=false;balls=[];shots=0;scored=0;turn=0;add(215,225,0);if(sn){for(let row=0;row<5;row++)for(let j=0;j<=row;j++)add(540+row*19,225+(j-row/2)*21,1);[[300,225,2],[370,225,3],[440,225,4],[490,225,5],[730,225,6],[240,225,7]].forEach(([x,y,n])=>add(x,y,n))}
 else {let k=1;for(let row=0;row<5;row++)for(let j=0;j<=row;j++)add(520+row*24,225+(j-row/2)*25,k++);}
 info.textContent=sn?'Snooker practice · Pot reds and colours · Drag back from the white ball to shoot':'Pool physics practice · Drag back from the cue ball to aim and release';say('Aim by dragging away from the target direction.');render()}
-function pocket(b){const pts=[[37,37],[W/2,27],[W-37,37],[37,H-37],[W/2,H-27],[W-37,H-37]];return pts.some(([x,y])=>Math.hypot(b.x-x,b.y-y)<23)}
+function pocket(b){return cueRules.pocket(b,W,H)}
 function frame(){if(!alive)return;raf=0;let moving=false;for(let sub=0;sub<3;sub++){
 for(const b of balls){if(!b.alive)continue;b.x+=b.vx/3;b.y+=b.vy/3;b.vx*=.989;b.vy*=.989;if(Math.abs(b.vx)<.015)b.vx=0;if(Math.abs(b.vy)<.015)b.vy=0;
 if(b.vx||b.vy)moving=true;
@@ -23,7 +37,7 @@ if(b.x<R+34){b.x=R+34;b.vx=Math.abs(b.vx)*.86}if(b.x>W-R-34){b.x=W-R-34;b.vx=-Ma
 if(b.y<R+33){b.y=R+33;b.vy=Math.abs(b.vy)*.86}if(b.y>H-R-33){b.y=H-R-33;b.vy=-Math.abs(b.vy)*.86}
 
 }
-for(let i=0;i<balls.length;i++)for(let j=i+1;j<balls.length;j++){const a=balls[i],b=balls[j];if(!a.alive||!b.alive)continue;let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.01;if(d>=2*R)continue;let nx=dx/d,ny=dy/d,over=2*R-d;a.x-=nx*over/2;b.x+=nx*over/2;a.y-=ny*over/2;b.y+=ny*over/2;let impulse=(a.vx-b.vx)*nx+(a.vy-b.vy)*ny;if(impulse>0){a.vx-=impulse*nx*.97;a.vy-=impulse*ny*.97;b.vx+=impulse*nx*.97;b.vy+=impulse*ny*.97}}
+for(let i=0;i<balls.length;i++)for(let j=i+1;j<balls.length;j++)cueRules.collide(balls[i],balls[j],R);
 }
 render();if(moving){raf=requestAnimationFrame(frame)}else{settling=false;const toRespot=pendingRespots;pendingRespots=[];for(const b of toRespot){if(b.n!==0&&(!sn||b.n===1))continue;const target=b.n===0?{x:215,y:225}:b.spot;let x=target.x,y=target.y;let free=false;for(let attempt=0;attempt<200;attempt++){const ring=Math.ceil(Math.sqrt(attempt)),offset=attempt===0?0:attempt-(ring-1)*(ring-1),side=Math.max(1,2*ring),angle=offset*Math.PI*2/side,candidateX=Math.max(50,Math.min(W-50,target.x+Math.cos(angle)*ring*(2*R+2))),candidateY=Math.max(50,Math.min(H-50,target.y+Math.sin(angle)*ring*(2*R+2)));if(!pocket({x:candidateX,y:candidateY})&&!balls.some(other=>other!==b&&other.alive&&Math.hypot(other.x-candidateX,other.y-candidateY)<2*R+1)){x=candidateX;y=candidateY;free=true;break}}if(free){b.x=x;b.y=y;b.vx=b.vy=0;b.alive=true}else{pendingRespots.push(b);say('Respot waiting for a free space on the table.')}}render();info.textContent=`${sn?'Snooker':'Pool'} practice · ${shots} shots · ${scored} potted · Drag back from the white ball to shoot`}}
 function render(){ctx.clearRect(0,0,W,H);const wood=ctx.createLinearGradient(0,0,W,H);wood.addColorStop(0,'#b18448');wood.addColorStop(.5,'#54321e');wood.addColorStop(1,'#c39b58');ctx.fillStyle=wood;ctx.fillRect(0,0,W,H);ctx.fillStyle='#093e34';ctx.fillRect(26,25,W-52,H-50);let felt=ctx.createRadialGradient(380,170,20,420,220,500);felt.addColorStop(0,'#237a61');felt.addColorStop(1,'#0b4d3e');ctx.fillStyle=felt;ctx.fillRect(35,34,W-70,H-68);ctx.strokeStyle='#a8cbb7';ctx.lineWidth=1;if(sn){ctx.beginPath();ctx.moveTo(240,35);ctx.lineTo(240,H-35);ctx.stroke();ctx.beginPath();ctx.arc(240,225,75,-Math.PI/2,Math.PI/2);ctx.stroke()}
@@ -93,5 +107,5 @@ function throwAt(e){
 }
 canvas.addEventListener('pointerup',throwAt);coach(()=>`Tap the board to aim. Double-out required; a checkout must finish on a double or inner bull. ${mode.value} is a practice reference: ring position determines actual score.`);registerCleanup(()=>{alive=false});reset()
 }
-window.TL192={cue,darts};
+window.TL192={cue,darts,rules:cueRules};
 })();
