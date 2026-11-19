@@ -65,7 +65,7 @@ function botVisit(){
    }
    const safe=candidates.filter(h=>remaining-h.points>=2&&remaining-h.points!==1);
    if(!safe.length)return {points:0,double:false,label:'Miss'};
-   return safe.sort((x,y)=>Math.abs(remaining-h.points-40)-Math.abs(remaining-x.points-40))[0];
+   return safe.sort((x,y)=>Math.abs(remaining-x.points-40)-Math.abs(remaining-y.points-40))[0];
  }
  for(let dart=0;dart<3;dart++){
    const h=choose(bot,3-dart),result=apply(bot,h);
