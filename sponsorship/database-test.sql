@@ -1,0 +1,30 @@
+begin;
+do $$
+declare owner_id uuid; outsider uuid:=gen_random_uuid(); payload jsonb; rowdata jsonb; active_id uuid; rows jsonb;
+begin
+ select user_id into owner_id from public.local_platform_owners limit 1;
+ if owner_id is null then select id into owner_id from auth.users limit 1; if owner_id is null then raise exception 'Staging user fixture missing';end if; insert into public.local_platform_owners(user_id) values(owner_id);end if;
+ if has_function_privilege('anon','public.local_sponsor_manage(text,jsonb)','execute') or has_table_privilege('authenticated','public.local_sponsor_placements','select') then raise exception 'Private sponsorship permissions exposed';end if;
+ perform set_config('request.jwt.claim.sub',outsider::text,true);
+ begin perform public.local_sponsor_manage('list');raise exception 'Non-owner was allowed';exception when others then if sqlerrm<>'Owner access required' then raise;end if;end;
+ perform set_config('request.jwt.claim.sub',owner_id::text,true);
+ payload:=jsonb_build_object('business','QA sponsor','message','Test only','website','https://example.org','plan','section','section','games','starts_at',now()-interval '1 hour','ends_at',now()+interval '1 day','status','active','agreement_confirmed',true,'payment_reference','PRIVATE-REFERENCE-QA');
+ begin perform public.local_sponsor_manage('save',payload);raise exception 'Payment check bypassed';exception when others then if sqlerrm<>'Confirm the agreement and payment before activation' then raise;end if;end;
+ payload:=payload||'{"payment_confirmed":true}'::jsonb;
+ rowdata:=public.local_sponsor_manage('save',payload);active_id:=(rowdata->>'id')::uuid;
+ rows:=public.local_sponsor_public('games');
+ if not exists(select 1 from jsonb_array_elements(rows) e where e->>'id'=active_id::text) then raise exception 'Active placement absent';end if;
+ if rows::text like '%PRIVATE-REFERENCE-QA%' or rows::text like '%approved_by%' then raise exception 'Private fields leaked';end if;
+ if exists(select 1 from jsonb_array_elements(public.local_sponsor_public('home')) e where e->>'id'=active_id::text) then raise exception 'Incorrect slot';end if;
+ if not exists(select 1 from jsonb_array_elements(public.local_sponsor_public('partners')) e where e->>'id'=active_id::text) then raise exception 'Partner placement absent';end if;
+ perform public.local_sponsor_manage('pause',jsonb_build_object('id',active_id));
+ if exists(select 1 from jsonb_array_elements(public.local_sponsor_public('games')) e where e->>'id'=active_id::text) then raise exception 'Paused placement exposed';end if;
+ payload:=payload||jsonb_build_object('id',active_id,'starts_at',now()-interval '2 day','ends_at',now()-interval '1 day');perform public.local_sponsor_manage('save',payload);
+ if exists(select 1 from jsonb_array_elements(public.local_sponsor_public('games')) e where e->>'id'=active_id::text) then raise exception 'Expired placement exposed';end if;
+ payload:=payload||jsonb_build_object('starts_at',now()+interval '1 day','ends_at',now()+interval '2 day');perform public.local_sponsor_manage('save',payload);
+ if exists(select 1 from jsonb_array_elements(public.local_sponsor_public('games')) e where e->>'id'=active_id::text) then raise exception 'Future placement exposed';end if;
+ begin perform public.local_sponsor_manage('save',payload||'{"website":"https://user:pass@example.org"}'::jsonb);raise exception 'Credential URL accepted';exception when check_violation then null;end;
+ if (select count(*) from public.local_sponsor_audit where placement_id=active_id)<>4 then raise exception 'Audit trail incorrect';end if;
+end $$;
+select 'PASS: owner-only management, payment approval, private fields, slots, pause, expiry, future start, URL and audit checks' as result;
+rollback;

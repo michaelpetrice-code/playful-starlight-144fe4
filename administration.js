@@ -28,7 +28,7 @@ export function mountAdministration(root, context, access, openPane) {
   const content = root.querySelector('[data-admin-content]');
   const menu = root.querySelector('[data-admin-menu]');
   const panes = [];
-  if (access.owner) panes.push(['overview', 'Platform & members', ownerView, () => bindOwner(context)]);
+  if (access.owner) panes.push(['overview', 'Owner dashboard', ownerView, () => bindOwner(context)]);
   if (access.owner) panes.push(['analytics', 'Analytics', () => '', () => mountAnalytics(content, context.sb)]);
   if (access.local) {
     panes.push(['content', 'Club content & notifications', () => '', () => mountClubAdmin(context.sb, context.user, content)]);
@@ -38,10 +38,11 @@ export function mountAdministration(root, context, access, openPane) {
   if (access.safety) panes.push(['safety', 'Safety reports', () => safetyView(true), () => bindSafety({ ...context, committee: true })]);
   if (access.staff.length) panes.push(['venue', 'Venue controls', () => '', () => mountVenueControls({ ...context, staff: access.staff }, content)]);
 
-  if(access.owner) panes.splice(1,0,['assistant','✦ AI management assistant',()=>'',()=>{content.innerHTML='<div class="tl197-ai-landing"><h2>AI management assistant</h2><p>Open the existing owner copilot to review live priorities, prepare a weekly report and ask for recommendations. It only suggests actions; nothing is published automatically.</p><button type="button" id="tl197-open-copilot">Open owner copilot</button></div>';content.querySelector('#tl197-open-copilot').onclick=()=>{show('overview');setTimeout(()=>content.querySelector('.tl-copilot')?.scrollIntoView({behavior:'smooth',block:'start'}),200)};}]);
+  if(access.owner) panes.splice(1,0,['assistant','Guided assistant',ownerView,async()=>{await bindOwner(context);content.querySelector('[data-owner-focus=assistant]')?.click();}]);
   root.classList.add('tl197-admin');
-  const intro=document.createElement('div');intro.className='tl197-admin-intro';intro.innerHTML='<span class="tl197-kicker">THE LOCAL · CONTROL CENTRE</span><h2>Manage your platform</h2><p>Choose a section below. Tools are displayed according to your verified administrator permissions.</p>';
+  const intro=document.createElement('div');intro.className='tl197-admin-intro';intro.innerHTML='<span class="tl197-kicker">THE LOCAL · CONTROL CENTRE</span><h2>Your control centre</h2><p>Start with Owner dashboard for priorities, income, members and content. Choose a specialist section for venue approvals, safety or analytics. Access follows your verified permissions.</p>';
   root.insertBefore(intro,menu);
+  menu.classList.add('admin-task-menu');content.classList.add('admin-task-content');
   const buttons = new Map();
   let active;
   function show(name) {
