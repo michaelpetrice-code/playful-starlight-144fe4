@@ -41,3 +41,12 @@ The staging service reports no football provider key, no OpenAI key, AI disabled
 See `server/README.md` for credential activation and the production gate. Serve the repository to preview `football-demo.html`; `football.html` reuses the configured project's existing user session or serves a public league.
 
 Security advisors reviewed: no direct-access RLS policies is intentional because table grants are revoked. The two callable security-definer APIs are intentional: authenticated actions enforce membership/roles, and public reads return an explicitly sanitized public-only projection. See https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable and https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable .
+
+## Sponsorship and revenue (20 November 2026)
+Owner-only league settings now support a sponsor name, message and HTTPS website. A disclosed advertisement appears on league pages, public league pages, printable invitations and TV screens. Blank sponsor name removes it. Sponsors cannot alter competition results. Public reads expose only those three additional commercial fields.
+
+The Revenue section explains sponsor sales, optional venue spending and links to the existing venue subscription. Sponsorship contracts, pricing, expiry/removal and invoicing remain manually managed. No automatic income collection, platform commission, new billing product or paid entry has been activated. The example is gross arithmetic, not a forecast. Payments processing would carry transaction charges even without a monthly software subscription.
+
+Paid prediction entry and prize-pool commissions are excluded pending specialist UK gambling advice: https://www.legislation.gov.uk/ukpga/2005/19/section/11 and https://www.gamblingcommission.gov.uk/licensees-and-businesses/licences-and-fees/remote-pool-betting-licence .
+
+Deployment remains pending: apply and test the updated consolidated installer against staging, verify sponsor owner permissions/public projection and run two-account browser checks before production rollout. Coombe has not been updated by this branch.

@@ -102,6 +102,8 @@ begin
   if coalesce(payload->>'visibility',d->>'visibility','private') not in ('private','public') or coalesce(payload->>'rollover',d->>'rollover','end') not in ('end','replay') then raise exception 'Invalid league settings';end if;
   if coalesce(payload->>'rollover',d->>'rollover','end')<>coalesce(d->>'rollover','end') and ((d->>'round')::int>1 or jsonb_array_length(d->'picks')>0 or now()>=deadline) then raise exception 'Rollover rules are fixed once picks begin';end if;
   if length(coalesce(payload->>'prize',''))>160 then raise exception 'Prize description too long';end if;
+  if length(coalesce(payload->>'sponsor_name',''))>80 or length(coalesce(payload->>'sponsor_message',''))>160 or length(coalesce(payload->>'sponsor_url',''))>500 then raise exception 'Sponsor details too long';end if;
+  if coalesce(payload->>'sponsor_url','')<>'' and (payload->>'sponsor_url' !~ '^https://[A-Za-z0-9][A-Za-z0-9.-]*(:[0-9]+)?(/|\?|#|$)' or payload->>'sponsor_url' ~ '[[:cntrl:][:space:]]') then raise exception 'Use an HTTPS sponsor website';end if;
   if payload ? 'slug' then
    if coalesce(payload->>'slug','') !~ '^[a-z0-9][a-z0-9-]{2,49}$' then raise exception 'Use 3–50 lower-case letters, numbers or hyphens';end if;
    l.slug:=payload->>'slug';
@@ -110,7 +112,7 @@ begin
    if length(payload->>'logo')>180000 or payload->>'logo' !~ '^data:image/png;base64,[a-zA-Z0-9+/=]+$' then raise exception 'Invalid PNG logo';end if;
    if encode(substring(decode(split_part(payload->>'logo',',',2),'base64') from 1 for 8),'hex')<>'89504e470d0a1a0a' then raise exception 'Invalid PNG image';end if;
   end if;
-  d:=d||jsonb_build_object('name',trim(payload->>'name'),'theme',payload->>'theme','visibility',coalesce(payload->>'visibility',d->>'visibility','private'),'rollover',coalesce(payload->>'rollover',d->>'rollover','end'),'prize',coalesce(payload->>'prize',d->>'prize',''),'logo',coalesce(payload->>'logo',d->>'logo',''));
+  d:=d||jsonb_build_object('name',trim(payload->>'name'),'theme',payload->>'theme','visibility',coalesce(payload->>'visibility',d->>'visibility','private'),'rollover',coalesce(payload->>'rollover',d->>'rollover','end'),'prize',coalesce(payload->>'prize',d->>'prize',''),'logo',coalesce(payload->>'logo',d->>'logo',''),'sponsor_name',coalesce(payload->>'sponsor_name',d->>'sponsor_name',''),'sponsor_message',coalesce(payload->>'sponsor_message',d->>'sponsor_message',''),'sponsor_url',coalesce(payload->>'sponsor_url',d->>'sponsor_url',''));
 
  elsif action in ('approve','role') then
   target:=payload->>'member';
@@ -185,7 +187,7 @@ begin
  'picks',(select coalesce(jsonb_agg(jsonb_build_object('user_id','player-'||n,'team',p->>'team')),'[]') from jsonb_array_elements(d->'members') with ordinality a(x,n) cross join lateral jsonb_array_elements(coalesce(h->'picks','[]'::jsonb)) p where p->>'user_id'=x->>'user_id' and (x->>'approved')::boolean),
  'members',(select coalesce(jsonb_agg(jsonb_build_object('user_id','player-'||n,'active',hm->'active')),'[]') from jsonb_array_elements(d->'members') with ordinality a(x,n) cross join lateral jsonb_array_elements(coalesce(h->'members','[]'::jsonb)) hm where hm->>'user_id'=x->>'user_id' and (x->>'approved')::boolean)
  )),'[]') into hs from jsonb_array_elements(d->'history') h;
- return jsonb_build_object('name',d->>'name','theme',d->>'theme','logo',d->>'logo','slug',l.slug,'visibility','public','prize',d->>'prize','round',d->'round','deadline',d->>'deadline','status',d->>'status','source',d->>'source','synced_at',d->>'synced_at','feed',d->'feed','members',ms,'picks',ps,'fixtures',d->'fixtures','history',hs,'messages','[]'::jsonb,'events','[]'::jsonb,'winner_name',(select x->>'name' from jsonb_array_elements(d->'members') x where x->>'user_id'=d->>'winner' and (x->>'approved')::boolean),'public_view',true);
+ return jsonb_build_object('name',d->>'name','theme',d->>'theme','logo',d->>'logo','slug',l.slug,'visibility','public','sponsor_name',d->>'sponsor_name','sponsor_message',d->>'sponsor_message','sponsor_url',d->>'sponsor_url','prize',d->>'prize','round',d->'round','deadline',d->>'deadline','status',d->>'status','source',d->>'source','synced_at',d->>'synced_at','feed',d->'feed','members',ms,'picks',ps,'fixtures',d->'fixtures','history',hs,'messages','[]'::jsonb,'events','[]'::jsonb,'winner_name',(select x->>'name' from jsonb_array_elements(d->'members') x where x->>'user_id'=d->>'winner' and (x->>'approved')::boolean),'public_view',true);
 end;$$;
 revoke all on function public.tl_football_public(text) from public;
 grant execute on function public.tl_football_public(text) to anon,authenticated;

@@ -12,3 +12,13 @@ test('rollover restores the same remaining players and team history stays used',
 test('demo manual scores cannot change after settlement',()=>{let s=initialDemo();s.status='complete';assert.throws(()=>demoAction(s,'result',{fixture:'1',status:'FT',home_score:9,away_score:0}));});
 
 test('survival statistics include the just-settled round',()=>{const s=initialDemo();s.status='complete';s.members[1].active=false;assert.equal(playerRounds(s,'demo-me'),1);assert.equal(playerRounds(s,'demo-sam'),0);});
+
+import {sponsorHTML,sponsorURL} from './model.mjs';
+test('sponsorship is disclosed and safely escaped on public pages and posters',()=>{
+ assert.equal(sponsorHTML({}), '');
+ assert.equal(sponsorURL('javascript:alert(1)'), '');
+ assert.equal(sponsorURL('https://user:pass@example.com'), '');
+ const html=sponsorHTML({sponsor_name:'<Local & Co>',sponsor_message:'<img src=x>',sponsor_url:'https://example.com'});
+ assert.match(html,/Advertisement/);assert.match(html,/&lt;Local &amp; Co&gt;/);assert.match(html,/&lt;img src=x&gt;/);assert.match(html,/sponsored noopener noreferrer/);
+ assert.doesNotMatch(sponsorHTML({sponsor_name:'Test',sponsor_url:'javascript:alert(1)'}),/href=/);
+});
