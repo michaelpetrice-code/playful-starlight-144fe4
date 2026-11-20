@@ -19,7 +19,7 @@ Updated 20 November 2026. Development and isolated staging only; no Games Room p
 - Browser: pool shot animation and computer reply completed; darts 301 finished on a double in six darts.
 
 ## Remaining release gates
-- Complete functional browser checks for each remaining game, including resume/restart and input behaviour.
+- Functional checks now include complete local Memory Match, Word Search, Reversi, noughts and Connect Four games; legal 301/501 double-outs; Solitaire draw/undo/resume; Snake wall loss; 2048 merges; local Battleships shot turns; snooker and pool shot/computer responses. Pool practice now uses the same deterministic cue engine after the older practice renderer failed a settle check. Full visual benchmark parity and long-session/device testing remain unverified.
 - Physical Android touch and visual-quality review remain unverified. Do not describe preview viewport checks as device testing.
 - Snooker free-ball, miss and referee discretion are not automated; these are casual browser rules, not professional officiating.
 - Production database/service promotion and live authenticated multiplayer smoke test have not happened.
