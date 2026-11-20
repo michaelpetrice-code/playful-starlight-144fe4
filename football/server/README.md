@@ -2,7 +2,7 @@
 
 Do not place API secrets in config.js, client JavaScript, source control, browser local storage or PR comments.
 
-## Required secrets on the intended Supabase project
+## Optional secrets for provider and paid AI activation
 
 | Secret | Purpose |
 | --- | --- |
@@ -25,3 +25,5 @@ For unattended operation, create Supabase Vault entries football_service_url and
 Before production: finish the provider/AI/scheduler end-to-end tests, apply the reviewed installer to the confirmed production project, deploy the function and required secrets to that same project, and deploy the tested static branch. Do not swap existing project URLs or auth keys as a shortcut.
 
 References: https://docs.football-data.org/general/v4/competition.html and https://docs.football-data.org/general/v4/policies.html ; https://supabase.com/docs/guides/functions/secrets ; https://developers.openai.com/api/reference/resources/responses/methods/create .
+
+Free production mode is active as of 20 November 2026: manual fixtures/results and the local recorded-results Gaffer guide need none of the optional secrets. Keep paid AI disabled unless separately authorised with an API budget. Automated provider-score activation remains pending a data key and provider/scheduler end-to-end checks.

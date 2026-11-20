@@ -1,3 +1,4 @@
+import {venueSetupGuide} from './venue-setup-guide.mjs';
 import { venueSectors, sectorForType, featureLabel, sectorBrief } from './venue-sectors.js';
 import { blankApp, el, features, httpsUrl, renderVenue, slugify, themes } from './venue-app-content.js';
 
@@ -554,14 +555,14 @@ export async function mountVenueBuilder(root, sb, user) {
   const setupGoal = el('input', { maxlength: '200', placeholder: 'For example: more room hire enquiries', 'aria-label': 'Your main goal (optional)' });
   const industrySection = el('section',{className:'vb200-industry-section'},
     el('h2',{},'Set up your kind of venue'),
-    el('p',{},'Choose your industry. Apply a recommended starter in one click, then use the AI assistant to refine the wording. No app goes live without your approval.'),
+    el('p',{},'Choose your industry. Apply a recommended starter in one click, then use the setup assistant to prepare the wording. No app goes live without your approval.'),
     el('label', {}, 'What type of venue or organisation do you run?', industrySelect),
     el('label', {}, 'What would you like help with first?', setupGoal), applyIndustry,industryInfo,tablesHelp);
   industryPreview();
   const starterSection = el('section',{className:'vb199-starter-section'},el('h2',{},'Start with a professional design'),
     el('p',{},'Choose a venue style and we will set up suggested sections, colours and welcome wording. You can change everything.'),starterCards,starterStatus);
   const brief = el('textarea', { maxlength: '1200', placeholder: 'A family-friendly social club with live music, kids’ bingo and a function room…' });
-  const ask = el('button', { type: 'button' }, 'Suggest an app with AI');
+  const ask = el('button', { type: 'button' }, 'Suggest my app layout');
   const apply = el('button', { type: 'button', className: 'vb-primary' }, 'Apply suggestion');
   apply.hidden = true;
   const response = el('div', { role: 'status', className: 'vb-ai-result' });
@@ -569,12 +570,16 @@ export async function mountVenueBuilder(root, sb, user) {
     if (brief.value.trim().length < 5) { response.textContent = 'Describe your venue and what members should be able to do.'; brief.focus(); return; }
     ask.disabled = true; apply.hidden = true; response.textContent = 'Preparing a suggestion…';
     try {
+      if (!window.LADS_CONFIG?.venueAiEnabled) {
+        suggestion = venueSetupGuide({prompt:brief.value,name:draft.name,type:draft.type,town:draft.town});
+      } else {
       const result = await sb.functions.invoke('venue-builder-ai', { body: { prompt: brief.value, name: draft.name, type: draft.type, town: draft.town } });
       if (result.error) {
         const payload = await result.error.context?.json?.().catch(() => null);
         throw new Error(payload?.message || 'The AI assistant is unavailable. You can still edit your app.');
       }
       suggestion = result.data;
+      }
       response.replaceChildren(el('p', {}, suggestion.note),
         el('p', {}, `${suggestion.theme} · ${suggestion.features.filter(key => features[key]).map(key => featureLabel(draft.type, key, features[key].label)).join(', ')}`),
         el('blockquote', {}, suggestion.welcome));
@@ -609,7 +614,7 @@ export async function mountVenueBuilder(root, sb, user) {
     if (welcome) actions.push('Create a friendly welcome message using the venue name and town');
     if (!actions.length) {
       pendingCoach = null; coachApply.hidden = true;
-      coachPlan.textContent = 'I can change your theme, add a feature or create a welcome message. For more detailed wording, use “Suggest an app with AI” below.';
+      coachPlan.textContent = 'I can change your theme, add a feature or create a welcome message. For more detailed wording, use “Suggest my app layout” below.';
       return;
     }
     pendingCoach = { matchTheme, matchFeatures: matchFeatures.map(([key])=>key), welcome };
@@ -644,9 +649,9 @@ export async function mountVenueBuilder(root, sb, user) {
     el('label', {}, 'What would you like to do?', coachInput), coachSuggestions,
     el('div', { className: 'vb-actions' }, coachAsk, coachApply), coachPlan, coachMessage);
 
-  const assistant = el('section', { className: 'vb-assistant' }, el('h2', {}, 'AI setup assistant'),
+  const assistant = el('section', { className: 'vb-assistant' }, el('h2', {}, 'Venue setup assistant'),
     el('label', {}, 'Describe the app you want to create', brief),
-    el('p', {}, 'The brief and venue details are sent to the AI service. Keep personal information out of your brief.'),
+    el('p', {}, 'The free setup guide works on this device. An external AI service is used only if the platform owner has explicitly enabled it. Keep personal information out of your brief.'),
     el('div', { className: 'vb-actions' }, ask, apply), response);
 
   function updateLinks() {
@@ -791,7 +796,7 @@ export async function mountVenueBuilder(root, sb, user) {
     advanced.open = true; assistant.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (!brief.value.trim()) brief.value = [draft.name && `Our venue is called ${draft.name}.`, draft.type && `It is a ${draft.type}.`, draft.town && `It is in ${draft.town}.`, 'Please suggest a friendly welcome and useful features for our visitors.'].filter(Boolean).join(' ');
     brief.focus({ preventScroll: true });
-    response.textContent = 'Read or change the description, then select “Suggest an app with AI”. Nothing is sent until you select that button.';
+    response.textContent = 'Read or change the description, then select “Suggest my app layout”. Nothing is sent until you select that button.';
   });
   guideHide.addEventListener('click', () => { guide.hidden = true; guideResume.hidden = false; });
   guideResume.addEventListener('click', () => { guide.hidden = false; guideResume.hidden = true; guide.scrollIntoView({ behavior: 'smooth' }); });
@@ -884,8 +889,8 @@ export async function mountVenueBuilder(root, sb, user) {
   drawModules(); updateLinks(); refreshPreview();
   status.textContent = restoreRecovery ? 'Your unfinished changes were restored from this device.' : (saved ? (published ? 'Your app is published.' : 'Your saved draft is ready to edit.') : '');
   form.append(details, modules);
-  const advanced = el('details', { className: 'vb-advanced' }, el('summary', {}, 'AI App Studio — writing, coaching and notifications'), coach, assistant, notifyForm);
-  const aiQuick = el('button',{type:'button',className:'vb199-ai-quick'},'✨ Ask AI to build my first draft');
+  const advanced = el('details', { className: 'vb-advanced' }, el('summary', {}, 'App Studio — writing, setup guidance and notifications'), coach, assistant, notifyForm);
+  const aiQuick = el('button',{type:'button',className:'vb199-ai-quick'},'Build my first draft');
   aiQuick.addEventListener('click',()=>{advanced.open=true; assistant.scrollIntoView({behavior:'smooth',block:'start'});brief.focus({preventScroll:true});});
   autoSaveNotice = el('p', { className: 'vb-autosave-status', role: 'status' }, 'Automatic saving is on');
   root.replaceChildren(el('h1', {}, 'Venue App Builder'),

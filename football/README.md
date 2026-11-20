@@ -18,15 +18,15 @@ A branded replacement for the basic Football predictions form. Original artwork 
 
 ## Deployment state — 20 November 2026
 
-Published as draft GitHub PR #13, branch `feat/football-clubhouse`. Additive schema and `football-service` were deployed ONLY to staging project `xqgzdezcnkvjjbhsrofa`.
+The free league release was published to The Local production at https://thelocal.me.uk on 20 November 2026, Netlify deployment `6b00371592a766b99f43fb4e`. The additive schema and football-service v1 are installed on production project `huuqwjmztqurnyyokrxd`; the existing auth configuration is preserved. Transactional production checks passed for league rules, roles, private/public data projection and provider/cache state handling, with all synthetic rows rolled back. Browser checks verified the production page, local sample sponsor save/render/QR poster and free form guide; sample changes were reset. Existing staging two-account QA is recorded below.
 
-Production remains unchanged. `config.js` still points to the existing production project `huuqwjmztqurnyyokrxd`; do not overwrite it with staging or blank values. No project migration, main-branch merge, Netlify production deployment or paid subscription was performed.
+Manual fixtures/results and the local form guide require no paid account. Automatic provider scores remain unavailable without a data key. Paid AI is disabled and its controls are hidden unless configured. No scheduler, paid service, entry charge or automatic sponsor billing was enabled.
 
-The staging service reports no football provider key, no OpenAI key, AI disabled, and no scheduler secret. Real live-score and AI-provider end-to-end tests are therefore blocked. This is not yet a fully activated production release.
+Coombe v64 is prepared, but its deployment needs access to its separate Netlify account. The Games Room 2.0 draft is outside this football release and remains incomplete.
 
 ## Validation
 
-- 14 passing football rule/model tests; provider normalization, incomplete results, AI team validation, rollover/team reuse, HTML escaping, QR output and URL scopes.
+- 16 passing football rule/model tests; provider normalization, incomplete results, AI team validation, rollover/team reuse, HTML escaping, QR output and URL scopes.
 - Invitation QR decoded independently with jsQR 1.4.0 back to the exact invitation URL.
 - Two transactional staging SQL suites pass for roles, pick privacy, public privacy, cache, AI reservation/cache, mentions, provider deadline clamp, automatic settlement, rollover, next-round reset and team reuse. All their synthetic rows are rolled back.
 - Two actual temporary staging Auth accounts used in browser: league creation, request/approval, separate picks, hidden opponent pick, shared mention/alert, public read-only route, theme/vanity link, resized logo persisted as PNG, manual final score and winner confirmation.
@@ -49,6 +49,6 @@ The Revenue section explains sponsor sales, optional venue spending and links to
 
 Paid prediction entry and prize-pool commissions are excluded pending specialist UK gambling advice: https://www.legislation.gov.uk/ukpga/2005/19/section/11 and https://www.gamblingcommission.gov.uk/licensees-and-businesses/licences-and-fees/remote-pool-betting-licence .
 
-Deployment remains pending: apply and test the updated consolidated installer against staging, verify sponsor owner permissions/public projection and run two-account browser checks before production rollout. Coombe has not been updated by this branch.
+The consolidated installer is installed on staging and production. Sponsorship persistence and public projection were tested transactionally on staging; owner-only settings are covered by the shared role suite. Coombe has not been updated by this branch.
 
 The sponsorship installer has now passed both existing transactional staging suites plus sponsor persistence, public projection and unsafe URL rejection checks. A free local Gaffer form guide uses archived final scores only; missing form remains explicitly unrated. Paid AI controls stay hidden unless already configured.
