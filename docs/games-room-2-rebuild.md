@@ -1,6 +1,6 @@
 # Games Room 2.0 — implementation and verification
 
-Updated 20 November 2026. Development and isolated staging only; no Games Room production deployment yet. Michael has authorised publication when the remaining checks pass.
+Updated 20 November 2026. Casual Games Room update published with Michael’s prior approval at 13:04 UK to the existing thelocal.me.uk project (Netlify deploy 6b004571811e6fa3069d5659). PR #12 merged. This is not a claim of professional simulation quality or completion of every device/competitive-play acceptance gate.
 
 ## Implemented
 - Deterministic pool/snooker shots, collisions, cushions, spin, legal targets, fouls, ball in hand, colour respots, scores and computer turns. Accessible angle/power/Shoot controls supplement pointer aiming.
@@ -22,7 +22,7 @@ Updated 20 November 2026. Development and isolated staging only; no Games Room p
 - Functional checks now include complete local Memory Match, Word Search, Reversi, noughts and Connect Four games; legal 301/501 double-outs; Solitaire draw/undo/resume; Snake wall loss; 2048 merges; local Battleships shot turns; snooker and pool shot/computer responses. Pool practice now uses the same deterministic cue engine after the older practice renderer failed a settle check. Full visual benchmark parity and long-session/device testing remain unverified.
 - Physical Android touch and visual-quality review remain unverified. Do not describe preview viewport checks as device testing.
 - Snooker free-ball, miss and referee discretion are not automated; these are casual browser rules, not professional officiating.
-- Production database/service promotion and live authenticated multiplayer smoke test have not happened.
+- Production arcade schema and arcade-game v1 are deployed. Public capability responds 200; unauthenticated actions respond 401. All 14 live gallery launches and a live practice shot/reset pass. A signed-in two-player production match is still unverified.
 - No ranked, cash-prize, subscription or paid API service is enabled by this rebuild.
 
 ## Staging setup
