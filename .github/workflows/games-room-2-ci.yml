@@ -1,0 +1,31 @@
+name: Games Room rules and integration checks
+on:
+  push:
+    branches: [games-room-2-rebuild]
+  pull_request:
+    paths:
+      - 'games/**'
+      - 'games-room-next.js'
+      - 'realistic-engines-*.js'
+      - 'games-room-2-*.js'
+      - 'tests/games-room-2-static.test.cjs'
+      - 'tests/games-room-2-darts.test.cjs'
+      - 'tests/games-room-2-cue.test.cjs'
+      - '.github/workflows/games-room-2-ci.yml'
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax checks
+        run: |
+          node --check games-room-next.js
+          node --check realistic-engines-v192.js
+          node --check realistic-engines-more-v192.js
+          node --check games-room-2-solitaire.js
+          node --check games-room-2-cards.js
+      - name: Static integration tests
+        run: node --test games/*.test.mjs tests/games-room-2-*.test.cjs
