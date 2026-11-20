@@ -39,3 +39,6 @@ jobs:
         run: |
           node cue-physics-v94.test.mjs
           node cue-referee-v95.test.mjs
+
+      - name: Check football rules, provider validation and QR rendering
+        run: node --test football/rules.test.mjs football/model.test.mjs venue-setup-guide.test.mjs

@@ -1,0 +1,46 @@
+begin;
+do $$
+declare a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();l uuid;l2 uuid;code text;r jsonb;d jsonb;f jsonb;fixtures jsonb;slug text;blocked boolean:=false;
+begin
+ insert into auth.users(id) values(a),(b);perform set_config('request.jwt.claim.sub',a::text,true);
+ r:=public.tl_football('create',jsonb_build_object('name','Extended test','name_player','Owner','deadline',now()+interval '3 days'));l:=(r#>>'{league,id}')::uuid;code:=r#>>'{league,invite}';slug:='test-'||substr(replace(l::text,'-',''),1,20);
+ if public.tl_football_public(r#>>'{league,slug}') is not null then raise exception 'Private league exposed';end if;
+ perform public.tl_football('settings',jsonb_build_object('id',l,'name','Extended test','theme','blue','slug',slug,'visibility','public','rollover','replay','prize','Venue trophy'));
+ perform set_config('request.jwt.claim.sub',b::text,true);perform public.tl_football('join',jsonb_build_object('code',code,'name','Player'));perform set_config('request.jwt.claim.sub',a::text,true);perform public.tl_football('approve',jsonb_build_object('id',l,'member',b));
+ fixtures:=jsonb_build_array(jsonb_build_object('id','12','home','A','away','B','kickoff',now()+interval '1 day','status','NS','home_score',null,'away_score',null));
+ perform public.tl_football_service('sync',jsonb_build_object('id',l,'round',1,'fixtures',fixtures,'feed',jsonb_build_object('competition','PL','matchday',1,'season',2026),'fetched_at',now()));
+ select doc into d from public.tl_football_leagues where id=l;
+ if (d->>'deadline')::timestamptz>now()+interval '1 day 1 minute' then raise exception 'Deadline was not brought forward';end if;
+ perform public.tl_football('pick',jsonb_build_object('id',l,'team','A'));
+ r:=public.tl_football_public(slug);
+ if jsonb_array_length(r->'picks')<>0 or position(a::text in r::text)>0 or position(b::text in r::text)>0 or position(code in r::text)>0 then raise exception 'Public data leaked account IDs, invite or hidden picks';end if;
+ begin perform public.tl_football('result',jsonb_build_object('id',l,'fixture','12','status','FT','home_score',9,'away_score',0));raise exception 'TEST FAIL: provider override';exception when others then if sqlerrm='TEST FAIL: provider override' then raise;end if;end;
+ perform public.tl_football_cache_claim('test-feed-'||l::text,60);
+ perform public.tl_football_service('cache-put',jsonb_build_object('key','test-feed-'||l::text,'data',jsonb_build_object('matches','[]'::jsonb)));
+ r:=public.tl_football_cache_claim('test-feed-'||l::text,60);
+ if not (r->>'hit')::boolean or r#>'{payload,matches}'<>'[]'::jsonb then raise exception 'Provider cache failed';end if;
+ r:=public.tl_football_service('ai-start',jsonb_build_object('id',l,'user',a));if (r->>'cached')::boolean then raise exception 'Unexpected AI cache';end if;
+ begin perform public.tl_football_service('ai-start',jsonb_build_object('id',l,'user',a));raise exception 'TEST FAIL: concurrent AI request';exception when others then if sqlerrm='TEST FAIL: concurrent AI request' then raise;end if;end;
+ perform public.tl_football_service('ai-complete',jsonb_build_object('id',l,'user',a,'round',1,'reply',jsonb_build_object('picks',jsonb_build_array(jsonb_build_object('team','A','reason','Test only')),'note','Test only')));
+ r:=public.tl_football_service('ai-start',jsonb_build_object('id',l,'user',a));if not (r->>'cached')::boolean then raise exception 'AI verdict not cached';end if;
+ -- Both players choose opposing teams, then a draw triggers the configured rollover.
+ perform set_config('request.jwt.claim.sub',b::text,true);perform public.tl_football('pick',jsonb_build_object('id',l,'team','B'));
+ perform public.tl_football('message',jsonb_build_object('id',l,'text','Hello owner','mention',a));
+ perform set_config('request.jwt.claim.sub',a::text,true);r:=public.tl_football('get',jsonb_build_object('id',l));
+ if not exists(select 1 from jsonb_array_elements(r#>'{league,events}') x where x->>'text'='You were mentioned in the banter wall') then raise exception 'Mention notification missing';end if;
+ update public.tl_football_leagues set doc=jsonb_set(doc,'{deadline}',to_jsonb(now()-interval '1 minute')) where id=l;
+ fixtures:=jsonb_set(jsonb_set(jsonb_set(fixtures,'{0,status}','"FT"'::jsonb),'{0,home_score}','0'::jsonb),'{0,away_score}','0'::jsonb);
+ perform public.tl_football_service('sync',jsonb_build_object('id',l,'round',1,'fixtures',fixtures,'feed',jsonb_build_object('competition','PL','matchday',1,'season',2026),'fetched_at',now()));
+ r:=public.tl_football('get',jsonb_build_object('id',l));
+ if r#>>'{league,status}'<>'round-complete' or not (r#>>'{league,rolled_over}')::boolean then raise exception 'Provider automatic settlement or rollover failed';end if;
+ if jsonb_array_length(public.tl_football_public(slug)->'picks')<>2 then raise exception 'Public picks not revealed after deadline';end if;
+ perform public.tl_football('next',jsonb_build_object('id',l,'deadline',now()+interval '4 days'));
+ r:=public.tl_football_public(slug);if position(a::text in r::text)>0 or position(b::text in r::text)>0 or jsonb_array_length(r->'history')<>1 then raise exception 'Public history leaked account IDs or was missing';end if;
+ select doc into d from public.tl_football_leagues where id=l;if coalesce(d->'feed','null'::jsonb)<>'null'::jsonb then raise exception 'Previous feed persisted into next round';end if;
+ perform public.tl_football('fixture',jsonb_build_object('id',l,'home','A','away','C','kickoff',now()+interval '5 days'));
+ begin perform public.tl_football('pick',jsonb_build_object('id',l,'team','A'));raise exception 'TEST FAIL: reused team';exception when others then if sqlerrm='TEST FAIL: reused team' then raise;end if;end;
+ if has_function_privilege('authenticated','public.tl_football_service(text,jsonb)','execute') or has_function_privilege('anon','public.tl_football_cache_claim(text,int)','execute') or has_table_privilege('authenticated','public.tl_football_ai','select') then raise exception 'Server-only service exposed';end if;
+ perform public.tl_football_service('provider-allow','{}'::jsonb);
+end $$;
+select 'PASS: public privacy, provider import and deadline, manual override denial, cache, AI reservation/cache, mentions, automatic settlement, rollover, next round and team reuse' as result;
+rollback;
