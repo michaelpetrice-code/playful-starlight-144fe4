@@ -58,10 +58,10 @@ canvas.addEventListener('pointerup',e=>{if(!drag)return;const q=balls[0];if(q.al
 coach(()=>sn?'Use the white ball to pot a red, then a colour. This is physics practice, not full official snooker scoring.':'Drag away from your intended shot direction. Lower power gives better control of the cue ball.');
 registerCleanup(()=>{alive=false;pendingRespots=[];cancelAnimationFrame(raf)});setup()
 }
-function darts({root,say,record,coach,registerCleanup},start=501){
+function darts({root,say,record,coach,registerCleanup,difficulty='normal'},start=501){
 let alive=true,score=start,bot=start,throws=0,turn=0,done=false,visitStart=start;
 const wrap=E('div','v192-panel'),status=E('div','v192-status'),canvas=E('canvas','v192-dartboard');canvas.width=560;canvas.height=560;
-const control=E('div','v192-actions'),mode=E('select');for(const m of ['Single','Double','Treble']){const o=E('option','',m);mode.append(o)}control.append(E('span','','Target ring'),mode,btn('New leg',reset));wrap.append(status,canvas,control);root.append(wrap);
+const control=E('div','v192-actions'),mode=E('select');for(const m of ['Single','Double','Treble']){const o=E('option','',m);mode.append(o)}const targetNumber=E('input');targetNumber.type='number';targetNumber.min=1;targetNumber.max=25;targetNumber.value=20;targetNumber.setAttribute('aria-label','Dart target number or 25 for bull');mode.setAttribute('aria-label','Dart target ring');control.append(E('span','','Target ring'),mode,targetNumber,btn('Throw at target',()=>{const n=Number(targetNumber.value);if(!Number.isInteger(n)||(n>20&&n!==25)||n<1){say('Choose 1–20 or 25 for bull.');return;}const index=order.indexOf(n),angle=-Math.PI/2+index*Math.PI/10,radius=n===25?0:mode.value==='Double'?190:mode.value==='Treble'?112:160;const rect=canvas.getBoundingClientRect();throwAt({clientX:rect.left+(280+Math.cos(angle)*radius)*rect.width/560,clientY:rect.top+(280+Math.sin(angle)*radius)*rect.height/560});}),btn('New leg',reset));wrap.append(status,canvas,control);root.append(wrap);
 const ctx=canvas.getContext('2d'),order=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 function draw(){ctx.clearRect(0,0,560,560);ctx.fillStyle='#152b28';ctx.fillRect(0,0,560,560);ctx.translate(280,280);
 for(let i=0;i<20;i++){let a=-Math.PI/2+(i-.5)*Math.PI/10,b=a+Math.PI/10;for(let [outer,inner,col] of [[220,198,i%2?'#e5d5b3':'#1e2522'],[198,183,i%2?'#bd3b40':'#237657'],[183,120,i%2?'#e5d5b3':'#1e2522'],[120,105,i%2?'#bd3b40':'#237657']]){ctx.beginPath();ctx.arc(0,0,outer,a,b);ctx.arc(0,0,inner,b,a,true);ctx.closePath();ctx.fillStyle=col;ctx.fill()}ctx.fillStyle='#f7e5b9';ctx.font='bold 19px Arial';ctx.textAlign='center';ctx.fillText(order[i],Math.cos(a+Math.PI/20)*244,Math.sin(a+Math.PI/20)*244+6)}
@@ -88,7 +88,7 @@ function botVisit(){
    return safe.sort((x,y)=>Math.abs(remaining-x.points-40)-Math.abs(remaining-y.points-40))[0];
  }
  for(let dart=0;dart<3;dart++){
-   const h=choose(bot,3-dart),result=apply(bot,h);
+   let h=choose(bot,3-dart);const accuracy=difficulty==='easy'?.35:difficulty==='hard'?.9:.65;if(Math.random()>accuracy){const n=1+Math.floor(Math.random()*20);h={points:n,double:false,label:'Single '+n};}const result=apply(bot,h);
    if(result.bust){bot=starting;bust=true;break}
    bot=result.score;
    if(result.win){won=true;break}

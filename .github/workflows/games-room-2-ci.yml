@@ -1,9 +1,10 @@
-name: Games Room 2 static checks
+name: Games Room rules and integration checks
 on:
   push:
     branches: [games-room-2-rebuild]
   pull_request:
     paths:
+      - 'games/**'
       - 'games-room-next.js'
       - 'realistic-engines-*.js'
       - 'games-room-2-*.js'
@@ -27,4 +28,4 @@ jobs:
           node --check games-room-2-solitaire.js
           node --check games-room-2-cards.js
       - name: Static integration tests
-        run: node --test tests/games-room-2-static.test.cjs tests/games-room-2-darts.test.cjs tests/games-room-2-cue.test.cjs
+        run: node --test games/*.test.mjs tests/games-room-2-*.test.cjs
