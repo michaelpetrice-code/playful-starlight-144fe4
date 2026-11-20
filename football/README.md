@@ -1,37 +1,43 @@
-# The Local football clubhouse — draft replacement
+# The Local football clubhouse
 
-Original The Local branding and stadium artwork inspired by the reference's premium black-and-gold presentation. Does not copy EliminX assets or branding.
+A branded replacement for the basic Football predictions form. Original artwork and The Local identity; no EliminX artwork or branding copied. Existing prediction records remain visible beneath the new member page.
 
-## Included
+## Implemented
 
-- Replaces the signed-in Football tab and preserves existing prediction records beneath it.
-- Standalone `football.html` browser-local demo, explicitly labelled as demo fixtures, not live scores.
-- Private shared leagues using the existing Supabase session, league creation/selection, invitation codes, owner approval before the first deadline, staff roles, six themes and organiser-entered fixtures/results.
-- Server-side deadline enforcement, hidden opponent picks until deadline, one pick per round, no reuse of teams, win/draw/loss adjudication, no-pick elimination, postponed-match waiting, winner and all-out endings, round history.
-- Banter wall with moderation and rate limiting, invitation link and printable text poster, TV view, 30-second shared refresh while not typing.
-- Escaped user text, no public table access, authenticated RPC with per-action membership/role checks and row locking.
+- Last Man Standing private/shared leagues, invitations, owner approval before the first deadline, separate staff roles, and league switching.
+- Server-side pick deadlines, kickoff locking, one team per round, no team reuse, win/draw/loss/no-pick adjudication, postponed/suspended/cancelled match waiting, round history and winners.
+- Configurable all-out rollover, fixed once picks begin; used teams remain used. Optional venue reward description; free entry with no payments handled.
+- Six themes, resized PNG/JPEG/WebP logo upload, private/public visibility and vanity links through `football.html?league=your-slug`.
+- Public views expose display names and post-deadline picks, with ordinal player identifiers. Account UUIDs, invitation codes, messages and private notifications are not exposed, including in round history.
+- Banter with mentions, moderation, join-request alerts, personal league updates and optional browser notifications while the page remains open. Background web push is not implemented or advertised.
+- Vector QR invitations, A4/A5/table-tent print layouts, QR download, rotating TV scores/standings/statistics, team popularity and player history.
+- Credential-ready football-data.org provider adapter with global request budget, cache leases, source/check timestamps, slate validation and automatic final-score settlement. Manual fixtures/results remain available, with no fake live data.
+- Credential-ready AI Gaffer using provider fixtures and standings only, eligible-team checks, strict structured output, one completed verdict per player/round, two attempts per round, per-user/day and global/day request limits. Disabled until explicitly configured.
+- Secure background-sync endpoint plus optional `scheduler.sql` activation script. The schedule is not installed; secrets are missing.
+- Browser-local `football-demo.html` for a separate clearly labelled sample league.
 
-## Deployment state
+## Deployment state — 20 November 2026
 
-On 20 November 2026 the additive SQL was applied ONLY to The Local staging project `xqgzdezcnkvjjbhsrofa`. Production was not changed. The repository's existing `config.js` still points to production `huuqwjmztqurnyyokrxd`; this change does not switch it or migrate any existing database.
+Published as draft GitHub PR #13, branch `feat/football-clubhouse`. Additive schema and `football-service` were deployed ONLY to staging project `xqgzdezcnkvjjbhsrofa`.
 
-Before integrating on production, complete the remaining features below, verify an actual two-account browser flow on staging, and apply the reviewed SQL to the confirmed production target. Never replace `config.js` with blank values. No Netlify production deploy or main-branch merge was performed as part of this draft.
+Production remains unchanged. `config.js` still points to the existing production project `huuqwjmztqurnyyokrxd`; do not overwrite it with staging or blank values. No project migration, main-branch merge, Netlify production deployment or paid subscription was performed.
 
-`install-football.sql` is a consolidated installer. `database-test.sql` runs transactional integration checks and rolls back every synthetic test record. To preview locally, serve the repository and open `football.html`.
+The staging service reports no football provider key, no OpenAI key, AI disabled, and no scheduler secret. Real live-score and AI-provider end-to-end tests are therefore blocked. This is not yet a fully activated production release.
 
-## Remaining to reach the requested reference's functionality
+## Validation
 
-- Licensed football fixtures/live-score/form provider, server-side credentials, cache and provider error/stale-data handling; automated result settlement after verified finals.
-- AI Gaffer grounded in that feed, budget and rate limits, one cached verdict per player/round, and verified eligible-team recommendations. Current tab explicitly says unavailable.
-- QR poster generation (current poster contains the invitation URL as text), a custom venue-logo upload, public/private vanity league routes, TV auto-cycling, mentions/notifications, richer statistics, configurable rollovers and prize descriptions.
-- Genuine browser checks with two signed-in staging accounts and mobile viewport. Browser-local pick submission and banter posting were verified; database access rules and settlement were verified separately.
+- 14 passing football rule/model tests; provider normalization, incomplete results, AI team validation, rollover/team reuse, HTML escaping, QR output and URL scopes.
+- Invitation QR decoded independently with jsQR 1.4.0 back to the exact invitation URL.
+- Two transactional staging SQL suites pass for roles, pick privacy, public privacy, cache, AI reservation/cache, mentions, provider deadline clamp, automatic settlement, rollover, next-round reset and team reuse. All their synthetic rows are rolled back.
+- Two actual temporary staging Auth accounts used in browser: league creation, request/approval, separate picks, hidden opponent pick, shared mention/alert, public read-only route, theme/vanity link, resized logo persisted as PNG, manual final score and winner confirmation.
+- Mobile iframe: 375 CSS-pixel content viewport inside a 390-pixel frame; no horizontal overflow. Desktop and rotating TV display inspected.
+- Static site checks, venue-sector tests, existing cue physics/referee tests, JavaScript syntax and Edge Function TypeScript checks pass.
+- Temporary browser QA accounts and league are removed after testing. No real member accounts or records are modified.
 
-No entry fees, payment collection or cash prizes are implemented. Existing venue subscriptions are unchanged. No claim of full feature parity or live-score availability is made.
+## Files and activation
 
-## Validation on 20 November 2026
+`install-football.sql` is the consolidated idempotent installer. `database-test.sql` and `service-database-test.sql` are transactional tests. `server/index.ts` is the Edge Function, with `rules.mjs` and `service-model.mjs` as relative dependencies.
 
-- `node --test football/rules.test.mjs`: 6 passing rule tests.
-- `node --input-type=module --check < football/hub.js` and `app.js`: passing.
-- `python3 scripts/check_static.py`: passing existing site asset/guest checks.
-- Staging SQL: creation, approval, outsider denial, pick privacy, owner controls, posting, deadline, unplayed-result rejection, settlement and grants passed, all test rows rolled back.
-- Supabase advisors reviewed: the football table deliberately has no direct-access policies; access is exclusively through the checked RPC. The advisor also reports that the authenticated security-definer RPC is callable, which is intentional; anonymous execution is revoked and membership/roles are enforced in the function. Unrelated pre-existing advisories were not changed.
+See `server/README.md` for credential activation and the production gate. Serve the repository to preview `football-demo.html`; `football.html` reuses the configured project's existing user session or serves a public league.
+
+Security advisors reviewed: no direct-access RLS policies is intentional because table grants are revoked. The two callable security-definer APIs are intentional: authenticated actions enforce membership/roles, and public reads return an explicitly sanitized public-only projection. See https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable and https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable .

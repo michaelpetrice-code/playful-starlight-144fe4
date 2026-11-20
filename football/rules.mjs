@@ -1,9 +1,10 @@
-export const teams=['Arsenal','Aston Villa','Bournemouth','Brentford','Brighton','Burnley','Chelsea','Crystal Palace','Everton','Fulham','Leeds United','Liverpool','Manchester City','Manchester United','Newcastle United','Nottingham Forest','Sunderland','Tottenham','West Ham','Wolves'];
 export function validatePick({team,fixtures,used=[],deadline,now=Date.now(),active=true}) {
  if(!active)throw Error('You are out of this competition.');
  if(!Number.isFinite(Date.parse(deadline))||now>=Date.parse(deadline))throw Error('The deadline has passed.');
  if(used.includes(team))throw Error('You have already used this team.');
- if(!fixtures.some(f=>f.home===team||f.away===team))throw Error('Choose a team playing this round.');
+ const fixture=fixtures.find(f=>f.home===team||f.away===team);
+ if(!fixture)throw Error('Choose a team playing this round.');
+ if(fixture.kickoff&&now>=Date.parse(fixture.kickoff))throw Error('This fixture has already started.');
  return team;
 }
 export function verdict(team,fixtures){
