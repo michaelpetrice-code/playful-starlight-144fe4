@@ -22,3 +22,10 @@ test('sponsorship is disclosed and safely escaped on public pages and posters',(
  assert.match(html,/Advertisement/);assert.match(html,/&lt;Local &amp; Co&gt;/);assert.match(html,/&lt;img src=x&gt;/);assert.match(html,/sponsored noopener noreferrer/);
  assert.doesNotMatch(sponsorHTML({sponsor_name:'Test',sponsor_url:'javascript:alert(1)'}),/href=/);
 });
+
+import {localGaffer} from './gaffer.mjs';
+test('free form guide excludes used teams and never invents missing form',()=>{
+ const s=initialDemo();assert.equal(localGaffer(s,'demo-me').picks.length,0);
+ s.history=[{picks:[{user_id:'demo-me',team:'Arsenal'}],fixtures:[{home:'Arsenal',away:'Chelsea',status:'FT',home_score:0,away_score:2},{home:'Liverpool',away:'Aston Villa',status:'LIVE',home_score:9,away_score:0}]}];
+ const r=localGaffer(s,'demo-me');assert.equal(r.picks[0].team,'Chelsea');assert.ok(!r.picks.some(p=>p.team==='Arsenal'));assert.ok(r.unrated.includes('Liverpool'));assert.match(r.note,/not AI/);
+});

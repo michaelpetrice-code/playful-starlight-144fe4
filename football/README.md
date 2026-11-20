@@ -50,3 +50,5 @@ The Revenue section explains sponsor sales, optional venue spending and links to
 Paid prediction entry and prize-pool commissions are excluded pending specialist UK gambling advice: https://www.legislation.gov.uk/ukpga/2005/19/section/11 and https://www.gamblingcommission.gov.uk/licensees-and-businesses/licences-and-fees/remote-pool-betting-licence .
 
 Deployment remains pending: apply and test the updated consolidated installer against staging, verify sponsor owner permissions/public projection and run two-account browser checks before production rollout. Coombe has not been updated by this branch.
+
+The sponsorship installer has now passed both existing transactional staging suites plus sponsor persistence, public projection and unsafe URL rejection checks. A free local Gaffer form guide uses archived final scores only; missing form remains explicitly unrated. Paid AI controls stay hidden unless already configured.
