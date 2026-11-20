@@ -23,6 +23,7 @@ export function mountBilling(root, sb, user, params) {
           const detail=await error.context?.json?.().catch(()=>null);
           throw Error(detail?.message || 'Stripe could not be opened.');
         }
+        if(data.complimentary){status.textContent='Owner access is permanently complimentary. No checkout or payment details are required.';location.assign('index.html?section=venue-app-builder');return;}
         const url=new URL(data.url);
         if(url.protocol!=='https:' || !['checkout.stripe.com','billing.stripe.com'].includes(url.hostname)) throw Error('Stripe returned an unexpected address.');
         if(action==='checkout') void track('checkout_opened','subscription');
@@ -39,7 +40,7 @@ export function mountBilling(root, sb, user, params) {
       if(!root.isConnected)return;
       controls.length=0;
       plans.replaceChildren();
-      if (!data.eligible && !data.subscribed && !awaitingActivation) {
+      if (!data.complimentary && !data.eligible && !data.subscribed && !awaitingActivation) {
         if (preferred) {
           const plan = venuePlans[preferred];
           plans.append(el('article', { className: 'tl149-panel tl-venue-plan-summary' },
@@ -53,6 +54,13 @@ export function mountBilling(root, sb, user, params) {
           plans.append(el('a', { className: 'tl149-action', href: 'for-venues.html#plans' }, 'Choose a plan'));
         }
       }
+      if(data.complimentary){
+        const summary=el('p',{role:'status'},'Your platform-owner entitlement is permanently complimentary. It does not expire after 14 days and requires no payment details.');
+        const panel=el('section',{className:'tl149-panel'},el('h2',{},'Owner access · £0'),summary);
+        const preview=el('p',{},'Choose a plan below to preview its wording. This is an owner-only preview, not a Stripe checkout or a new subscription.');
+        for(const id of ['monthly','annual']){const b=el('button',{type:'button'},'Preview '+venuePlans[id].label.toLowerCase()+' plan — no card');b.onclick=()=>{preview.textContent=venuePlans[id].label+' plan preview: ordinary venues see '+venuePlans[id].renewal+'. Your owner account remains £0 with permanent access. No subscription or charge was created.';};panel.append(b);}
+        panel.append(preview);if(data.customer)panel.append(el('p',{},'Existing Stripe trials or subscriptions must be checked separately. Complimentary app access alone does not cancel a scheduled Stripe charge. Use Manage existing billing below until that check is complete.'));plans.append(panel);
+      }
       if (data.eligible) {
         const accessPanel = el('section', { className: 'tl176-builder-access' },
           el('h2', {}, 'Your Venue App Builder is ready'),
@@ -64,8 +72,8 @@ export function mountBilling(root, sb, user, params) {
           }, 'Open Venue App Builder'));
         plans.prepend(accessPanel);
       }
-      if(data.customer) plans.append(button('Manage billing','portal'));
-      status.textContent=data.eligible ? 'Venue App Builder access is active.' :
+      if(data.customer) plans.append(button(data.complimentary?'Manage existing billing':'Manage billing','portal'));
+      status.textContent=data.complimentary ? 'Permanent complimentary owner access is active. No payment is required for your app access.' : data.eligible ? 'Venue App Builder access is active.' :
         params.get('checkout')==='success' ? 'Waiting for Stripe to confirm your subscription. Check again shortly.' :
         params.get('checkout')==='cancelled' ? 'You left checkout before subscribing. An open Stripe session may take up to 32 minutes to expire.' : '';
       if(!data.eligible && params.get('checkout')==='success') {

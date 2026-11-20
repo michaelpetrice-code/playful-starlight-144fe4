@@ -30,12 +30,12 @@ export function mountAdministration(root, context, access, openPane) {
   const panes = [];
   if (access.owner) panes.push(['overview', 'Owner dashboard', ownerView, () => bindOwner(context)]);
   if (access.owner) panes.push(['analytics', 'Analytics', () => '', () => mountAnalytics(content, context.sb)]);
-  if (access.local) {
+  if (access.owner || access.local) {
     panes.push(['content', 'Club content & notifications', () => '', () => mountClubAdmin(context.sb, context.user, content)]);
     panes.push(['market', 'Marketplace & trades', adminView, () => bindAdmin(context)]);
   }
-  if (access.applications) panes.push(['applications', 'Venue applications', () => venueApprovalsView(true), () => bindVenueApprovals(context)]);
-  if (access.safety) panes.push(['safety', 'Safety reports', () => safetyView(true), () => bindSafety({ ...context, committee: true })]);
+  if (access.owner || access.applications) panes.push(['applications', 'Venue applications', () => venueApprovalsView(true), () => bindVenueApprovals(context)]);
+  if (access.owner || access.safety) panes.push(['safety', 'Safety reports', () => safetyView(true), () => bindSafety({ ...context, committee: true })]);
   if (access.staff.length) panes.push(['venue', 'Venue controls', () => '', () => mountVenueControls({ ...context, staff: access.staff }, content)]);
 
   if(access.owner) panes.splice(1,0,['assistant','Guided assistant',ownerView,async()=>{await bindOwner(context);content.querySelector('[data-owner-focus=assistant]')?.click();}]);
