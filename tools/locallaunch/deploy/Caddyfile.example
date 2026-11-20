@@ -1,0 +1,10 @@
+# Replace these two example hosts with ones you own and point DNS at the server.
+# Add BOTH published and preview hostnames explicitly. No wildcard certificate assumed.
+demo.sites.example.org, vRELEASE_ID--demo.sites.example.org {
+    encode zstd gzip
+    request_body {
+        max_size 1MB
+    }
+    reverse_proxy 127.0.0.1:8081
+}
+# Owner dashboard stays private: access through an SSH tunnel on port 8080.
