@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+<defs><radialGradient id="glow"><stop stop-color="#563417"/><stop offset="1" stop-color="#101010"/></radialGradient></defs>
+<rect width="1080" height="1350" fill="url(#glow)"/>
+<rect x="35" y="35" width="1010" height="1280" rx="30" fill="none" stroke="#9b7437" stroke-width="2"/>
+<g text-anchor="middle" font-family="DejaVu Sans" fill="#f2ca80">
+<text x="540" y="136" font-size="29" letter-spacing="10">THE LOCAL</text>
+<g font-family="DejaVu Serif" font-weight="bold" font-size="77"><text x="540" y="265">WHERE ARE WE</text><text x="540" y="361">MEETING?</text></g>
+<text x="540" y="430" font-size="33" fill="#f5ecdc">Find your next local night out</text>
+</g>
+<g fill="#1c1511" stroke="#d5a254" stroke-width="6" stroke-linejoin="round">
+<path d="M208 854V634l332-129 332 129v220z"/><path d="M172 646l368-148 368 148" fill="none"/>
+<rect x="458" y="675" width="164" height="179" rx="8"/><rect x="264" y="667" width="135" height="100" rx="8" fill="#e2ae61"/><rect x="681" y="667" width="135" height="100" rx="8" fill="#e2ae61"/>
+<path d="M331 667v100m-67-50h135m349-50v100m-67-50h135M540 675v179M174 854h732" fill="none"/>
+</g>
+<g text-anchor="middle" font-family="DejaVu Sans">
+<text x="540" y="955" fill="#f5ecdc" font-size="32">Pubs • Social clubs • What’s on</text>
+<rect x="253" y="1025" width="574" height="92" rx="12" fill="#efc272"/>
+<text x="540" y="1084" font-size="34" font-weight="bold" fill="#21160e">EXPLORE AS A GUEST</text>
+<text x="540" y="1200" font-size="32" fill="#f2ca80">thelocal.me.uk</text>
+</g></svg>
