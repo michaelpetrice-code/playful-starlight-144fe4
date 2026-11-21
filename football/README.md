@@ -52,3 +52,14 @@ Paid prediction entry and prize-pool commissions are excluded pending specialist
 The consolidated installer is installed on staging and production. Sponsorship persistence and public projection were tested transactionally on staging; owner-only settings are covered by the shared role suite. Coombe has not been updated by this branch.
 
 The sponsorship installer has now passed both existing transactional staging suites plus sponsor persistence, public projection and unsafe URL rejection checks. A free local Gaffer form guide uses archived final scores only; missing form remains explicitly unrated. Paid AI controls stay hidden unless already configured.
+
+## Launch readiness fixes — 21 November 2026
+
+- The standalone football page now puts free registration and sign-in in the hero, explains the device-only demo and links back to The Local.
+- Added accessible Rules navigation with player and organiser guidance, and a setup shortcut for empty shared leagues.
+- Private invitations open the joining screen even for members with an existing league. Football email confirmation returns preserve the football destination and valid invitation code.
+- Saving a pick releases the busy state immediately, allowing a player to change it before the deadline. Removed the unsupported manual half-time status.
+- Added football sharing metadata and four UI regression tests to GitHub Actions. Twenty football tests and existing static/venue checks pass locally.
+- Read-only production checks confirm RLS on all three football tables, no direct member/anonymous table reads, authenticated-only league actions, public-only read projection and no member access to internal service/cache/settlement APIs. Production football-service v1 remains active.
+- Database integration suites were attempted on the identified staging project xqgzdezcnkvjjbhsrofa but automatic approval review rejected synthetic Auth and league mutations. They were not rerun through another route. The prior recorded integration results above are historical, not new verification. No schema or Edge Function was changed by this release.
+- Automatic provider scores, unattended sync and paid AI remain outside the free release until credentials and the corresponding end-to-end checks are available. No charges or subscriptions were enabled.

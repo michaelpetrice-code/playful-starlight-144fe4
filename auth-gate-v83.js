@@ -38,7 +38,9 @@ const game = params.get('share-game');
 const shareReturn = incomingPage ? new URL(memberPageUrl(incomingPage.page, incomingPage))
   : publicVenue && /^[a-z0-9_-]{1,90}$/i.test(publicVenue) ? new URL(memberPageUrl('venues',{venue:publicVenue})) : null;
 if (shareReturn && incomingPage?.page === 'arcade' && /^[a-z0-9-]{1,30}$/.test(game || '')) shareReturn.searchParams.set('share-game',game);
-const signupRedirect = venueSignup ? venueSignupReturn(location.origin, plan) : shareReturn?.href;
+const footballReturn = params.get('section') === 'football' || params.get('page') === 'football' || params.has('football-invite') ? new URL('index.html?section=football', location.href) : null;
+if (footballReturn && /^[a-f0-9-]{36}$/i.test(params.get('football-invite') || '')) footballReturn.searchParams.set('football-invite', params.get('football-invite'));
+const signupRedirect = venueSignup ? venueSignupReturn(location.origin, plan) : footballReturn?.href || shareReturn?.href;
 let client=null,mode='login',working=false;
 let pendingEmail = '';
 
