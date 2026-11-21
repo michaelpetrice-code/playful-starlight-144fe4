@@ -1,0 +1,38 @@
+name: Publish approved Local Facebook advert
+on:
+  workflow_dispatch:
+    inputs:
+      approval:
+        description: 'Type PUBLISH LOCAL NIGHT OUT after reviewing the caption and artwork'
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: facebook-local-night-out
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: inputs.approval == 'PUBLISH LOCAL NIGHT OUT' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: facebook-production
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Render advert and publish to The Local
+        env:
+          FACEBOOK_PAGE_TOKEN: ${{ secrets.FACEBOOK_PAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          : "${FACEBOOK_PAGE_TOKEN:?Configure the Facebook Page access token first}"
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y librsvg2-bin fonts-dejavu-core
+          rsvg-convert marketing/facebook/local-night-out.svg -o "$RUNNER_TEMP/local-night-out.png"
+          response=$(curl --silent --show-error --fail --max-time 45 \
+            -H "Authorization: Bearer $FACEBOOK_PAGE_TOKEN" \
+            -F "source=@$RUNNER_TEMP/local-night-out.png" \
+            -F "message=<marketing/facebook/local-night-out.txt" \
+            https://graph.facebook.com/v27.0/61596370767548/photos)
+          jq -er '"Facebook post ID: " + .post_id' <<< "$response"
