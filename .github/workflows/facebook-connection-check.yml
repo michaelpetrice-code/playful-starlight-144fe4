@@ -1,0 +1,20 @@
+name: Check The Local Facebook connection
+on: workflow_dispatch
+permissions: {}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    environment: facebook-production
+    steps:
+      - name: Verify the token resolves to The Local
+        env:
+          FACEBOOK_PAGE_TOKEN: ${{ secrets.FACEBOOK_PAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          : "${FACEBOOK_PAGE_TOKEN:?Add FACEBOOK_PAGE_TOKEN to the facebook-production environment}"
+          result=$(curl --silent --show-error --fail --max-time 20 \
+            -H "Authorization: Bearer $FACEBOOK_PAGE_TOKEN" \
+            'https://graph.facebook.com/v27.0/me?fields=id,name')
+          jq -e '.id == "61596370767548"' <<< "$result" >/dev/null
+          echo 'The token resolves to The Local Facebook Page.'
