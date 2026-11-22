@@ -1,0 +1,45 @@
+/* Reference-led pub atmosphere with familiar social group and messaging controls. */
+body{background:#031710;color:#faf5e8}
+body>header{background:#041b14!important;border-bottom:1px solid #ba924c;padding:14px 20px!important}
+body>header img{max-height:56px!important}
+body>header h1{font-size:1.35rem!important;font-weight:650}
+body>header p{color:#cecdbb}
+.tl135-section-art{height:230px;border-radius:20px;isolation:isolate}
+.tl135-section-art img{height:100%;max-height:none!important;object-position:center 40%}
+.tl135-section-art:after{background:linear-gradient(0deg,#031710fa,transparent 95%)}
+.tl135-art-caption{position:absolute;left:0;bottom:0;padding:24px!important;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;color:white;line-height:1.1}
+.tl135-art-caption small{display:block;font-size:.7rem;letter-spacing:.14em;margin-top:10px;color:#f5dfb5}
+#tables.panel{background:#051e17!important;border-color:#b99a5344!important}
+#tableList{grid-template-columns:1fr;gap:10px}
+#tableList>.tableCard{display:grid;grid-template-columns:72px minmax(0,1fr) auto;align-items:center;gap:16px;margin:0;padding:14px!important;background:linear-gradient(115deg,#103d2d,#06251c)!important;border-radius:18px!important}
+.table-card-icon{display:grid;place-items:center;aspect-ratio:1;border-radius:14px;font-size:2.35rem;background:radial-gradient(circle at 40% 20%,#5b6234,#172e20 70%);box-shadow:inset 0 0 0 1px #ebcb7544,0 5px 12px #0004}
+.table-card-copy{min-width:0}.table-card-copy h4{margin:0 0 5px;font-size:1.15rem;color:#fff8e9}.table-card-copy p{margin:0;color:#d0d7ca;font-size:.9rem;overflow-wrap:anywhere}
+#tableList>.tableCard button{border-radius:99px;background:transparent;color:#f4d382;border:1px solid #e9bf60;min-height:44px;white-space:nowrap}
+#tableDetail .table-profile{position:relative;padding:22px!important;background:linear-gradient(120deg,#103a2b,#061e17)!important}
+#tableName{font-size:clamp(1.5rem,4vw,2.1rem);margin:0 0 8px}#tableVenueName{font-size:.85rem;letter-spacing:.03em}
+.table-share{padding:0;border:0;background:none}.table-share>button{width:auto}.table-share .muted{font-size:.8rem;margin:6px 4px}
+#memberArea{display:flex;flex-direction:column;gap:12px;min-width:0}
+#memberArea>.switch{order:1;margin:0;padding:6px;background:#10241e;border:1px solid #d9b96a33;border-radius:15px}
+#memberArea>.table-people{order:0;margin:0;border-color:#d9b96a44;overflow:hidden;background:#081b16}
+#memberArea>section{order:2;margin:0}
+.table-people summary{color:#efce85;font-weight:700;background:#0a241b}
+.table-people .pub-scene{margin:0;border:0!important;border-radius:0!important;padding:20px!important;background:linear-gradient(180deg,#170d0890,#071412dc),url('assets/pub-v97/pub-cover.webp') center/cover!important}
+.pub-scene:before{background:repeating-linear-gradient(90deg,#0000 0 76px,#d29e4722 77px 79px);opacity:.5}
+.tl162-scene-heading{justify-content:center;text-align:center}.tl162-scene-heading span:first-child{font-size:.8rem;color:#f7d577;letter-spacing:.08em}.tl162-scene-heading span:last-child{padding:5px 10px;border-radius:99px;background:#071c17dd}
+.tl162-table{border:8px solid #805729;border-radius:46% / 35%;padding:28px 24px;max-width:620px;min-height:280px;background:repeating-linear-gradient(3deg,#0000 0 6px,#20100615 7px 8px),radial-gradient(ellipse at 50% 20%,#bd8743,#75441f 70%);box-shadow:inset 0 0 0 2px #f3cb7a88,inset 0 0 35px #35170588,0 20px 0 #37210f,0 34px 32px #000a}
+.tl162-table-top{box-shadow:none;padding-bottom:8px}.tl162-table-top>span{color:#ffe8a8;font-family:Georgia,serif;font-size:1.35rem;letter-spacing:.12em}.tl162-table-top strong{font-size:.95rem}
+.pub-seats{gap:12px;padding:14px 0}.pub-seat.tl162-seat{background:#071d18ed;border:1px solid #e7c375aa;border-radius:32px;padding:7px 12px 7px 7px;min-width:115px;max-width:165px;box-shadow:0 5px 12px #0005}
+.tl162-seat b{width:36px;height:36px;border:2px solid #f4d37e;background:linear-gradient(130deg,#f2d791,#bb8d40);color:#17271b}.tl162-seat.tl162-active{border-color:#e7c375}.tl162-seat.tl162-active b{outline:2px solid #62cf80;outline-offset:2px;animation:none}
+.tl162-scene-foot{margin-top:32px;font-size:.85rem}
+#feed.panel{background:#0b151b!important;border:1px solid #e7c37533!important;padding:16px!important}
+#feed .chat-head{padding:0 0 12px;border-color:#ffffff17}#feed h3{color:#f9ecd0}
+#feed .chat-head button{background:#18262f;color:#e8e7de;border:1px solid #ffffff22;border-radius:99px;font-size:.8rem;min-height:44px}
+#postList{background:#071017;padding:12px;gap:12px;border-radius:15px;min-height:200px}
+#postList .pub-message{border:1px solid #ffffff12;border-radius:4px 16px 16px 16px;background:#17242e;padding:12px 15px;box-shadow:none}
+#postList .pub-message.own{background:#183c32;border-color:#b6975744;border-radius:16px 4px 16px 16px}
+#feed input,#feed textarea{background:#111e28!important;color:#fff4db!important;border:1px solid #d5bb7855!important}
+#feed #chatBody{border-radius:20px!important;padding:14px 18px}#feed .pub-compose button[type=submit]{background:linear-gradient(135deg,#f4d781,#c9982b);border-radius:99px;min-height:48px;color:#151d16}
+#feed .chat-tools button{background:#172831;color:#e9dab3;border-color:#ffffff22}
+#feed:fullscreen,.tl-chat-expanded #feed{background:#0b151b!important}.tl-chat-expanded #feed .chat-head,#feed:fullscreen .chat-head{background:#0b151b}
+@media(min-width:950px){#memberArea{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.4fr);align-items:start}#memberArea>.table-people{grid-column:1;grid-row:1 / span 2}#memberArea>.switch{grid-column:2}#memberArea>section{grid-column:2}.tl162-table{padding-inline:12px}.pub-seats{gap:8px}}
+@media(max-width:540px){.tl135-section-art{height:190px;margin:8px 10px!important}.tl135-art-caption{padding:18px!important}#tableList>.tableCard{grid-template-columns:56px minmax(0,1fr);gap:10px;padding:12px!important}.table-card-icon{font-size:1.9rem}.table-card-copy h4{font-size:1rem}#tableList>.tableCard button{grid-column:2;justify-self:start;margin:0;min-height:44px;padding:8px 18px}.tl162-table{padding:20px 12px;border-radius:36% / 20%}.pub-seat.tl162-seat{min-width:106px;max-width:135px}.tl162-scene-foot{gap:10px}.table-share>button{width:100%}#feed.panel{padding:12px!important}}

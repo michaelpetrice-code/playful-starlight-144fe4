@@ -1,0 +1,13 @@
+/* A familiar community feed, framed by The Local's forest and gold identity. */
+body{--tlp-bg:#041a13;--tlp-surface:#0c2b21;--tlp-border:#cdaa5e33;background:radial-gradient(ellipse at 85% 0%,#20433355,transparent 50%),#041a13;color:#fbf5e8}
+body>header{background:#051e16!important;border-bottom:1px solid #d5af573d!important;box-shadow:0 5px 22px #0003}
+#bottomNav{background:#061e17f5!important;border-top:1px solid #cdaa5e44!important;backdrop-filter:blur(16px)}
+#bottomNav button{border-radius:12px!important}#bottomNav button.active{color:#f5d16e!important;background:#c7a04218!important}
+.tl122-table-heading{padding:22px!important;border-radius:20px 20px 0 0;background:linear-gradient(90deg,#06231cea,#06231c77),url('assets/feature-slides/virtual-pub-tables.webp') center 40%/cover;min-height:155px;display:flex;flex-direction:column;justify-content:end}
+.tl122-table-heading h2{color:#fff8e9;font-size:clamp(1.65rem,4vw,2.3rem);letter-spacing:-.03em}.tl122-table-heading p{color:#eee5ce;max-width:38rem}
+.local-feed-intro,.local-compose-card,.local-feed-list,#venue-page-feed{max-width:720px;margin-inline:auto}
+body .local-feed-post,body .local-compose-card{background:#fffaf1!important;color:#17291f!important;border:1px solid #e0d7c7!important;border-radius:18px!important;box-shadow:0 8px 24px #0002}
+.local-feed-post .local-post-by strong{color:#142b20}.local-feed-post small,.local-feed-post .local-post-meta{color:#526053!important}.local-feed-post p{color:#203529}.local-feed-post .local-post-buttons{border-top:1px solid #d8dbd0;padding-top:10px}
+body .local-feed-post button,body .local-compose-card button{background:#f1eadb!important;color:#183527!important;border:1px solid #ded5c3;border-radius:10px;min-height:44px}
+.local-feed-post .local-post-by{padding-bottom:12px}.local-feed-post .local-feed-image img{border-radius:12px}.local-feed-post textarea{background:#fff!important;color:#173126!important;border:1px solid #a8b5a3!important}
+@media(max-width:650px){.tl122-table-heading{margin:0 8px;min-height:150px;padding:20px!important}.local-feed-list{display:grid;gap:12px}.local-feed-post{margin-block:0!important}}
