@@ -1,9 +1,11 @@
+import {createPushClient} from './push-notifications.js?v=240';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';
 import {bindChatScreen} from './table-chat-screen.js?v=168';
 import {bindTableVideo} from './table-video.js?v=167';
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 
 const cfg = window.LADS_CONFIG || {};
+const phoneAlerts = createPushClient(window,document,cfg);
 const sb = cfg.supabaseUrl && cfg.supabaseAnonKey ? createClient(cfg.supabaseUrl, cfg.supabaseAnonKey) : null;
 const $ = id => document.getElementById(id);
 const chatScreen = bindChatScreen($('feed'), $('toggleTableChatScreen'));
@@ -153,6 +155,7 @@ async function init() {
   user = data?.user;
   if (!user && (!error || error.name === 'AuthSessionMissingError')) { $('signin').hidden = false; msg('Please sign in to The Local to create or join a table.'); return; }
   if (error) throw error;
+  if (parent === window) phoneAlerts.sync(user.id).catch(()=>{});
   venues = check(await sb.from('local_venue_directory').select('id,name,town,type').in('status',['approved','featured']).order('name'));
   for (const item of venues) $('tableVenue').append(new Option([item.name,item.town].filter(Boolean).join(' · '),item.id));
   const saved = sessionStorage.getItem('local-table-venue');
@@ -868,3 +871,8 @@ $('shareTable').onclick=()=>run(async()=>{
     catch(e) { if(e.name!=='AbortError') msg('Choose a sharing option below.'); }
   }
 });
+
+$('enableTableAlerts').onclick = async () => {
+ if(parent !== window){parent.postMessage({type:'tl-enable-message-alerts'},location.origin);return;}
+ try{msg(await phoneAlerts.enable(user?.id));}catch(error){msg(error.message);}
+};

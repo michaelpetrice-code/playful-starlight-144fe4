@@ -78,9 +78,10 @@ def main():
         if marker not in game_html:
             failures.append(f'games-room-next.html: missing game marker {marker}')
     app_js = (ROOT / 'app.js').read_text(encoding='utf-8')
-    worker = re.search(r'''serviceWorkerPath:\s*['"]([^'"]+)['"]''', app_js)
+    push_js = (ROOT / 'push-notifications.js').read_text(encoding='utf-8') if "from './push-notifications.js" in app_js else app_js
+    worker = re.search(r'''serviceWorkerPath:\s*['"]([^'"]+)['"]''', push_js)
     if not worker or not (ROOT / worker.group(1)).is_file():
-        failures.append('app.js: configured notification worker is missing')
+        failures.append('configured notification worker is missing')
     if failures:
         print('FAILED static smoke checks:')
         for f in failures:

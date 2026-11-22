@@ -42,3 +42,6 @@ jobs:
 
       - name: Check football rules, provider validation and QR rendering
         run: node --test football/rules.test.mjs football/model.test.mjs venue-setup-guide.test.mjs
+
+      - name: Check message notifications, table access and invitations
+        run: node --test tests/message-alerts.test.cjs tests/table-chat-entry.test.cjs tests/table-message-visibility.test.cjs tests/table-invitations.test.cjs

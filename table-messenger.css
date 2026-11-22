@@ -50,3 +50,24 @@
 .pub-seat.tl162-seat>.member-avatar{grid-row:span 2;width:36px;height:36px}
 .pub-message>.member-avatar{float:left;margin:0 9px 6px 0;width:30px;height:30px;font-size:.8rem}
 .pub-message:after{content:'';display:block;clear:both}
+
+/* Keep the composer on screen while the message history scrolls. */
+.messenger-tables #feed:not([hidden]){display:flex;flex-direction:column;box-sizing:border-box;height:min(640px,75svh);min-height:260px;overflow:hidden}
+.messenger-tables.tl122-embedded #feed:not([hidden]){height:520px}
+.messenger-tables #feed #postList{flex:1 1 0;min-height:0;max-height:none;height:auto;overflow-y:auto;overscroll-behavior:contain}
+.messenger-tables #feed>#postForm{flex:none;margin:0;padding-bottom:max(8px,env(safe-area-inset-bottom));background:#0b151b;z-index:2}
+.messenger-tables #feed>.chat-head,.messenger-tables #feed>.table-active-members{flex:none}
+.messenger-tables #feed>.table-active-members{max-height:58px}
+.messenger-tables.tl-chat-expanded #feed:not([hidden]),.messenger-tables #feed:fullscreen{height:100dvh}
+@media(max-width:540px){.messenger-tables.tl122-embedded #feed:not([hidden]){height:420px}}
+/* A conversation fills the viewport; only history scrolls, never the composer. */
+html.table-conversation-open,html.table-conversation-open body{height:var(--conversation-height,100dvh);overflow:hidden}
+.table-conversation-open body>header,.table-conversation-open body>.tl135-section-art{display:none!important}
+.table-conversation-open body>main{display:flex;flex-direction:column;box-sizing:border-box;height:100%;max-width:960px;margin:0 auto;padding:8px!important}
+.table-conversation-open #tableDetail{display:flex;flex-direction:column;flex:1;min-height:0}
+.table-conversation-open #tableDetail>.table-profile{flex:none;margin-bottom:6px;padding-top:8px!important;padding-bottom:8px!important}
+.table-conversation-open #memberState{margin:4px 0;font-size:.8rem}
+.table-conversation-open #tableDetail>#back{flex:none;margin:0;min-height:36px;text-align:left}
+.table-conversation-open #memberArea{display:flex;flex:1;min-height:0}
+.messenger-tables.table-conversation-open #feed:not([hidden]){flex:1;height:auto;min-height:0;margin:0!important}
+.table-conversation-open #postForm{flex:none}

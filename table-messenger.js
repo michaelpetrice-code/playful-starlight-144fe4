@@ -12,7 +12,7 @@ if (feed) {
   content.className = 'messenger-menu-content';
   menu.append(summary, content);
   document.querySelector('.table-profile').append(menu);
-  for (const node of [document.querySelector('#memberArea > .switch'), document.querySelector('.table-people'), document.querySelector('.table-share'), byId('tableDescription'), byId('tableShortcutHelp'), byId('tl163Settings'), byId('tl163Preferences'), document.querySelector('.pub-search')]) {
+  for (const node of [document.querySelector('#memberArea > .switch'), document.querySelector('.table-people'), document.querySelector('.table-share'), byId('tableDescription'), byId('tableShortcutHelp'), byId('tableVideo'), byId('tl163Settings'), byId('tl163Preferences'), document.querySelector('.pub-search')]) {
     if (node) content.append(node);
   }
   const fullScreen = document.createElement('button');
@@ -41,3 +41,26 @@ if (feed) {
   send.title = 'Send message';
   document.documentElement.classList.add('messenger-tables');
 }
+
+// Reopening Chat should reveal the composer even after scrolling through Plans.
+document.querySelector('[data-tab="feed"]')?.addEventListener('click', () => {
+  const composer = byId('postForm');
+  if (composer && !composer.closest('[hidden]')) {
+    byId('chatBody').focus({preventScroll:true});
+    composer.scrollIntoView({block:'nearest'});
+  }
+});
+
+// Give an open conversation a viewport of its own, including inside The Local.
+function syncConversationViewport() {
+  const active = !byId('tableDetail').hidden && !byId('memberArea').hidden && !feed.hidden;
+  document.documentElement.classList.toggle('table-conversation-open', active);
+  const viewport = window.visualViewport;
+  document.documentElement.style.setProperty('--conversation-height', `${viewport?.height || innerHeight}px`);
+  if (parent !== window) parent.postMessage({type:'tl-table-conversation',active},location.origin);
+}
+const conversationObserver = new MutationObserver(syncConversationViewport);
+for (const id of ['tableDetail','memberArea','feed']) conversationObserver.observe(byId(id),{attributes:true,attributeFilter:['hidden']});
+window.visualViewport?.addEventListener('resize',syncConversationViewport);
+window.addEventListener('resize',syncConversationViewport);
+syncConversationViewport();

@@ -9,6 +9,7 @@ async function scenario({signedIn=true,approved=false,invalid=false}={}) {
   const calls = [];
   const destination = {venue:'venue-id',table:'table-id'};
   const context = {
+    phoneAlerts:{sync:async()=>null},
     linkedTable:destination, pageParams:new URLSearchParams('invite=secret'),
     location:{href:'https://example.com/secure-tables.html?venue=venue-id&table=table-id&invite=secret'},
     URL, Option:function(){}, shortcutPage:false, user:null, venues:[], role:null,
