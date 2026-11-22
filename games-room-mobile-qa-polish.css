@@ -1,0 +1,9 @@
+/* Games Room mobile/accessibility polish. Progressive enhancement only; no gameplay changes. */
+#tl191-library input[type="search"],#tl191-library select,.tl184-coach select{font:inherit;min-height:44px}
+#tl191-library input[type="search"]{min-width:0;max-width:100%;box-sizing:border-box}
+#tl191-library button,.tl191-playbar button,.tl186-toolbar button,.tl184-coach button,#restart{min-height:44px;touch-action:manipulation}
+#tl191-library :is(input,select,button):focus-visible,.tl191-playbar button:focus-visible,.tl186-toolbar button:focus-visible,.tl184-coach :is(button,select):focus-visible,#restart:focus-visible{outline:3px solid #f5c96b;outline-offset:3px}
+#tl191-play{scroll-margin-top:1.25rem}
+#tl191-library{scroll-margin-top:1.25rem}
+@media(max-width:700px){.tl191-controls{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center}.tl191-controls input[type="search"]{flex:1 1 100%;width:100%}.tl191-controls select{flex:1 1 9rem;max-width:100%}.tl191-playbar{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center;justify-content:space-between}.tl186-toolbar{display:flex;flex-wrap:wrap;gap:.65rem}.tl184-coach-head{display:flex;flex-wrap:wrap;gap:.65rem}}
+@media(prefers-reduced-motion:reduce){#tl191-library *,#tl191-play *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
