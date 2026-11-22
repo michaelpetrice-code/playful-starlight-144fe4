@@ -39,20 +39,35 @@ export async function renderVenuePageFeed(client, host, { discovery = false } = 
       status.textContent = 'Venue pages will appear here when they’re available.';
       return;
     }
-    const result = await client.from('local_venue_directory').select('id,name,town,description')
-      .in('id', [...sources.keys()]).in('status', ['approved','featured']).order('name').limit(pageLimit);
-    if (result.error) throw result.error;
-    const pages = await Promise.all((result.data || []).map(async venue => {
-      const link = sources.get(venue.id);
-      let app;
-      if (link.published_app_slug) {
-        const published = await client.rpc('local_builder_public', {p_slug: link.published_app_slug})
-          .catch(() => null);
-        app = published?.data;
-        if (!app || published.error) return null;
-      }
-      return { venue, link, app };
-    }));
+    const pageIds = [...sources.keys()];
+    const venues = [];
+    // Keep URL lengths and concurrent requests bounded as the directory grows.
+    for (let offset = 0; offset < pageIds.length; offset += 40) {
+      if (!host.isConnected) return;
+      const result = await client.from('local_venue_directory').select('id,name,town,description')
+        .in('id', pageIds.slice(offset, offset + 40))
+        .in('status', ['approved','featured']).order('name');
+      if (result.error) throw result.error;
+      venues.push(...(result.data || []));
+    }
+    venues.sort((a, b) => a.name.localeCompare(b.name, 'en-GB'));
+    const selected = discovery ? venues : venues.slice(0, pageLimit);
+    const pages = [];
+    for (let offset = 0; offset < selected.length; offset += 6) {
+      if (!host.isConnected) return;
+      const batch = await Promise.all(selected.slice(offset, offset + 6).map(async venue => {
+        const link = sources.get(venue.id);
+        let app;
+        if (link.published_app_slug) {
+          const published = await client.rpc('local_builder_public', {p_slug: link.published_app_slug})
+            .catch(() => null);
+          app = published?.data;
+          if (!app || published.error) return null;
+        }
+        return { venue, link, app };
+      }));
+      pages.push(...batch.filter(Boolean));
+    }
     if (!host.isConnected) return;
     const list = host.querySelector('.venue-page-feed-list');
     const town = el('input', {type:'search', placeholder:'e.g. Coventry'});
@@ -61,7 +76,7 @@ export async function renderVenuePageFeed(client, host, { discovery = false } = 
     date.value = '7';
     function draw() {
       const query = town.value.trim().toLowerCase();
-      const visible = pages.filter(Boolean).flatMap(({venue, link, app}) => {
+      const visible = pages.flatMap(({venue, link, app}) => {
       if (discovery && query && !String(venue.town || '').toLowerCase().includes(query)) return [];
       const cards = upcomingCards(app, discovery ? Number(date.value) : 30);
       if (discovery && !cards.length) return [];
