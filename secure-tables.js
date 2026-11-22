@@ -22,6 +22,7 @@ let presenceChannel = null;
 let presentUsers = new Set();
 let liveRefreshQueued = false;
 const signedLinks = new Map();
+let memberPhotos = new Map();
 // v163: device-local chat preferences; no server-side read receipts or calling claims.
 const prefKey = id => 'tl163-prefs-' + (user?.id || 'guest') + '-' + id;
 let chatPrefs = {mute:false, browser:false, hidePresence:false};
@@ -81,6 +82,8 @@ $('tl163HidePresence').onchange = e => {
   chatPrefs.hidePresence=e.target.checked;savePreferences();
   if (presenceChannel && sb) sb.removeChannel(presenceChannel);
   presenceChannel=null;
+  presentUsers = new Set();
+  renderSeats();
   if (!chatPrefs.hidePresence && table?.id && role) connectPresence(table.id);
 };
 
@@ -368,6 +371,22 @@ function seatName(id) {
   return id === user.id ? 'You' : seats.find(seat => seat.user_id === id)?.display_name || 'Member';
 }
 
+function memberAvatar(id, name) {
+  const avatar = element('span','','member-avatar');
+  avatar.classList.toggle('is-active', presentUsers.has(id));
+  avatar.setAttribute('aria-label', name + (presentUsers.has(id) ? ' · Active now' : ''));
+  avatar.title = name + (presentUsers.has(id) ? ' · Active now' : '');
+  avatar.append(element('span',name.slice(0,1).toUpperCase(),'member-avatar-initial'));
+  const raw = id === user?.id ? (user.user_metadata?.avatar_url || user.user_metadata?.avatar_data || memberPhotos.get(id)) : memberPhotos.get(id);
+  if (raw && (/^https:\/\//i.test(raw) || /^data:image\/(jpeg|png|webp);base64,/i.test(raw))) {
+    const photo = document.createElement('img');
+    photo.alt = ''; photo.src = raw; photo.referrerPolicy = 'no-referrer';
+    photo.addEventListener('error',()=>photo.remove(),{once:true});
+    avatar.append(photo);
+  }
+  return avatar;
+}
+
 function renderSeats() {
   const approved = seats.slice(0,12);
   const items = approved.map((seat,index) => {
@@ -377,13 +396,20 @@ function renderSeats() {
     marker.classList.toggle('tl162-active',active);
     marker.style.setProperty('--seat-index',index);
     marker.title = name + (active ? ' · at the table now' : ' · member');
-    marker.append(element('b',name.slice(0,1).toUpperCase()),element('span',name));
+    marker.append(memberAvatar(seat.user_id,name),element('span',name));
     const status = element('small',active?'● Here now':'○ Away','tl162-seat-status');
     marker.append(status);
     return marker;
   });
   if (seats.length > 12) items.push(element('span','+'+(seats.length-12)+' more','pub-seat pub-seat-count'));
   $('pubSeats').replaceChildren(...items);
+  const strip = $('tableActiveMembers');
+  if (strip) strip.replaceChildren(...approved.map(seat=>memberAvatar(seat.user_id,seatName(seat.user_id))));
+  document.querySelectorAll('[data-member-avatar]').forEach(node=>{
+    const active = presentUsers.has(node.dataset.memberAvatar);
+    node.classList.toggle('is-active',active);
+    node.setAttribute('aria-label',seatName(node.dataset.memberAvatar)+(active?' · Active now':''));
+  });
   $('tl162Members').textContent = seats.length + (seats.length===1?' member':' members') + ' · ' + [...presentUsers].filter(id=>seats.some(seat=>seat.user_id===id)).length + ' here now';
   $('tl162Online').textContent = presentUsers.size ? '● ' + presentUsers.size + ' online' : '○ No live presence';
 }
@@ -401,7 +427,18 @@ function loadPosts() {
     const badges = posts.length ? check(await sb.from('tl_table_reactions').select('post_id,user_id').in('post_id',posts.map(post=>post.id))) : [];
     if (table?.id !== id || !role) return;
     const memberRows = check(seatsResult);
-    const seatState = JSON.stringify([id,memberRows]);
+    // Optional public profile lookup uses the existing signed-in profile policy.
+    // Missing profile setup or an unavailable photo never blocks the chat.
+    let photos = [];
+    if (memberRows.length) {
+      try {
+        const result = await sb.from('local_member_profiles').select('user_id,avatar_url').in('user_id',memberRows.map(row=>row.user_id));
+        if (!result.error) photos = result.data || [];
+      } catch { /* Initials remain available. */ }
+    }
+    if (table?.id !== id || !role) return;
+    memberPhotos = new Map(photos.map(row=>[row.user_id,row.avatar_url]));
+    const seatState = JSON.stringify([id,memberRows,photos]);
     seats = memberRows;
     if (paintedSeats !== seatState || !$('pubSeats').children.length) {
       paintedSeats = seatState;
@@ -421,7 +458,7 @@ async function renderChat(id, scrollToEnd = false) {
   const list = $('postList');
   if (table?.id !== id || !role) return;
   const search = $('searchChat').value.trim().toLowerCase();
-  const state = JSON.stringify([id,search,messages,seats,reactions,role]);
+  const state = JSON.stringify([id,search,messages,seats,reactions,role,[...memberPhotos]]);
   if (state === rendered && !shownLinksNeedRefresh()) return;
   function shownLinksNeedRefresh() {
     return messages.some(post => {
@@ -435,6 +472,9 @@ async function renderChat(id, scrollToEnd = false) {
   for (const post of shown) {
     const own = post.user_id === user.id;
     const bubble = element('article','',own?'pub-message own':'pub-message');
+    const photo = memberAvatar(post.user_id,seatName(post.user_id));
+    photo.dataset.memberAvatar = post.user_id;
+    bubble.append(photo);
     const caption = new Date(post.created_at).toLocaleString('en-GB',{dateStyle:'short',timeStyle:'short'});
     bubble.append(element('small',seatName(post.user_id)+' · '+caption+(post.edited_at?' · Edited':'')+(post.hidden?' · Hidden':'')));
     if (post.reply_to) {
@@ -631,6 +671,7 @@ function disconnectLive() {
   if (presenceChannel && sb) sb.removeChannel(presenceChannel);
   presenceChannel = null;
   presentUsers = new Set();
+  renderSeats();
   if (liveChannel && sb) sb.removeChannel(liveChannel);
   liveChannel = null;
   if ($('chatLive')) $('chatLive').textContent = '● Checking updates';
@@ -659,6 +700,9 @@ function connectPresence(id) {
     if (status==='SUBSCRIBED' && presenceChannel===channel && table?.id===id && role) {
       try { await channel.track({joined_at:new Date().toISOString()}); }
       catch(error) { console.warn('Presence tracking unavailable:',error); }
+    } else if (['CLOSED','CHANNEL_ERROR','TIMED_OUT'].includes(status) && presenceChannel===channel) {
+      presentUsers = new Set();
+      renderSeats();
     }
   });
 }
