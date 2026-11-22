@@ -8,6 +8,15 @@ window.addEventListener('message', event => {
     return;
   }
 
+  if (event.data?.type === 'tl-table-invite-opened') {
+    const clean = new URL(location.href);
+    if (clean.searchParams.get('venue') === event.data.venue && clean.searchParams.get('table') === event.data.table) {
+      clean.searchParams.delete('invite');
+      history.replaceState(null, '', clean.href);
+    }
+    return;
+  }
+
   if (event.data?.type !== 'tl122-table-height') return;
   const height = event.data.height;
   if (!Number.isFinite(height) || height <= 0) return;
