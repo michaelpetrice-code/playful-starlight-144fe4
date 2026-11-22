@@ -143,7 +143,7 @@ $('copyTableShortcut').onclick = async () => {
 
 async function init() {
   if (linkedTable) {
-    $('tableSignIn').href = tableChatLink('index.html', location.href, linkedTable, {section:'tables'}).href;
+    $('tableSignIn').href = tableChatLink('index.html', location.href, linkedTable, {section:'tables', ...(pageParams.get('invite') ? {invite:pageParams.get('invite')} : {})}).href;
   }
   if (!sb) { $('signin').hidden = false; msg('Supabase connection is not configured.'); return; }
   const {data, error} = await sb.auth.getUser();
@@ -156,8 +156,8 @@ async function init() {
   const coombe = venues.find(item => item.name.trim().toLowerCase() === 'coombe social club');
   $('tableVenue').value = venues.some(item=>item.id===saved) ? saved : coombe ? coombe.id : venues.length === 1 ? venues[0].id : '';
   await loadTables();
-  // Open a shared table link after selecting its venue. A one-use invitation
-  // is redeemed only when its recipient explicitly presses Join.
+  // Opening a valid invitation admits the signed-in recipient immediately.
+  // The server still checks expiry, single use, venue and restricted membership.
   const sharedVenue = linkedTable?.venue;
   const sharedTable = linkedTable?.table;
   if (sharedVenue && sharedTable && venues.some(v => v.id === sharedVenue)) {
@@ -170,16 +170,26 @@ async function init() {
         baseTitle = document.title = found.name + ' · The Local';
         if (role) $('feed').scrollIntoView({block:'start'});
       }
-      const token = shortcutPage ? null : pageParams.get('invite');
-      if (token && !role) {
-        const join = button('Accept invitation & pull up a chair', async () => {
-          const id = check(await sb.rpc('tl_venue_invite_accept',{p_token:token,p_venue:sharedVenue}));
-          if (id !== sharedTable) throw Error('This invitation is for another table.');
-          history.replaceState(null,'',location.pathname+'?venue='+encodeURIComponent(sharedVenue)+'&table='+encodeURIComponent(sharedTable));
-          await refreshMembership(sharedTable,true);
-          msg('Invitation accepted. Welcome to the table!');
-        });
-        $('joinArea').prepend(join);
+      const token = pageParams.get('invite');
+      if (token) {
+        if (!role) {
+          msg('Opening your invitation…');
+          try {
+            const id = check(await sb.rpc('tl_venue_invite_accept',{p_token:token,p_venue:sharedVenue}));
+            if (id !== sharedTable) throw Error('This invitation is for another table.');
+            await refreshMembership(sharedTable,true);
+            msg('Welcome to the table!');
+          } catch (error) {
+            msg('Unable to open this invitation: '+(error.message || String(error))+'. Ask the table owner for a new invitation.');
+          }
+        }
+        if (role) {
+          const clean = new URL(location.href);
+          clean.searchParams.delete('invite');
+          history.replaceState(null,'',clean.href);
+          if (parent !== window) parent.postMessage({type:'tl-table-invite-opened',venue:sharedVenue,table:sharedTable},location.origin);
+          $('feed').scrollIntoView({block:'start'});
+        }
       }
     } else if (shortcutPage) msg('This table is no longer available. Choose a table below.');
   } else if (shortcutPage && venues.length) msg('This shortcut is no longer available. Choose a table below.');
@@ -341,7 +351,11 @@ async function refreshMembership(id, first = false) {
 function showTab(name) {
   if (name !== 'feed') chatScreen.close();
   for (const section of ['feed','events','manage']) $(section).hidden = section !== name;
-  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('[data-tab]').forEach(button => {
+    const selected = button.dataset.tab === name;
+    button.classList.toggle('active', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
 }
 
 function seatName(id) {
