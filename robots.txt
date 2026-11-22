@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /owner
+Disallow: /account
+Disallow: /profile
+Sitemap: https://thelocal.me.uk/sitemap.xml
