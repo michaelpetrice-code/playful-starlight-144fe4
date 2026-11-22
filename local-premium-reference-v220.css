@@ -1,0 +1,20 @@
+/* The Local premium design direction: reference-inspired black, champagne gold, restrained glow.
+   Presentation only. Does not alter sign-in, navigation, game rules or venue data. */
+:root{--tl-premium-bg:#080909;--tl-premium-surface:#151514;--tl-premium-gold:#e8c47c;--tl-premium-soft:#f5e7c5;--tl-premium-line:rgba(232,196,124,.28)}
+body{background:var(--tl-premium-bg);color:#f7f1e6}
+body :is(#tl-auth-gate,.tl-auth-shell){background-color:#090a09}
+body .tl-auth-shell{background-image:radial-gradient(ellipse at 50% 5%,rgba(210,155,48,.16),transparent 60%)}
+body .tl-auth-brand img{filter:drop-shadow(0 7px 20px rgba(220,164,57,.24));max-width:100%;height:auto}
+body :is(.tl-auth-card,.tl-auth-inner,.tl-auth-features,.tl-home-venue-trial){border-color:var(--tl-premium-line)}
+body :is(.tl-auth-card,.tl-auth-inner){box-shadow:0 18px 48px rgba(0,0,0,.32)}
+body :is(.tl-auth-brand h1,.tl-auth-card h1,.tl-auth-card h2){color:var(--tl-premium-gold);letter-spacing:.015em}
+body :is(#tl-auth-submit,.tl149-action,.guest-button){background:linear-gradient(135deg,#f0d28c,#c99a43)!important;color:#16130d!important;border:1px solid #edca78!important;box-shadow:0 4px 16px rgba(185,133,44,.18)}
+body :is(#tl-auth-submit,.tl149-action,.guest-button):hover{filter:brightness(1.07)}
+body :is(.card,.panel,.tile,.feature-card,.dashboard-card,.module-card,.guest-card,.guest-feature){box-shadow:0 12px 34px rgba(0,0,0,.25);border-color:var(--tl-premium-line);overflow-wrap:anywhere}
+body :is(.card,.panel,.tile,.feature-card,.dashboard-card,.module-card,.guest-card,.guest-feature):hover{border-color:rgba(232,196,124,.52)}
+body :is(#tabs,#bottomNav){border-color:var(--tl-premium-line)}
+body :is(button,a,input,select,textarea):focus-visible{outline:3px solid #ffdc91;outline-offset:3px}
+body :is(button,.button,.tl149-action,.guest-button){touch-action:manipulation}
+body img{max-width:100%}
+@media(max-width:700px){body .tl-auth-shell{padding-inline:clamp(12px,4vw,24px)}body .tl-auth-brand img{max-height:120px;object-fit:contain}body :is(.tl-auth-card,.tl-auth-inner){max-width:100%;box-sizing:border-box}body :is(.tl149-action,.guest-button,#tl-auth-submit){min-height:48px}}
+@media(prefers-reduced-motion:reduce){body :is(.card,.tile,.feature-card,.guest-card,button,a){transition-duration:.01ms!important;animation-duration:.01ms!important}}
