@@ -1,0 +1,10 @@
+.member-notifications { position: relative; width: fit-content; margin: .5rem auto; text-align: left; }
+.member-notifications[hidden], .member-notifications [hidden] { display: none !important; }
+.member-notifications summary, .member-notifications button { min-height: 44px; cursor: pointer; }
+.member-notifications summary { padding: .6rem .8rem; }
+.member-notifications :focus-visible { outline: 3px solid #b27c27; outline-offset: 2px; }
+.member-notifications section { width: min(24rem, 85vw); max-height: 50vh; overflow: auto; padding: .8rem; border: 1px solid #c9a467; border-radius: .75rem; background: #fff9ec; color: #17332b; }
+.member-notifications h2 { font-size: 1.1rem; margin-top: 0; color: inherit; }
+.member-notifications ul { list-style: none; padding: 0; }
+.member-notifications li button { width: 100%; text-align: left; }
+#member-notification-count { border-radius: 1rem; background: #f1c875; color: #17332b; padding: .15rem .4rem; }

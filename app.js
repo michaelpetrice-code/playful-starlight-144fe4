@@ -1,3 +1,4 @@
+import { renderMemberNotifications } from './member-notifications.js';
 import {footballView,mountFootball} from './football/hub.js';
 import {trackPage} from './analytics-track.js?v=174';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';
@@ -283,6 +284,18 @@ return `<div class="local50-interior local50-${theme}"><section class="local50-p
 
 async function renderAnnouncements(){if(!sb)return;const view=document.getElementById('view');if(!view)return;const marker=document.createElement('section');marker.className='local-owner-news';marker.innerHTML='<h2>✦ News from The Local</h2><p>Loading announcements…</p>';const target=view.querySelector('.local50-page-body')||view;const content=view.querySelector('.tl149-home #tl82-public');if(content)content.after(marker);else target.prepend(marker);const news=await loadPublicAnnouncements(sb);if(!marker.isConnected)return;if(!news.length){marker.remove();return}marker.innerHTML='<h2>✦ News from The Local</h2>';for(const item of news){const article=document.createElement('article');const title=document.createElement('strong');title.textContent=item.title;const body=document.createElement('p');body.textContent=item.body;article.append(title,body);if(item.image_url&&/^https:\/\//.test(item.image_url)){const img=document.createElement('img');img.src=item.image_url;img.loading='lazy';img.alt='Announcement image';article.append(img)}marker.append(article)}}
 function render(){
+ renderMemberNotifications({
+  member: user && (memberStatus === 'active' || ownerAccess) ? user.id : null,
+  groupId, records,
+  openPage(page) {
+   tab = page;
+   $('member-notifications').open = false;
+   render();
+   $('view').setAttribute('tabindex', '-1');
+   $('view').focus();
+   window.scrollTo(0,0);
+  }
+ });
  if (Object.hasOwn(legacyAdmin,tab)) { adminPane=legacyAdmin[tab]; tab='Administration'; }
  const analyticsPage = Object.keys(memberPages).find(key => memberPages[key]===tab)
    || (tab==='Venue subscription' ? 'subscription' : tab==='Venue App Builder' ? 'builder' : null);
