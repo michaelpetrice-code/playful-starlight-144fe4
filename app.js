@@ -62,8 +62,8 @@ const groupItemPages = new Set(['updates', 'plans', 'events', 'photos']);
 const tableDestination = builderLink.get('section') === 'tables' ? readTableChatLink(builderLink) : null;
 if (builderLink.get('section') === 'tables') tab = 'Virtual Pub Tables';
 const tableFrameUrl = tableDestination
-  ? tableChatLink('secure-tables.html', location.href, tableDestination, {embedded:'1', v:'169'}).href
-  : 'secure-tables.html?embedded=1&v=169';
+  ? tableChatLink('secure-tables.html', location.href, tableDestination, {embedded:'1', v:'170', ...(builderLink.get('invite') ? {invite:builderLink.get('invite')} : {})}).href
+  : 'secure-tables.html?embedded=1&v=170';
 if (builderLink.get('section') === 'venue-app-builder') tab = 'Venue App Builder';
 if (builderLink.get('section') === 'venue-applications') tab = 'Venue Applications';
 if (builderLink.get('section') === 'football') tab = 'Football';
