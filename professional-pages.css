@@ -1,0 +1,62 @@
+/* Shared visual rhythm for public, member and venue pages. Gameplay surfaces keep their own styling. */
+:root{--local-ink:#f8f4e9;--local-soft:#c7d1c9;--local-gold:#e7c77e;--local-line:#e3c4792b;--local-surface:#10271f;--local-radius:18px}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+body :where(h1,h2,h3){text-wrap:balance;letter-spacing:-.025em}
+body :where(p){text-wrap:pretty}
+body :where(.local50-page-body,.guest-main,.tl149-public-main,.vb-builder,.owner-workspace-content){min-width:0}
+body :where(.guest-main,.tl149-public-main){max-width:1180px;margin-inline:auto}
+body :where(.guest-header,.tl149-public-header){padding-block:18px;gap:16px;border-bottom:1px solid var(--local-line)}
+body :where(.guest-header,.tl149-public-header) img{max-width:min(220px,50vw);height:auto;object-fit:contain}
+body :where(.local50-page-hero,.guest-hero,.tl149-home-intro){border-radius:22px;overflow:hidden}
+body :where(.local50-page-hero h1,.guest-main>h1,.tl149-public-hero h1){font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.1;max-width:22ch}
+body :where(.local50-page-body>.panel,.guest-card,.tl149-panel,.owner-stat,.v192-panel){border-radius:var(--local-radius)!important;border:1px solid var(--local-line)!important;padding:clamp(16px,2.5vw,26px);box-shadow:0 10px 30px #0002}
+body :where(.guest-card-grid,.tl149-features,.owner-stats){gap:18px}
+body :where(.guest-feature,.tl149-feature){border-radius:18px!important;box-shadow:0 8px 24px #0003;border:1px solid var(--local-line)!important;overflow:hidden}
+body :where(.guest-feature img,.tl149-feature img){display:block;aspect-ratio:16/10;object-fit:cover;width:100%;height:auto}
+body :where(.guest-feature-body,.tl149-feature-body){padding:18px;gap:8px}
+body :where(.guest-feature strong,.tl149-feature h3){line-height:1.25}
+body :where(.guest-nav,.tl149-public-nav){display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;padding-block:12px}
+body :where(.guest-nav,.tl149-public-nav)>a{min-height:44px;display:inline-flex;align-items:center;text-decoration:none;font-weight:600}
+body :where(.guest-nav,.tl149-public-nav)>a[aria-current=page]{color:var(--local-gold);box-shadow:inset 0 -2px var(--local-gold)}
+body :where(.tl149-action,.guest-button,.tl172-share){min-height:44px;border-radius:12px!important;padding:11px 17px;text-decoration:none;line-height:1.3}
+body :where(.local50-page-body form,.guest-main form,.tl149-public-main form) :where(input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea){max-width:100%;font:inherit;min-height:44px;box-sizing:border-box;border-radius:11px}
+body :where(.local50-page-body form,.guest-main form,.tl149-public-main form) button{min-height:44px;border-radius:11px;line-height:1.3}
+body :where(.local50-hero-inner p,#guest-intro){max-width:65ch;line-height:1.6}
+body :where(.local50-hero-links){display:flex;justify-content:flex-end;min-height:0}
+body :where(.guest-footer,.tl149-public-footer){display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:24px 16px;border-top:1px solid var(--local-line);font-size:.9rem}
+.local-secondary-tabs{display:none!important}
+.local-options{display:inline-block;max-width:100%;position:relative;vertical-align:middle;border:1px solid var(--local-line);border-radius:12px;background:#10271f;color:#f6e9c9;margin:4px 0}
+.local-options>summary{display:flex;align-items:center;justify-content:space-between;gap:14px;list-style:none;cursor:pointer;min-height:44px;padding:9px 14px;font:650 .9rem/1.3 ui-sans-serif,system-ui,sans-serif;color:inherit;box-sizing:border-box}
+.local-options>summary:after{content:'⌄';color:var(--local-gold)}
+.local-options>summary::-webkit-details-marker{display:none}
+.local-options-compact{border:0;background:transparent;margin:0}
+.local-options-compact>summary{width:44px;padding:8px;justify-content:center;font-size:1.2rem;letter-spacing:.08em;border-radius:50%}
+.local-options-compact>summary:after{display:none}
+.local-options-compact>summary:hover{background:#ac8b3725}
+.local-options[open]>summary{border-bottom:1px solid var(--local-line)}
+.local-options[open]>*:not(summary){margin:10px!important;max-width:calc(100% - 20px)}
+.local-options:not([open])>*:not(summary){display:none!important}
+.local-options-links{display:grid;gap:4px;min-width:min(200px,70vw)}
+.local-options-links a{display:flex;align-items:center;min-height:44px;padding:4px 10px;color:#f5e5bb;text-decoration:none;border-radius:8px}
+.local-options-links a:hover{background:#ffffff0d}
+.local-options .tl-install-banner{padding:0;text-align:left}
+.local-options .tl186-toolbar{flex-wrap:wrap}
+.tl-app-installed .local-options:has(>.tl-install-banner),html.tl-auth-locked body>.local-options:has(>.tl-install-banner){display:none}
+body>.local-options:has(>.tl-install-banner){display:block;width:max-content;max-width:calc(100% - 24px);margin:10px auto}
+:where(.local-options summary,a,button,input,select,textarea):focus-visible{outline:3px solid #f4cf7a;outline-offset:3px}
+@media(max-width:650px){
+ body :where(.guest-main,.tl149-public-main){padding-inline:14px}
+ body :where(.local50-hero-inner){padding:22px 18px!important}
+ body :where(.guest-main>h1){font-size:2.1rem}
+ body :where(.guest-card-grid,.tl149-features){gap:12px}
+ body :where(.guest-feature-body,.tl149-feature-body){padding:14px}
+ body :where(.local50-page-body>.panel){padding:16px!important}
+ body :where(.guest-nav,.tl149-public-nav){gap:5px 14px;font-size:.88rem}
+ .local-options[open]{max-width:100%}
+}
+@media(prefers-reduced-motion:reduce){.local-options{scroll-behavior:auto}}
+@media print{.local-options{display:none!important}}
+/* Navigation and per-item menus float over content rather than pushing the page down. */
+:where(.guest-nav,.tl149-public-nav)>.local-options>.local-options-links{position:absolute;top:100%;right:0;z-index:40;width:220px;max-width:min(260px,80vw);padding:8px;margin:6px 0 0!important;border:1px solid #d1b26855;border-radius:13px;background:#10271f;box-shadow:0 14px 35px #0007}
+.local-options-compact[open]>*:not(summary){position:absolute;top:100%;right:0;z-index:35;min-width:140px;margin:4px 0 0!important;max-width:80vw;box-shadow:0 12px 24px #0005}
+.local-options-compact[open]{z-index:30}
