@@ -27,3 +27,9 @@
   margin: 9px 0 0;
   color: #254e42;
 }
+
+.tl-install-banner {max-width:720px;margin:14px auto;padding:0 18px;text-align:center}
+.tl-install-banner button {min-height:44px;padding:12px 24px;border:1px solid #f4d48b;border-radius:12px;background:linear-gradient(135deg,#f6dea5,#c89537);color:#102d25;font:800 16px system-ui;cursor:pointer;box-shadow:0 4px 14px #0003}
+.tl-install-banner button:focus-visible {outline:3px solid #deba68;outline-offset:4px}
+.tl-install-banner p {padding:16px;border:1px solid #b59653;border-radius:12px;background:#123b30;color:#fff;line-height:1.6;text-align:left}
+html.tl-auth-locked .tl-install-banner {display:none}
