@@ -246,7 +246,13 @@ async function loadTables() {
   if (!rows.length) $('tableList').append(element('p','No tables here yet. Set one up to get started.'));
   for (const row of rows) {
     const card = element('article', '', 'tableCard');
-    card.append(element('h4',row.name),element('p',row.description),button('Pull up a chair',()=>openTable(row)));
+    const icon = element('span','', 'table-card-icon');
+    icon.setAttribute('aria-hidden','true');
+    const title = row.name.toLowerCase();
+    icon.textContent = /football|sport|match/.test(title) ? '⚽' : /dart/.test(title) ? '🎯' : /quiz/.test(title) ? '🏆' : '🍻';
+    const copy = element('div','','table-card-copy');
+    copy.append(element('h4',row.name),element('p',row.description || 'A place for your people and conversations.'));
+    card.append(icon,copy,button('Open table →',()=>openTable(row)));
     $('tableList').append(card);
   }
   for (const row of check(legacy)) {
