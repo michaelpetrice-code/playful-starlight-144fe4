@@ -50,3 +50,9 @@ First measure replies and qualified walkthrough requests using native channel in
 ## Validation
 
 Node tests cover all 54 combinations, invalid configuration fallbacks, name limits, SVG escaping and long-name layout. Existing static checks cover public assets and guest routes. Browser checks should cover narrow/mobile view, form generation, copy, downloads and the demo link before production promotion.
+
+## Photographic creative refresh
+
+The campaign hero and Facebook preview use `assets/campaigns/next-chapter-modern.jpg`: AI-generated, photorealistic adult social-club scene, explicitly labelled. This is promotional imagery, not evidence of real customers or a named venue. The Facebook launch uses the same creative and links to the public concept studio. No paid boosting.
+
+The final art direction uses oversized editorial typography, lime accents and a realistic candid greeting scene. The website hero matches the Facebook creative.
