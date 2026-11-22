@@ -58,3 +58,5 @@ The campaign hero and Facebook preview use `assets/campaigns/next-chapter-gold.j
 The final art direction uses oversized editorial typography, gold accents and a realistic candid greeting scene. The website hero matches the Facebook creative.
 
 Brand correction: the page header uses the repository’s official gold pint-glass logo. The advert uses that supplied logo reference and warm gold accents, preserving the bolder photographic layout.
+
+Final creative adds restrained 3D bevels, physical gold plaque depth and soft shadows, preserving natural photography and official gold identity.

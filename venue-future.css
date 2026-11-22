@@ -8,3 +8,6 @@
 
 /* Preserve the official emerald-and-gold identity in the editorial campaign. */
 .official-logo{display:block;width:285px;max-width:45vw;height:auto}.wordmark{line-height:1}header{padding-top:15px;padding-bottom:15px}.nav-cta{border-color:#e6c17b99}.primary{background:linear-gradient(120deg,#e6c17b,#f4dca5);border-color:#e6c17b}.primary:hover{background:#f8d89e}@media(max-width:760px){.official-logo{width:200px;max-width:45vw}header{gap:12px}}
+
+/* Restrained depth, while retaining reduced-motion preferences. */
+.hero h1{text-shadow:1px 1px 0 #b59b67,2px 2px 0 #7f6638,4px 7px 16px #0008}.hero-art{perspective:1000px}.hero-art img{box-shadow:0 8px 0 #4b3d20,0 15px 0 #221f14,0 35px 65px #0009}.hero .primary{box-shadow:0 5px 0 #977239,0 12px 25px #0006}.hero .primary:hover{transform:translateY(-2px);box-shadow:0 7px 0 #977239,0 16px 30px #0007}.official-logo{filter:drop-shadow(0 4px 5px #0008)}
