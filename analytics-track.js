@@ -1,11 +1,11 @@
 const preferenceKey = 'the-local-analytics-choice';
 const visitKey = 'the-local-analytics-visit';
 const sources = {
-  facebook:'Facebook', instagram:'Instagram', whatsapp:'WhatsApp', tiktok:'TikTok',
+  linkedin:'LinkedIn', facebook:'Facebook', instagram:'Instagram', whatsapp:'WhatsApp', tiktok:'TikTok',
   google:'Google', bing:'Bing', email:'Email', qr:'QR code', share:'Shared link'
 };
 const referralHosts = {
-  'facebook.com':'Facebook', 'fb.com':'Facebook', 'instagram.com':'Instagram',
+  'linkedin.com':'LinkedIn', 'facebook.com':'Facebook', 'fb.com':'Facebook', 'instagram.com':'Instagram',
   'whatsapp.com':'WhatsApp', 'tiktok.com':'TikTok', 'google.com':'Google',
   'google.co.uk':'Google', 'bing.com':'Bing'
 };
@@ -126,7 +126,9 @@ function mountPreferences() {
 }
 
 mountPreferences();
-if(location.pathname.endsWith('/for-venues.html')){
+if(['/for-your-venue.html','/for-your-venue'].includes(location.pathname)){
+  trackPage('venue-campaign');
+} else if(['/for-venues.html','/for-venues'].includes(location.pathname)){
   trackPage('for-venues');
   document.querySelector('.tl-plan-picker')?.addEventListener('submit',() => { void track('plan_selected','for-venues'); });
 } else if(location.pathname.endsWith('/venue-app.html')){
