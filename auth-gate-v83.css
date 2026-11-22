@@ -31,3 +31,38 @@ html.tl-auth-locked body>header,html.tl-auth-locked body>#tabs,html.tl-auth-lock
 #tl-auth-message[data-kind=success]{color:#136b4d!important}
 .tl-auth-foot{margin-top:22px;text-align:center;font-size:12px;color:#73877f}
 @media(max-width:760px){#tl-auth-gate{align-items:flex-start}.tl-auth-shell{grid-template-columns:1fr;gap:16px;max-width:460px}.tl-auth-brand{text-align:center;padding:3px}.tl-auth-brand img{width:60px;height:60px}.tl-auth-brand h1{font-size:38px;margin:0}.tl-auth-brand p{font-size:15px;margin:5px auto}.tl-auth-features{justify-content:center;margin-top:9px}.tl-auth-features span{padding:5px 10px;font-size:11px}.tl-auth-card{padding:22px}.tl-auth-card h2{font-size:24px}}
+
+.tl-invite-auth .tl-home-venue-trial, .tl-invite-auth .tl172-welcome-share { display: none; }
+
+#tl-auth-gate .tl-auth-card label[hidden] { display: none; }
+#tl-auth-gate .tl-auth-card label,
+#tl-auth-gate .tl-auth-card input,
+#tl-auth-subtitle { font-size: 1rem; line-height: 1.5; }
+#tl-auth-gate .tl-auth-card input,
+#tl-auth-gate .tl-auth-card button,
+#tl-auth-gate #tl-continue-guest { min-height: 44px; }
+#tl-auth-gate .tl-auth-card :is(a, button, input):focus-visible {
+  outline: 3px solid #a96f13;
+  outline-offset: 3px;
+}
+#tl-auth-gate .tl-auth-card input:focus-visible { outline-color: #a96f13; }
+#tl-auth-gate .tl-auth-start { margin-block: 8px; }
+#tl-auth-gate .tl-auth-start button { padding-inline: 12px; }
+@media (max-width: 760px) {
+  #tl-auth-gate .tl-auth-features { display: none; }
+}
+
+#tl-auth-gate .tl-auth-start button[hidden],
+#tl-auth-gate #tl-auth-form[hidden],
+#tl-auth-gate #tl-auth-forgot[hidden] { display: none; }
+#tl-auth-gate .tl-auth-start { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+#tl-auth-gate .tl-auth-start button {
+  flex: 1 1 9rem;
+  border: 1px solid #a97d32;
+  border-radius: 11px;
+  background: #fbf2df;
+  color: #15342f;
+  text-decoration: none;
+}
+
+#tl-auth-gate .tl-auth-foot summary { min-height: 44px; padding: 12px; cursor: pointer; font-size: 1rem; color: inherit; }
