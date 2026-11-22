@@ -15,3 +15,10 @@
 .community-home-shortcuts button { min-height: 44px; }
 .community-home :is(.local-feed-intro, .local-compose-card, .local-feed-list) { max-width: 46rem; margin-inline: auto; }
 .community-home .local-feed-list { width: 100%; }
+
+#venue-page-feed { max-width: 46rem; margin: 1rem auto; }
+#venue-page-feed-title { font-size: 1.25rem; margin-bottom: .5rem; }
+.venue-page-feed-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,15rem),1fr)); gap: .75rem; }
+.venue-page-feed-card { display: flex; flex-direction: column; margin: 0; }
+.venue-page-feed-card h3 { margin-top: 0; }
+.venue-page-feed-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: auto; font-weight: 700; }
