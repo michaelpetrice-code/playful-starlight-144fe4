@@ -14,3 +14,5 @@
 html:has(#tl122-secure-tables.tl-chat-frame-expanded) {
   overflow: hidden;
 }
+#tl122-secure-tables.tl-conversation-frame:not(.tl-chat-frame-expanded){position:fixed;top:var(--conversation-frame-top,0px);left:0;width:100%;height:var(--conversation-frame-height,80dvh)!important;min-height:0;z-index:9000;border-radius:0;background:#0b151b}
+html:has(#tl122-secure-tables.tl-conversation-frame){overflow:hidden}

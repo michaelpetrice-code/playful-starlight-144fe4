@@ -50,3 +50,17 @@ document.querySelector('[data-tab="feed"]')?.addEventListener('click', () => {
     composer.scrollIntoView({block:'nearest'});
   }
 });
+
+// Give an open conversation a viewport of its own, including inside The Local.
+function syncConversationViewport() {
+  const active = !byId('tableDetail').hidden && !byId('memberArea').hidden && !feed.hidden;
+  document.documentElement.classList.toggle('table-conversation-open', active);
+  const viewport = window.visualViewport;
+  document.documentElement.style.setProperty('--conversation-height', `${viewport?.height || innerHeight}px`);
+  if (parent !== window) parent.postMessage({type:'tl-table-conversation',active},location.origin);
+}
+const conversationObserver = new MutationObserver(syncConversationViewport);
+for (const id of ['tableDetail','memberArea','feed']) conversationObserver.observe(byId(id),{attributes:true,attributeFilter:['hidden']});
+window.visualViewport?.addEventListener('resize',syncConversationViewport);
+window.addEventListener('resize',syncConversationViewport);
+syncConversationViewport();

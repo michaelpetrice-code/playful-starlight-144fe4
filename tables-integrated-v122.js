@@ -23,3 +23,23 @@ window.addEventListener('message', event => {
   const size = Math.max(360, Math.ceil(height)) + 'px';
   if (frame.style.height !== size) frame.style.height = size;
 });
+
+// Size chat against the phone's visible area, including when the keyboard opens.
+function sizeConversationFrame() {
+  const frame = document.getElementById('tl122-secure-tables');
+  if (!frame?.classList.contains('tl-conversation-frame')) return;
+  const viewport = window.visualViewport;
+  const nav = document.getElementById('bottomNav');
+  const navHeight = nav && getComputedStyle(nav).display !== 'none' ? nav.getBoundingClientRect().height : 0;
+  frame.style.setProperty('--conversation-frame-height', `${Math.max(160,(viewport?.height || innerHeight)-navHeight)}px`);
+  frame.style.setProperty('--conversation-frame-top', `${viewport?.offsetTop || 0}px`);
+}
+window.addEventListener('message', event => {
+  const frame = document.getElementById('tl122-secure-tables');
+  if (event.origin !== location.origin || event.source !== frame?.contentWindow || event.data?.type !== 'tl-table-conversation' || typeof event.data.active !== 'boolean') return;
+  frame.classList.toggle('tl-conversation-frame',event.data.active);
+  sizeConversationFrame();
+});
+window.visualViewport?.addEventListener('resize',sizeConversationFrame);
+window.visualViewport?.addEventListener('scroll',sizeConversationFrame);
+window.addEventListener('resize',sizeConversationFrame);
