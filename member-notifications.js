@@ -4,7 +4,7 @@ const kinds = {
   chat: { label: 'New community update', page: 'Local Updates' }
 };
 
-export function renderMemberNotifications({ member, groupId, records, messages, openPage }) {
+export function renderMemberNotifications({ member, groupId, records, messages, openPage, enableNotifications }) {
   const bell = document.getElementById('member-notifications');
   if (!bell) return;
   bell.hidden = !member;
@@ -42,6 +42,16 @@ export function renderMemberNotifications({ member, groupId, records, messages, 
   empty.hidden = updates.length > 0;
   empty.textContent = groupId ? 'You’re all caught up.' : 'Join a community to see its updates here.';
   list.replaceChildren();
+  document.getElementById('enable-message-notifications-notice')?.remove();
+  const invitation=unread.find(record=>record.notice?.campaign==='enable-message-notifications-v240');
+  if(invitation && globalThis.Notification?.permission!=='granted' && enableNotifications){
+    const banner=document.createElement('section');banner.id='enable-message-notifications-notice';banner.className='panel';
+    const title=document.createElement('strong');title.textContent=invitation.notice.label;
+    const body=document.createElement('p');body.textContent=invitation.notice.body;
+    const enable=document.createElement('button');enable.type='button';enable.textContent='Enable notifications';
+    enable.onclick=async()=>{await enableNotifications();if(globalThis.Notification?.permission==='granted')banner.remove()};
+    banner.append(title,body,enable);document.getElementById('view')?.prepend(banner);
+  }
   for (const record of updates.slice(0, 20)) {
     const { label, page } = record.notice || kinds[record.kind];
     const item = document.createElement('li');
@@ -52,6 +62,7 @@ export function renderMemberNotifications({ member, groupId, records, messages, 
       isUnread(record) && 'Unread'].filter(Boolean).join(' · ');
     button.onclick = () => openPage(page, record.notice);
     item.append(button);
+    if(record.notice?.body){const body=document.createElement('p');body.textContent=record.notice.body;item.append(body)}
     list.append(item);
   }
 
@@ -67,7 +78,7 @@ export function renderMemberNotifications({ member, groupId, records, messages, 
       readTimes.set(key, time);
       try { localStorage.setItem(key, String(time)); } catch {}
     }
-    renderMemberNotifications({ member, groupId, records, messages, openPage });
+    renderMemberNotifications({ member, groupId, records, messages, openPage, enableNotifications });
     bell.querySelector('summary').focus();
   };
 }
@@ -75,6 +86,8 @@ export function renderMemberNotifications({ member, groupId, records, messages, 
 
 export async function loadMessageNotifications(client, member) {
   const sources = [
+    [client.from('local_member_notices').select('id,title,body,campaign,created_at')
+      .eq('user_id', member), row => ({label:row.title,body:row.body,campaign:row.campaign,page:'Alerts'})],
     [client.from('tl_table_posts').select('created_at,tl_tables!inner(id,venue_id)')
       .neq('user_id', member).eq('hidden', false), row => ({
         label: 'New table message', page: 'Virtual Pub Tables',
