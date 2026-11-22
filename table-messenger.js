@@ -12,7 +12,7 @@ if (feed) {
   content.className = 'messenger-menu-content';
   menu.append(summary, content);
   document.querySelector('.table-profile').append(menu);
-  for (const node of [document.querySelector('#memberArea > .switch'), document.querySelector('.table-people'), document.querySelector('.table-share'), byId('tableDescription'), byId('tableShortcutHelp'), byId('tl163Settings'), byId('tl163Preferences'), document.querySelector('.pub-search')]) {
+  for (const node of [document.querySelector('#memberArea > .switch'), document.querySelector('.table-people'), document.querySelector('.table-share'), byId('tableDescription'), byId('tableShortcutHelp'), byId('tableVideo'), byId('tl163Settings'), byId('tl163Preferences'), document.querySelector('.pub-search')]) {
     if (node) content.append(node);
   }
   const fullScreen = document.createElement('button');
