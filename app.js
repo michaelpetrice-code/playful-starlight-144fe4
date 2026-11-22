@@ -1,4 +1,4 @@
-import { renderMemberNotifications } from './member-notifications.js';
+import { loadMessageNotifications, renderMemberNotifications } from './member-notifications.js';
 import {footballView,mountFootball} from './football/hub.js';
 import {trackPage} from './analytics-track.js?v=174';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';
@@ -283,19 +283,43 @@ return `<div class="local50-interior local50-${theme}"><section class="local50-p
 }
 
 async function renderAnnouncements(){if(!sb)return;const view=document.getElementById('view');if(!view)return;const marker=document.createElement('section');marker.className='local-owner-news';marker.innerHTML='<h2>✦ News from The Local</h2><p>Loading announcements…</p>';const target=view.querySelector('.local50-page-body')||view;const content=view.querySelector('.tl149-home #tl82-public');if(content)content.after(marker);else target.prepend(marker);const news=await loadPublicAnnouncements(sb);if(!marker.isConnected)return;if(!news.length){marker.remove();return}marker.innerHTML='<h2>✦ News from The Local</h2>';for(const item of news){const article=document.createElement('article');const title=document.createElement('strong');title.textContent=item.title;const body=document.createElement('p');body.textContent=item.body;article.append(title,body);if(item.image_url&&/^https:\/\//.test(item.image_url)){const img=document.createElement('img');img.src=item.image_url;img.loading='lazy';img.alt='Announcement image';article.append(img)}marker.append(article)}}
-function render(){
+let messageNotificationItems = [];
+let notificationRoom = null;
+let messageRequest = 0;
+
+async function refreshMessageNotifications() {
+ const request = ++messageRequest;
+ const member = user?.id;
+ if (!sb || !member || memberStatus !== 'active' && !ownerAccess) return;
+ const items = await loadMessageNotifications(sb, member);
+ if (request !== messageRequest || user?.id !== member) return;
+ messageNotificationItems = items;
+ updateNotificationBell();
+}
+
+function updateNotificationBell() {
  renderMemberNotifications({
   member: user && (memberStatus === 'active' || ownerAccess) ? user.id : null,
-  groupId, records,
-  openPage(page) {
+  groupId, records, messages: messageNotificationItems,
+  openPage(page, message) {
+   if (message?.table) {
+    location.assign(tableChatLink('secure-tables.html', location.href, message.table, { shortcut: '1' }));
+    return;
+   }
+   notificationRoom = message?.room || null;
    tab = page;
    $('member-notifications').open = false;
    render();
+   if (message?.page === 'Buy, Sell or Give Away') $('marketInbox')?.click();
    $('view').setAttribute('tabindex', '-1');
    $('view').focus();
    window.scrollTo(0,0);
   }
  });
+}
+
+function render(){
+ updateNotificationBell();
  if (Object.hasOwn(legacyAdmin,tab)) { adminPane=legacyAdmin[tab]; tab='Administration'; }
  const analyticsPage = Object.keys(memberPages).find(key => memberPages[key]===tab)
    || (tab==='Venue subscription' ? 'subscription' : tab==='Venue App Builder' ? 'builder' : null);
@@ -307,7 +331,7 @@ function render(){
   cog.hidden=!adminAccess || memberStatus!=='active' && !ownerAccess;
   cog.onclick=event=>{event.preventDefault();tab='Administration';render();$('administration')?.querySelector('h1')?.focus();window.scrollTo(0,0)};
  }
- if(['Chat','Private Chats','Chat & Media Settings'].includes(tab))tab='Virtual Pub Tables'; if(memberStatus!=='active'&&!ownerAccess){$('tabs').innerHTML='';$('view').innerHTML=`<section class="panel" style="margin:40px auto;max-width:600px"><h2>Account ${memberStatus==='banned'?'banned':'suspended'}</h2><p>Your account is currently restricted. Contact the platform owner if you believe this is an error.</p><button id="restrictedSignOut">Sign out</button></section>`;document.getElementById('restrictedSignOut').onclick=()=>sb?.auth.signOut();return} const visibleNames=names;$('tabs').innerHTML=visibleNames.map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}">${esc(pageLabel(n))}</button>`).join('');
+ if(['Chat','Chat & Media Settings'].includes(tab))tab='Virtual Pub Tables'; if(memberStatus!=='active'&&!ownerAccess){$('tabs').innerHTML='';$('view').innerHTML=`<section class="panel" style="margin:40px auto;max-width:600px"><h2>Account ${memberStatus==='banned'?'banned':'suspended'}</h2><p>Your account is currently restricted. Contact the platform owner if you believe this is an error.</p><button id="restrictedSignOut">Sign out</button></section>`;document.getElementById('restrictedSignOut').onclick=()=>sb?.auth.signOut();return} const visibleNames=names;$('tabs').innerHTML=visibleNames.map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}">${esc(pageLabel(n))}</button>`).join('');
 const quick=['Home','Virtual Pub Tables','Who’s Up for It?','Arcade'];
 const labels={Home:`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8 M5 10v11h14V10 M9 21v-7h6v7"/></svg>`,'Virtual Pub Tables':`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h11v13H5z M16 9h3a3 3 0 0 1 0 6h-3 M7 4h7 M8 2v2 M12 2v2 M8 11v5 M12 11v5"/></svg>`,'Who’s Up for It?':`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2 M17 5a3 3 0 0 1 0 6 M18 14a5 5 0 0 1 3 5v1"/></svg>`,'Venue Hub':`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8 M5 10v11h14V10 M9 21v-7h6v7"/></svg>`,Arcade:`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="5"/><path d="M7 11v4 M5 13h4 M15 12h.01 M18 14h.01"/></svg>`};
 const inMore=!quick.includes(tab);
@@ -446,7 +470,7 @@ if (tab==='Venue subscription' && !keepBilling) {
  billingUser=user?.id;
  mountBilling(billingRoot,sb,user,builderLink);
 }
-bind();if(tab==='Football')mountFootball(document.getElementById('football-hub'),{sb,user});bindPageSharing(view);if(tab==='Who’s Up for It?')bindCommunityHub(hubApi);if(tab==='Venue Hub')bindVenueDirectory(hubApi);if(tab==='Venue Applications')bindVenueApprovals(hubApi);if(tab==='Home'||tab==='Local Updates')bindLocalFeed();if(tab==='Create Post')bindComposer();if(tab==='Account')bindProfile();if(tab==='Report Behaviour')bindSafety({sb,user,cloud,notice,render,committee:false});if(tab==='Account')bindAppearance();if(tab==='Chat & Media Settings')bindChatMediaSettings();if(tab==='Alerts')updatePushStatus();if(tab==='Quiz')quiz();if(tab==='Games')bindGames();if(tab==='Arcade'){bindGamesRoomHub({notify:notice, sharedGame:builderLink.get('share-game')});bindMemberGames(sb,()=>({user,cloud}));bindOnlineDarts(sb,user);bindOnlineCue(sb,user);bindLiveMatches({entries,add,who,notice,render,cloud,user,groupId,refresh});bindPremiumGames({add,who,notice});bindArcade({add,who,notice,render});bindExtraGames({add,who,notice})}if(tab==='More Games')bindExtraGames({add,who,notice});if(tab==='Private Chats')bindPrivateChat({sb,user,notice});if(tab==='Tournaments')bindTournaments();if(tab==='Buy, Sell or Give Away')bindMarketplace({sb,user,notice,sharedItem: (!cloud || adminChecked) ? takeSharedDetail() : null});if(tab==='Trades & Services')bindTrades({sb,user,notice,sharedItem: (!cloud || adminChecked) ? takeSharedDetail() : null});if(tab==='Home'){loadHomeMarket();document.getElementById('tl195-refresh')?.addEventListener('click',()=>refresh())}if(tab==='Home'||tab==='Local Updates')renderAnnouncements();if(['Home','Local Updates','Events'].includes(tab))renderPublicStudioContent(sb,notice);if(tab==='Events')renderClubContent(sb,tab,notice);if(tab==='Photos'||tab==='Chat')loadPhotos();}
+bind();if(tab==='Football')mountFootball(document.getElementById('football-hub'),{sb,user});bindPageSharing(view);if(tab==='Who’s Up for It?')bindCommunityHub(hubApi);if(tab==='Venue Hub')bindVenueDirectory(hubApi);if(tab==='Venue Applications')bindVenueApprovals(hubApi);if(tab==='Home'||tab==='Local Updates')bindLocalFeed();if(tab==='Create Post')bindComposer();if(tab==='Account')bindProfile();if(tab==='Report Behaviour')bindSafety({sb,user,cloud,notice,render,committee:false});if(tab==='Account')bindAppearance();if(tab==='Chat & Media Settings')bindChatMediaSettings();if(tab==='Alerts')updatePushStatus();if(tab==='Quiz')quiz();if(tab==='Games')bindGames();if(tab==='Arcade'){bindGamesRoomHub({notify:notice, sharedGame:builderLink.get('share-game')});bindMemberGames(sb,()=>({user,cloud}));bindOnlineDarts(sb,user);bindOnlineCue(sb,user);bindLiveMatches({entries,add,who,notice,render,cloud,user,groupId,refresh});bindPremiumGames({add,who,notice});bindArcade({add,who,notice,render});bindExtraGames({add,who,notice})}if(tab==='More Games')bindExtraGames({add,who,notice});if(tab==='Private Chats')bindPrivateChat({sb,user,notice,roomId:notificationRoom});if(tab==='Tournaments')bindTournaments();if(tab==='Buy, Sell or Give Away')bindMarketplace({sb,user,notice,sharedItem: (!cloud || adminChecked) ? takeSharedDetail() : null});if(tab==='Trades & Services')bindTrades({sb,user,notice,sharedItem: (!cloud || adminChecked) ? takeSharedDetail() : null});if(tab==='Home'){loadHomeMarket();document.getElementById('tl195-refresh')?.addEventListener('click',()=>refresh())}if(tab==='Home'||tab==='Local Updates')renderAnnouncements();if(['Home','Local Updates','Events'].includes(tab))renderPublicStudioContent(sb,notice);if(tab==='Events')renderClubContent(sb,tab,notice);if(tab==='Photos'||tab==='Chat')loadPhotos();}
 const val=id=>$(id)?.value.trim()||'',who=()=>profileName();
 async function uploadImage(file){const img=await resize(file);if(!cloud){if(img.length>800000)throw Error('Photo too large for local demo');return {image:img}}if(!groupId)throw Error('Join a group first');const path=`${groupId}/${crypto.randomUUID()}.jpg`;const blob=await(await fetch(img)).blob();const {error}=await sb.storage.from('pub-photos').upload(path,blob,{contentType:'image/jpeg'});if(error)throw error;return {path}}
 function bind(){document.querySelectorAll('#shareFriends,#headerShare').forEach(b=>b.onclick=()=>shareLocal({notify:notice}));if($('enableAlerts'))$('enableAlerts').onclick=enablePush; if($('inviteCode'))$('inviteCode').value=pendingInvite('join-community')||localStorage.getItem('lads-pending-invite')||'';if($('goPrivateJoin'))$('goPrivateJoin').onclick=e=>{e.preventDefault();tab='Private Chats';render()};if($('shareInvite'))$('shareInvite').onclick=()=>shareLocal({title:'Join my community on The Local',message:'Join my community on The Local! Sign in or register, then follow this invitation link.',url:location.origin+location.pathname+'#join-community='+encodeURIComponent(group.invite_code),notify:notice});document.querySelectorAll('#view [data-go],#tabs [data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab||b.dataset.go;if(cloud&&groupId)refresh();else render()});function form(id,fn){if($(id))$(id).onsubmit=async e=>{e.preventDefault();try{await fn();}catch(err){notice(err.message)}}}
@@ -527,6 +551,7 @@ if(cloud){
  async function applyIdentity(identity){
   const identityChanged=lastIdentity!==identity?.id;
   if(identityChanged){
+   messageNotificationItems = []; notificationRoom = null; ++messageRequest;
    sharedGroupState='pending'; sharedHighlight=false; openedSharedDetails.clear();
    if(lastIdentity){group=null;groupId=null;records=[];}
    lastIdentity=identity?.id;
@@ -541,6 +566,7 @@ if(cloud){
   if(sequence!==authCheckSequence)return;
   ownerAccess=canOwn; memberStatus=status; adminAccess=controls; adminChecked=true;
   if(!returnToVenue())render();
+  if (identityChanged) refreshMessageNotifications();
  }
  let observedAuth=false;
  const authFailure=()=>notice('Unable to load account permissions.');
@@ -560,3 +586,10 @@ if(cloud){
 render();if(cloud&&sb){let channel=sb.channel('lads-activity').on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},payload=>{if(payload.new?.group_id!==groupId)return;if(payload.new.user_id!==user?.id&&['chat','event','challenge'].includes(payload.new.kind)){notice('New '+payload.new.kind+' from everyone');if('Notification'in window&&Notification.permission==='granted'&&document.hidden)new Notification('The Local',{body:'New group '+payload.new.kind})}refresh()}).subscribe();let invite=new URLSearchParams(location.search).get('invite');if(invite){localStorage.setItem('lads-pending-invite',invite);notice('Community invitation received — open Account to join')}}
 
 window.addEventListener('focus',()=>{if(cloud&&groupId)refresh()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cloud&&groupId)refresh()});
+
+$('member-notifications')?.addEventListener('toggle', event => {
+ if (event.currentTarget.open) refreshMessageNotifications();
+});
+window.setInterval(() => {
+ if (!document.hidden) refreshMessageNotifications();
+}, 30000);
