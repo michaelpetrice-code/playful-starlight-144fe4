@@ -70,8 +70,8 @@ function setMode(next){
  authSubtitle.textContent=venueSignup
   ? (mode==='register'?'Confirm your email and you’ll be ready to start your trial.':'Log in to continue to your chosen plan.')
   : invite
-    ? (mode==='register'?'Create a free account to open your table invitation.':'Log in to open your table invitation, or join free below.')
-    : (mode==='register'?'Create your free member account. No payment details needed.':'Log in to The Local or join free below.');
+    ? (mode==='register'?'Create a free account to open your table invitation.':'Log in to open your table invitation, or join free.')
+    : (mode==='register'?'Create your free member account. No payment details needed.':'Browse without an account, join free, or log in.');
  if (invite && !venueSignup) authTitle.textContent = 'You’re invited to a table';
  document.getElementById('tl-auth-switch').textContent=mode==='register'?'Already have an account? Log in':'Join free';
  document.getElementById('tl-auth-forgot').hidden=mode==='register';

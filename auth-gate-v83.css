@@ -33,3 +33,21 @@ html.tl-auth-locked body>header,html.tl-auth-locked body>#tabs,html.tl-auth-lock
 @media(max-width:760px){#tl-auth-gate{align-items:flex-start}.tl-auth-shell{grid-template-columns:1fr;gap:16px;max-width:460px}.tl-auth-brand{text-align:center;padding:3px}.tl-auth-brand img{width:60px;height:60px}.tl-auth-brand h1{font-size:38px;margin:0}.tl-auth-brand p{font-size:15px;margin:5px auto}.tl-auth-features{justify-content:center;margin-top:9px}.tl-auth-features span{padding:5px 10px;font-size:11px}.tl-auth-card{padding:22px}.tl-auth-card h2{font-size:24px}}
 
 .tl-invite-auth .tl-home-venue-trial, .tl-invite-auth .tl172-welcome-share { display: none; }
+
+#tl-auth-gate .tl-auth-card label[hidden] { display: none; }
+#tl-auth-gate .tl-auth-card label,
+#tl-auth-gate .tl-auth-card input,
+#tl-auth-subtitle { font-size: 1rem; line-height: 1.5; }
+#tl-auth-gate .tl-auth-card input,
+#tl-auth-gate .tl-auth-card button,
+#tl-auth-gate #tl-continue-guest { min-height: 44px; }
+#tl-auth-gate .tl-auth-card :is(a, button, input):focus-visible {
+  outline: 3px solid #a96f13;
+  outline-offset: 3px;
+}
+#tl-auth-gate .tl-auth-card input:focus-visible { outline-color: #a96f13; }
+#tl-auth-gate .tl-auth-start { margin-block: 8px; }
+#tl-auth-gate .tl-auth-start button { padding-inline: 12px; }
+@media (max-width: 760px) {
+  #tl-auth-gate .tl-auth-features { display: none; }
+}
