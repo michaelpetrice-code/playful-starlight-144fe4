@@ -51,3 +51,16 @@ html.tl-auth-locked body>header,html.tl-auth-locked body>#tabs,html.tl-auth-lock
 @media (max-width: 760px) {
   #tl-auth-gate .tl-auth-features { display: none; }
 }
+
+#tl-auth-gate .tl-auth-start button[hidden],
+#tl-auth-gate #tl-auth-form[hidden],
+#tl-auth-gate #tl-auth-forgot[hidden] { display: none; }
+#tl-auth-gate .tl-auth-start { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+#tl-auth-gate .tl-auth-start button {
+  flex: 1 1 9rem;
+  border: 1px solid #a97d32;
+  border-radius: 11px;
+  background: #fbf2df;
+  color: #15342f;
+  text-decoration: none;
+}

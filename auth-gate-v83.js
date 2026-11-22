@@ -44,7 +44,8 @@ const tableReturn = invite && tableChatLink('index.html', location.href, tableDe
 });
 const signupRedirect = venueSignup ? venueSignupReturn(location.origin, plan) : tableReturn?.href || shareReturn?.href;
 gate.classList.toggle('tl-invite-auth', Boolean(invite && !venueSignup));
-let client=null,mode='login',working=false;
+let client=null,mode='welcome',working=false;
+const openLogin = document.getElementById('tl-auth-open-login');
 let pendingEmail = '';
 
 if (venueSignup) {
@@ -60,7 +61,8 @@ function show(yes){
 }
 function setMode(next){
  mode=next;
- form.hidden=false;
+ form.hidden=mode==='welcome';
+ openLogin.hidden=mode!=='welcome';
  emailActions.hidden=true;
  nameRow.hidden=mode!=='register';
  nameInput.required=mode==='register';
@@ -74,7 +76,7 @@ function setMode(next){
     : (mode==='register'?'Create your free member account. No payment details needed.':'Browse without an account, join free, or log in.');
  if (invite && !venueSignup) authTitle.textContent = 'You’re invited to a table';
  document.getElementById('tl-auth-switch').textContent=mode==='register'?'Already have an account? Log in':'Join free';
- document.getElementById('tl-auth-forgot').hidden=mode==='register';
+ document.getElementById('tl-auth-forgot').hidden=mode!=='login';
  status('');
 }
 function showEmailConfirmation() {
@@ -110,7 +112,12 @@ authTitle.tabIndex = -1;
 // v206: Removed redundant Coombe sign-in shortcut; standard account sign-in remains.
 
 function busy(yes){working=yes;resend.disabled=yes;changeEmail.disabled=yes;submit.disabled=yes;document.getElementById('tl-auth-switch').disabled=yes;document.getElementById('tl-auth-forgot').disabled=yes}
-document.getElementById('tl-auth-switch').addEventListener('click',()=>setMode(mode==='login'?'register':'login'));
+function openForm(next) {
+  setMode(next);
+  (next === 'register' ? nameInput : emailInput).focus();
+}
+document.getElementById('tl-auth-switch').addEventListener('click',()=>openForm(mode==='register'?'login':'register'));
+openLogin.addEventListener('click',()=>openForm('login'));
 document.getElementById('tl-auth-forgot').addEventListener('click',async()=>{
  const email=emailInput.value.trim();
  if(!email){status('Enter your email address first.','error');emailInput.focus();return}
@@ -150,7 +157,7 @@ form.addEventListener('submit',async e=>{
  }catch(e){status(e.message,'error')}finally{busy(false)}
 });
 async function init(){
- show(true);setMode((venueSignup && !params.has('confirmed')) || (!venueSignup && params.get('register') === '1') ? 'register' : 'login');
+ show(true);setMode((venueSignup && !params.has('confirmed')) || (!venueSignup && params.get('register') === '1') ? 'register' : venueSignup || params.has('confirmed') ? 'login' : 'welcome');
  if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){status('Sign-in has not been configured. Contact the site administrator.','error');busy(true);return}
  try{
   const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2');
