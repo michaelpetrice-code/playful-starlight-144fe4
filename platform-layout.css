@@ -1,0 +1,106 @@
+/* Shared layout rhythm, with page-specific colours left to each venue and section. */
+:root {
+  --local-layout-gutter: clamp(0.875rem, 3vw, 2rem);
+  --local-layout-gap: clamp(0.75rem, 2vw, 1.375rem);
+  --local-layout-radius: 0.875rem;
+}
+
+body > main,
+body > .tl149-public-main {
+  box-sizing: border-box;
+  min-inline-size: 0;
+}
+
+main :is(h1, h2, h3) {
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+main :is(p, dd, li) {
+  overflow-wrap: anywhere;
+}
+
+main p {
+  text-wrap: pretty;
+}
+
+:is(.guest-card-grid, .tl173-venue-grid, .venue-page-feed-list, .tl149-feature-grid, .vb-sections) {
+  gap: var(--local-layout-gap);
+}
+
+:is(.guest-feature, .tl149-feature, .tl173-venue-card, .venue-page-feed-card) {
+  min-inline-size: 0;
+  border-radius: var(--local-layout-radius);
+}
+
+:is(.local-post-body, .local-reply-list p, .vb-welcome, .guest-feature-body p) {
+  line-height: 1.55;
+}
+
+:is(.guest-nav, .community-home-shortcuts, .table-shortcut-actions, .tl149-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+:is(.guest-nav, .community-home-shortcuts, .table-shortcut-actions, .tl149-actions, .vb-enquiry, .venue-discovery-filters)
+  :is(a, button, summary, input, select) {
+  min-block-size: 44px;
+}
+
+:is(.guest-nav, .community-home-shortcuts, .table-shortcut-actions, .tl149-actions) > a {
+  display: inline-flex;
+  align-items: center;
+}
+
+:where(main, header, #tl-auth-gate) :where(a, button, summary, input, select, textarea):focus-visible {
+  outline: 3px solid #b47e26;
+  outline-offset: 3px;
+}
+
+:is(.local-feed-image, .vb-card-photo, .local-upload-preview) {
+  max-inline-size: 100%;
+}
+
+.venue-discovery-filters label,
+.vb-enquiry label {
+  line-height: 1.45;
+}
+
+.venue-discovery-filters :is(input, select),
+.vb-enquiry textarea {
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+@media (max-width: 640px) {
+  .community-home-heading,
+  .venue-page-feed-card,
+  .local-feed-post {
+    padding-inline: var(--local-layout-gutter);
+  }
+
+  .community-home-shortcuts > :is(a, button) {
+    flex: 1 1 9rem;
+    justify-content: center;
+  }
+
+  :is(.guest-header, .tl149-public-header) img {
+    max-inline-size: min(38vw, 10rem);
+    height: auto;
+  }
+
+  .venue-discovery-filters > label {
+    min-inline-size: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.guest-feature, .tl149-feature, .tl173-venue-card, .venue-page-feed-card) {
+    transition: none;
+  }
+
+  :is(.guest-feature, .tl149-feature):hover {
+    transform: none;
+  }
+}
