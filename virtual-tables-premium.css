@@ -71,3 +71,28 @@ body>header a{font-size:.95rem}
 }
 .tl122-embedded body>header{display:none!important}
 .tl122-embedded main{max-width:none!important;margin:0!important;padding:12px 8px 24px!important}
+
+/* Keep the table identity and conversation ahead of secondary controls. */
+body:has(#tableDetail:not([hidden])) > .tl135-section-art { display: none; }
+#tableDetail { padding-top: 1rem; }
+#tableDetail .table-profile {
+  margin-top: .75rem;
+  background: linear-gradient(125deg, #133e32, #092820) !important;
+}
+#tableDetail .table-profile h2 { margin-top: 0; }
+#tableDetail .switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: .75rem;
+}
+#tableDetail .switch button:not([hidden]) { flex: 1 1 auto; min-height: 44px; }
+#tableDetail .switch button[aria-pressed="true"] {
+  background: #ecc578;
+  color: #142c23;
+}
+.table-people { margin-bottom: .75rem; border: 1px solid var(--vt-line); border-radius: 12px; }
+.table-people summary { padding: .75rem 1rem; min-height: 44px; box-sizing: border-box; cursor: pointer; }
+.table-people .pub-scene { margin: .5rem; }
+#feed .pub-message { overflow-wrap: anywhere; }
+#feed #chatBody { font-size: 1rem; }
