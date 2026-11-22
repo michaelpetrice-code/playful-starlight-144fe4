@@ -8,3 +8,10 @@
 .local-reply-list p { margin: .3rem 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .local-post-replies textarea { display: block; width: 100%; font-size: 1rem; }
 .local-post-replies button { min-height: 44px; margin-top: .4rem; }
+
+.community-home .community-home-heading { display: block; margin: 0 auto 1rem; padding: 1rem 0; max-width: 46rem; }
+.community-home-heading h1 { margin: .15rem 0 .75rem; }
+.community-home-shortcuts { display: flex; flex-wrap: wrap; gap: .5rem; }
+.community-home-shortcuts button { min-height: 44px; }
+.community-home :is(.local-feed-intro, .local-compose-card, .local-feed-list) { max-width: 46rem; margin-inline: auto; }
+.community-home .local-feed-list { width: 100%; }
