@@ -341,7 +341,11 @@ async function refreshMembership(id, first = false) {
 function showTab(name) {
   if (name !== 'feed') chatScreen.close();
   for (const section of ['feed','events','manage']) $(section).hidden = section !== name;
-  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('[data-tab]').forEach(button => {
+    const selected = button.dataset.tab === name;
+    button.classList.toggle('active', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
 }
 
 function seatName(id) {
