@@ -1,3 +1,4 @@
+import { readTableChatLink, tableChatLink } from './table-chat-link.js?v=169';
 import { sharedPage, memberPageUrl } from './page-share.js?v=173';
 import {bindVenueSignIn} from './venue-member-sign-in.js?v=170';
 import { selectedVenuePlan, venuePlans, venueSignupReturn } from './venue-plans.js?v=154';
@@ -8,8 +9,6 @@ const message=document.getElementById('tl-auth-message');
 const form=document.getElementById('tl-auth-form');
 const nameRow=document.getElementById('tl-auth-name-row');
 const nameInput=document.getElementById('tl-auth-name');
-const confirmRow=document.getElementById('tl-auth-confirm-row');
-const confirmInput=document.getElementById('tl-auth-confirm');
 const emailInput=document.getElementById('tl-auth-email');
 const passInput=document.getElementById('tl-auth-password');
 const submit=document.getElementById('tl-auth-submit');
@@ -38,7 +37,13 @@ const game = params.get('share-game');
 const shareReturn = incomingPage ? new URL(memberPageUrl(incomingPage.page, incomingPage))
   : publicVenue && /^[a-z0-9_-]{1,90}$/i.test(publicVenue) ? new URL(memberPageUrl('venues',{venue:publicVenue})) : null;
 if (shareReturn && incomingPage?.page === 'arcade' && /^[a-z0-9-]{1,30}$/.test(game || '')) shareReturn.searchParams.set('share-game',game);
-const signupRedirect = venueSignup ? venueSignupReturn(location.origin, plan) : shareReturn?.href;
+const tableDestination = params.get('section') === 'tables' && readTableChatLink(params);
+const invite = tableDestination && params.get('invite');
+const tableReturn = invite && tableChatLink('index.html', location.href, tableDestination, {
+  section: 'tables', invite
+});
+const signupRedirect = venueSignup ? venueSignupReturn(location.origin, plan) : tableReturn?.href || shareReturn?.href;
+gate.classList.toggle('tl-invite-auth', Boolean(invite && !venueSignup));
 let client=null,mode='login',working=false;
 let pendingEmail = '';
 
@@ -51,23 +56,24 @@ function show(yes){
  document.documentElement.classList.toggle('tl-auth-locked',yes);
  gate.hidden=!yes;
  if(!yes){pendingEmail='';status('');return;}
- if(venueSignup && mode==='register' && pendingEmail) showEmailConfirmation();
+ if(mode==='register' && pendingEmail) showEmailConfirmation();
 }
 function setMode(next){
  mode=next;
  form.hidden=false;
  emailActions.hidden=true;
  nameRow.hidden=mode!=='register';
- confirmRow.hidden=mode!=='register'||Boolean(venueSignup);
- confirmInput.required=!confirmRow.hidden;
  nameInput.required=mode==='register';
  passInput.autocomplete=mode==='register'?'new-password':'current-password';
- submit.textContent=mode==='register'?(venueSignup?'Create venue account':'Create account'):'Log in';
+ submit.textContent=mode==='register'?(venueSignup?'Create venue account':'Join free'):invite && !venueSignup ? 'Log in and open table' : 'Log in';
  authTitle.textContent=mode==='register'?(venueSignup?'Create your venue account':'Join The Local'):'Welcome to The Local';
  authSubtitle.textContent=venueSignup
   ? (mode==='register'?'Confirm your email and you’ll be ready to start your trial.':'Log in to continue to your chosen plan.')
-  : (mode==='register'?'Create your free member account. No payment details or commitment.':'Sign in with your Local account or continue with your Coombe account.');
- document.getElementById('tl-auth-switch').textContent=mode==='register'?'Already have an account? Log in':'New here? Create an account';
+  : invite
+    ? (mode==='register'?'Create a free account to open your table invitation.':'Log in to open your table invitation, or join free below.')
+    : (mode==='register'?'Create your free member account. No payment details needed.':'Log in to The Local or join free below.');
+ if (invite && !venueSignup) authTitle.textContent = 'You’re invited to a table';
+ document.getElementById('tl-auth-switch').textContent=mode==='register'?'Already have an account? Log in':'Join free';
  document.getElementById('tl-auth-forgot').hidden=mode==='register';
  status('');
 }
@@ -75,7 +81,7 @@ function showEmailConfirmation() {
   form.hidden = true;
   emailActions.hidden = false;
   authTitle.textContent = 'Check your email';
-  authSubtitle.textContent = 'Open the confirmation link sent to ' + pendingEmail + ' to continue to your plan.';
+  authSubtitle.textContent = 'Open the confirmation link sent to ' + pendingEmail + (venueSignup ? ' to continue to your plan.' : invite ? ' to open your table invitation.' : ' to finish joining The Local.');
   authTitle.focus();
 }
 
@@ -124,7 +130,6 @@ form.addEventListener('submit',async e=>{
  busy(true);
  try{
   if(mode==='register'){
-   if(confirmInput.required && password!==confirmInput.value)throw Error('Passwords do not match. Please try again.');
    const display_name=nameInput.value.trim();
    if(display_name.length<2||display_name.length>60)throw Error('Please enter a name between 2 and 60 characters.');
    const options = { data: { display_name, full_name: display_name } };
@@ -132,11 +137,11 @@ form.addEventListener('submit',async e=>{
    const {data,error}=await client.auth.signUp({email,password,options});
    if(error)throw error;
    if(data.session) show(false);
-   else if (venueSignup) {
+   else {
     pendingEmail = email;
     passInput.value = '';
     showEmailConfirmation();
-   } else status('Check your email to confirm your account, then log in.','success');
+   }
   }else{
    const {error}=await client.auth.signInWithPassword({email,password});
    if(error)throw error;
