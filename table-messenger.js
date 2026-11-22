@@ -41,3 +41,12 @@ if (feed) {
   send.title = 'Send message';
   document.documentElement.classList.add('messenger-tables');
 }
+
+// Reopening Chat should reveal the composer even after scrolling through Plans.
+document.querySelector('[data-tab="feed"]')?.addEventListener('click', () => {
+  const composer = byId('postForm');
+  if (composer && !composer.closest('[hidden]')) {
+    byId('chatBody').focus({preventScroll:true});
+    composer.scrollIntoView({block:'nearest'});
+  }
+});

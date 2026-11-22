@@ -50,3 +50,13 @@
 .pub-seat.tl162-seat>.member-avatar{grid-row:span 2;width:36px;height:36px}
 .pub-message>.member-avatar{float:left;margin:0 9px 6px 0;width:30px;height:30px;font-size:.8rem}
 .pub-message:after{content:'';display:block;clear:both}
+
+/* Keep the composer on screen while the message history scrolls. */
+.messenger-tables #feed:not([hidden]){display:flex;flex-direction:column;box-sizing:border-box;height:min(640px,75svh);min-height:260px;overflow:hidden}
+.messenger-tables.tl122-embedded #feed:not([hidden]){height:520px}
+.messenger-tables #feed #postList{flex:1 1 0;min-height:0;max-height:none;height:auto;overflow-y:auto;overscroll-behavior:contain}
+.messenger-tables #feed>#postForm{flex:none;margin:0;padding-bottom:max(8px,env(safe-area-inset-bottom));background:#0b151b;z-index:2}
+.messenger-tables #feed>.chat-head,.messenger-tables #feed>.table-active-members{flex:none}
+.messenger-tables #feed>.table-active-members{max-height:58px}
+.messenger-tables.tl-chat-expanded #feed:not([hidden]),.messenger-tables #feed:fullscreen{height:100dvh}
+@media(max-width:540px){.messenger-tables.tl122-embedded #feed:not([hidden]){height:420px}}
