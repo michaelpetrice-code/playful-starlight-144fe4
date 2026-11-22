@@ -1,5 +1,5 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');
-const moduleFrom=path=>import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync(path)).toString('base64'));
+const moduleFrom=path=>import(require('node:url').pathToFileURL(require('node:path').resolve(path)).href);
 test('message alerts exclude own, hidden and other recipient messages, and stop after logout',async()=>{
  const {watchMessageAlerts}=await moduleFrom('message-alerts.js');const handlers={},received=[];let removed=false;
  const channel={on(event,filter,fn){handlers[filter.table]=fn;return this},subscribe(){}};
