@@ -1,0 +1,33 @@
+/* The Local platform-wide polish. Purely visual; no routing, authentication or business logic. */
+:root{--tlp-bg:#0b1111;--tlp-surface:#171f1e;--tlp-surface2:#202a27;--tlp-gold:#e8c57c;--tlp-text:#f9f5eb;--tlp-muted:#c5d0c8;--tlp-border:rgba(232,197,124,.23);--tlp-radius:18px;--tlp-shadow:0 16px 40px rgba(0,0,0,.23)}
+html{scroll-padding-top:20px}
+body{background:radial-gradient(ellipse 80% 40% at 80% 0%,rgba(39,77,61,.18),transparent 70%),var(--tlp-bg);color:var(--tlp-text);-webkit-font-smoothing:antialiased}
+body :where(h1,h2,h3){text-wrap:balance}
+body :where(p,li){line-height:1.55}
+body :where(.panel,.card,.guest-feature,.guest-card,.tl149-feature,.tl149-panel,.owner-stat,.owner-actions,.tl-auth-card,.tl-sponsor-card,.enquiry,.v192-panel,.tableCard):not(.game-board,.game-card){border:1px solid var(--tlp-border)!important;border-radius:var(--tlp-radius)!important;box-shadow:var(--tlp-shadow);background-color:var(--tlp-surface)!important}
+body :where(.guest-feature,.tl149-feature,.card,.tableCard){overflow:hidden}
+body :where(.guest-feature,.tl149-feature,.card,.tableCard):hover{border-color:rgba(232,197,124,.55)!important}
+body :where(.guest-feature img,.tl149-feature img,.tl149-panel img){object-fit:cover}
+body :where(button,a,input,select,textarea,summary):focus-visible{outline:3px solid #f8d38a!important;outline-offset:3px!important}
+body :where(input:not([type=checkbox]):not([type=radio]),select,textarea){max-width:100%;border-radius:11px}
+body :where(button,.button,.guest-button,.tl149-action):not(:disabled){transition:filter .18s ease,transform .18s ease,box-shadow .18s ease}
+body :where(button,.button,.guest-button,.tl149-action):not(:disabled):hover{filter:brightness(1.09)}
+body :where(button,.button,.guest-button,.tl149-action):not(:disabled):active{transform:scale(.985)}
+body :where(.guest-nav,.tl149-public-nav,#bottomNav,#tabs){scrollbar-width:thin;scrollbar-color:var(--tlp-border) transparent}
+body :where(.guest-main,.tl149-public-main){max-width:1280px;margin-inline:auto}
+body :where(.guest-feature-body,.tl149-feature-body){padding:clamp(14px,2vw,22px)}
+body :where(.guest-feature,.tl149-feature){transition:transform .2s ease,box-shadow .2s ease}
+body :where(.guest-feature,.tl149-feature):hover{transform:translateY(-2px);box-shadow:0 22px 46px #0005}
+body :where(.tl-auth-card,.owner-workspace-content,.guest-main){min-width:0}
+body :where(table){max-width:100%}
+body :where(.tl149-public-footer,.guest-footer){border-top:1px solid var(--tlp-border);padding-block:20px}
+@media(max-width:680px){
+ body :where(.guest-main,.tl149-public-main){padding-inline:12px}
+ body :where(.guest-feature,.tl149-feature,.card){border-radius:15px!important}
+ body :where(button,.guest-button,.tl149-action){min-height:42px}
+ body :where(.guest-header,.tl149-public-header){gap:10px}
+ body :where(.guest-feature-body,.tl149-feature-body){padding:14px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body :where(button,.button,.guest-button,.tl149-action,.guest-feature,.tl149-feature){transition:none!important;transform:none!important}}
+/* Preserve game rendering surfaces and embedded venue app previews. */
+:where(#game-root,.game-root,.online-board,.vb-public,.venue-app-preview,.tl149-venue-preview) :where(button,.card,.panel){box-shadow:revert-layer}
