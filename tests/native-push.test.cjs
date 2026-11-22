@@ -13,7 +13,7 @@ function setup(permission='granted'){
  }};
  const storage=new Map();win.localStorage={getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)};
  const client={auth:{getSession:async()=>({data:{session:{access_token:'token'}}})}};
- return {win,client,calls,get subscribes(){return subscribes}};
+ return {win,client,calls,service,get subscribes(){return subscribes}};
 }
 test('native push binds a real subscription before reporting enabled',async()=>{
  const {createNativePushClient}=await from('native-push.js');const s=setup();const c=createNativePushClient(s.win,{supabaseUrl:'https://example.supabase.co'},s.client);
@@ -50,4 +50,12 @@ test('disabling a device remains disabled when the app next syncs',async()=>{
  const {createNativePushClient}=await from('native-push.js');const s=setup();const c=createNativePushClient(s.win,{supabaseUrl:'https://example.supabase.co'},s.client);
  await c.enable('me');await c.disable();const before=s.subscribes;await c.sync('me');assert.equal(s.subscribes,before);assert.equal((await c.init()).User.PushSubscription.optedIn,false);
  await c.enable('me');assert.equal(s.subscribes,before+1);
+});
+
+test('opting out while registration is pending prevents a late subscription from re-enabling alerts',async()=>{
+ const {createNativePushClient}=await from('native-push.js');const s=setup();let finish;
+ const subscribe=s.service.pushManager.subscribe;s.service.pushManager.subscribe=async()=>{await new Promise(resolve=>finish=resolve);return subscribe()};
+ const c=createNativePushClient(s.win,{supabaseUrl:'https://example.supabase.co'},s.client);const pending=c.sync('me');
+ while(!finish)await new Promise(resolve=>setImmediate(resolve));
+ await c.disable();finish();await pending;assert.equal((await c.init()).User.PushSubscription.optedIn,false);assert(!s.calls.includes('register'));assert(s.calls.includes('unsubscribe'));
 });

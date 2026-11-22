@@ -39,7 +39,7 @@ export function createNativePushClient(win, config, client) {
     const service=await registration();
     if(before && before!==member){const old=await service.pushManager.getSubscription();if(old)await old.unsubscribe();}
     const device=await subscription(service);
-    if(turn!==revision)return state;
+    if(turn!==revision){if(disabled())await device.unsubscribe();return state;}
     await api('register',{subscription:device.toJSON()});
     if(turn===revision)registered=true;
     return state;
@@ -61,7 +61,7 @@ export function createNativePushClient(win, config, client) {
     await sync(id);const result=await api('test');
     return result.sent?'Test notification sent to your enabled devices.':'Enable message alerts first.';
   }
-  async function disable(){try{win.localStorage?.setItem('local-device-push-disabled','1')}catch{}await unregister();return 'Message alerts are off on this device.';}
+  async function disable(){++revision;try{win.localStorage?.setItem('local-device-push-disabled','1')}catch{}await unregister();return 'Message alerts are off on this device.';}
   async function muteTable(id,table,muted){if(!id)return;await api('mute-table',{table,muted});}
   return {init:async()=>state,sync,enable,test,disable,muteTable};
 }
