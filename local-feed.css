@@ -22,3 +22,7 @@
 .venue-page-feed-card { display: flex; flex-direction: column; margin: 0; }
 .venue-page-feed-card h3 { margin-top: 0; }
 .venue-page-feed-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: auto; font-weight: 700; }
+
+.venue-discovery-filters { display: flex; flex-wrap: wrap; gap: .75rem; margin: .75rem 0; }
+.venue-discovery-filters > label { flex: 1 1 12rem; }
+.venue-discovery-filters :is(input,select) { display: block; width: 100%; min-height: 44px; font-size: 1rem; }

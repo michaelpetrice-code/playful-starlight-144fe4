@@ -1,4 +1,4 @@
-import { renderVenuePageFeed } from './venue-page-feed.js';
+import { renderVenuePageFeed } from './venue-page-feed.js?v=232';
 import { loadMessageNotifications, renderMemberNotifications } from './member-notifications.js';
 import {footballView,mountFootball} from './football/hub.js';
 import {trackPage} from './analytics-track.js?v=174';
@@ -418,7 +418,7 @@ if(tab==='Home'){
   <h1 id="community-home-title">Your Local</h1>
   <nav class="community-home-shortcuts" aria-label="Community shortcuts">
    <button type="button" data-go="Venue Hub">Find a Local</button>
-   <button type="button" data-go="Who’s Up for It?">What’s on</button>
+   <a class="tl149-action" href="guest.html?page=events">Find something to do</a>
    <button type="button" data-go="Virtual Pub Tables">My tables</button>
   </nav>
  </section>
