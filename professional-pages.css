@@ -56,3 +56,7 @@ body>.local-options:has(>.tl-install-banner){display:block;width:max-content;max
 }
 @media(prefers-reduced-motion:reduce){.local-options{scroll-behavior:auto}}
 @media print{.local-options{display:none!important}}
+/* Navigation and per-item menus float over content rather than pushing the page down. */
+:where(.guest-nav,.tl149-public-nav)>.local-options>.local-options-links{position:absolute;top:100%;right:0;z-index:40;width:220px;max-width:min(260px,80vw);padding:8px;margin:6px 0 0!important;border:1px solid #d1b26855;border-radius:13px;background:#10271f;box-shadow:0 14px 35px #0007}
+.local-options-compact[open]>*:not(summary){position:absolute;top:100%;right:0;z-index:35;min-width:140px;margin:4px 0 0!important;max-width:80vw;box-shadow:0 12px 24px #0005}
+.local-options-compact[open]{z-index:30}
