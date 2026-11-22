@@ -276,8 +276,8 @@ async function lookupTable(id) {
 }
 
 async function openTable(next) {
-  disconnectLive();
   if (opening || !venue || next.venue_id !== venue.id) return;
+  disconnectLive();
   video?.setTable(null);
   opening = true;
   ++listRequest;
@@ -347,13 +347,15 @@ async function refreshMembership(id, first = false) {
       return;
     }
     updateShortcutLink();
-    if (!before || (!admin() && ['owner','moderator'].includes(before))) showTab('feed');
+    if (first || !before || (!admin() && ['owner','moderator'].includes(before))) showTab('feed');
   }
   if (role && (first || !before)) {
-    await loadPosts();
+    // Make the composer usable before history, profiles or plans finish loading.
+    $('chatBody').focus({preventScroll:true});
+    $('postForm').scrollIntoView({block:'nearest'});
     connectLive(id);
     connectPresence(id);
-    if (table?.id === id) await loadEvents();
+    await loadPosts();
   }
 }
 
