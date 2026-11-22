@@ -8,3 +8,14 @@
 .member-notifications ul { list-style: none; padding: 0; }
 .member-notifications li button { width: 100%; text-align: left; }
 #member-notification-count { border-radius: 1rem; background: #f1c875; color: #17332b; padding: .15rem .4rem; }
+
+#member-messages[hidden] { display: none !important; }
+#member-messages { min-height: 44px; margin-top: .5rem; }
+.member-messenger summary, .member-messenger button { min-height: 44px; cursor: pointer; }
+.member-messenger .chat-room-list { display: flex; flex-wrap: wrap; gap: .5rem; }
+.member-messenger .private-chat-messages { display: flex; flex-direction: column; gap: .5rem; max-height: 50vh; overflow: auto; margin-block: 1rem; }
+.member-messenger .private-chat-messages .item { align-self: flex-start; max-width: 85%; background: #283932; color: #fff9ec; border-radius: 1rem 1rem 1rem .25rem; padding: .65rem .85rem; overflow-wrap: anywhere; }
+.member-messenger .private-chat-messages .message-own { align-self: flex-end; background: #f1c875; color: #17332b; border-radius: 1rem 1rem .25rem 1rem; }
+.member-messenger .item p { white-space: pre-wrap; margin: .3rem 0 0; }
+.member-messenger #privateSend { display: flex; align-items: end; gap: .5rem; }
+.member-messenger #privateMessage { flex: 1; min-width: 0; font-size: 1rem; }

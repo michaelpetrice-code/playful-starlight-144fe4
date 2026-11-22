@@ -20,7 +20,7 @@ import {initLounge,decorateLounge,uploadTablePhoto,uploadProfilePhoto,loadProfil
 import {virtualTablesView,meetupsView,venueView,bindCommunityHub,hubEntries} from './community-hub.js?v=173';
 import {shareLocal} from './share.js?v=172';
 import { memberPages, sharedPage, shareButton, shareMemberPage, pageLabel, shareItem, focusSharedItem } from './page-share.js?v=173';
-import {privateChatView,bindPrivateChat} from './private-chat.js';
+import {privateChatView,bindPrivateChat} from './private-chat.js?v=227';
 import {appearancePanel,bindAppearance} from './theme-settings.js';
 import {tradesView,bindTrades} from './trades.js?v=202';
 import {marketplaceView,bindMarketplace} from './marketplace.js?v=202';
@@ -89,7 +89,7 @@ let builderRoot;
 let builderUser;
 // Invitation links use URL fragments so invite secrets are not sent in HTTP requests.
 const invitationHash=(()=>{const raw=location.hash.slice(1);const i=raw.indexOf('=');if(i<0)return null;const kind=raw.slice(0,i);if(!['join-private','join-community'].includes(kind))return null;try{return {kind,code:decodeURIComponent(raw.slice(i+1))}}catch{return null}})();
-if(invitationHash){tab=invitationHash.kind==='join-private'?'Virtual Pub Tables':'Account';sessionStorage.setItem('local-pending-'+invitationHash.kind,invitationHash.code);history.replaceState(null,'',location.pathname+location.search)}
+if(invitationHash){tab=invitationHash.kind==='join-private'?'Private Chats':'Account';sessionStorage.setItem('local-pending-'+invitationHash.kind,invitationHash.code);history.replaceState(null,'',location.pathname+location.search)}
 const pendingInvite=kind=>sessionStorage.getItem('local-pending-'+kind)||'';
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function notice(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',3200)}
@@ -298,6 +298,16 @@ async function refreshMessageNotifications() {
 }
 
 function updateNotificationBell() {
+ const messagesButton = $('member-messages');
+ messagesButton.hidden = !user || memberStatus !== 'active' && !ownerAccess;
+ messagesButton.onclick = () => {
+  notificationRoom = null;
+  tab = 'Private Chats';
+  $('member-notifications').open = false;
+  render();
+  $('messages-heading')?.focus();
+  window.scrollTo(0,0);
+ };
  renderMemberNotifications({
   member: user && (memberStatus === 'active' || ownerAccess) ? user.id : null,
   groupId, records, messages: messageNotificationItems,
