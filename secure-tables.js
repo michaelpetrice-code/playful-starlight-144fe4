@@ -1,12 +1,12 @@
-import {createPushClient} from './push-notifications.js?v=240';
+import {createPushClient} from './push-notifications.js?v=241';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';
 import {bindChatScreen} from './table-chat-screen.js?v=168';
 import {bindTableVideo} from './table-video.js?v=167';
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 
 const cfg = window.LADS_CONFIG || {};
-const phoneAlerts = createPushClient(window,document,cfg);
 const sb = cfg.supabaseUrl && cfg.supabaseAnonKey ? createClient(cfg.supabaseUrl, cfg.supabaseAnonKey) : null;
+const phoneAlerts = createPushClient(window,document,cfg,sb);
 const $ = id => document.getElementById(id);
 const chatScreen = bindChatScreen($('feed'), $('toggleTableChatScreen'));
 const video = sb && bindTableVideo($('tableVideo'), sb,
@@ -46,6 +46,7 @@ function savePreferences() {
   if (!table) return;
   localStorage.setItem(prefKey(table.id),JSON.stringify(chatPrefs));
   applyPreferences();
+  if(cfg.webPushEnabled && phoneAlerts.muteTable)phoneAlerts.muteTable(user?.id,table.id,chatPrefs.mute).catch(()=>msg('Your on-device preference was saved. Phone mute settings could not sync; please try again.'));
 }
 function notifyNewPosts(posts) {
   if (!posts.length || !table || !role) return;
@@ -58,7 +59,7 @@ function notifyNewPosts(posts) {
   if (!others.length || !document.hidden) return;
   unreadCount += others.length;
   document.title = '('+unreadCount+') '+baseTitle;
-  if (chatPrefs.mute || !chatPrefs.browser || !('Notification' in window) || Notification.permission !== 'granted') return;
+  if (cfg.webPushEnabled || chatPrefs.mute || !chatPrefs.browser || !('Notification' in window) || Notification.permission !== 'granted') return;
   try {
     const notification = new Notification('New message · '+table.name, {body: others.length+' new message'+(others.length===1?'':'s')+' at your table',tag:'tl163-'+table.id});
     notification.onclick = () => {window.focus();notification.close();};
