@@ -417,7 +417,7 @@ function renderSeats() {
 }
 
 let paintedSeats = '';
-function loadPosts() {
+function loadPosts(scrollToEnd = false) {
   const id = table?.id;
   const next = refreshTail.catch(()=>{}).then(async()=>{
     if (!id || table?.id !== id || !role) return;
@@ -450,7 +450,7 @@ function loadPosts() {
     messages = posts;
     $('chatCount').textContent = posts.length ? `(${posts.length} recent)` : '';
     reactions = badges;
-    await renderChat(id);
+    await renderChat(id, scrollToEnd);
   });
   refreshTail = next;
   return next;
@@ -461,7 +461,10 @@ async function renderChat(id, scrollToEnd = false) {
   if (table?.id !== id || !role) return;
   const search = $('searchChat').value.trim().toLowerCase();
   const state = JSON.stringify([id,search,messages,seats,reactions,role,[...memberPhotos]]);
-  if (state === rendered && !shownLinksNeedRefresh()) return;
+  if (state === rendered && !shownLinksNeedRefresh()) {
+    if (scrollToEnd) list.scrollTop = list.scrollHeight;
+    return;
+  }
   function shownLinksNeedRefresh() {
     return messages.some(post => {
       const link = signedLinks.get(post.media_path);
@@ -557,7 +560,7 @@ async function renderChat(id, scrollToEnd = false) {
     bubble.append(menu);
     fragment.append(bubble);
   }
-  const current = JSON.stringify([id,$('searchChat').value.trim().toLowerCase(),messages,seats,reactions,role]);
+  const current = JSON.stringify([id,$('searchChat').value.trim().toLowerCase(),messages,seats,reactions,role,[...memberPhotos]]);
   if (table?.id !== id || current !== state || !role) return;
   const nearBottom = list.scrollHeight-list.clientHeight-list.scrollTop < 80;
   const previousScroll = list.scrollTop;
@@ -601,8 +604,11 @@ async function sendMessage(event) {
     recording = null;
     $('voiceStatus').textContent = '';
     clearReply();
-    $('postList').scrollTop = $('postList').scrollHeight;
-    await loadPosts();
+    $('searchChat').value = '';
+    await loadPosts(true);
+    if (table?.id === id && role) {
+      $('postList').lastElementChild?.scrollIntoView({block:'nearest'});
+    }
   } finally { submit.disabled = false; }
 }
 
