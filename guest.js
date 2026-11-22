@@ -1,3 +1,4 @@
+import { renderVenuePageFeed } from './venue-page-feed.js?v=232';
 import { trackPage } from './analytics-track.js?v=174';
 import { memberPageUrl, sharedPage } from './page-share.js?v=173';
 import { venueDirectoryView, bindVenueDirectory } from './venue-directory.js?v=213';
@@ -21,7 +22,7 @@ const memberDestination = (section && locationPage === 'home') ||
 const guestPages = {
   home: ['Explore The Local as a guest', 'Find pubs and clubs, see public events and take a look at the marketplace.'],
   venues: ['Find a Local', 'Browse registered pubs, clubs and community venues.'],
-  events: ['What’s on', 'See public events, dates and prizes.'],
+  events: ['Find something to do', 'Explore upcoming events from local venue pages.'],
   marketplace: ['Buy, Sell or Give Away', 'Log in to browse live listings, contact sellers or post an item.'],
   tables: ['Virtual Pub Tables', 'See how members meet and chat around virtual tables.'],
   games: ['Games Room', 'Play 14 browser games, including pool, darts and solitaire.'],
@@ -103,8 +104,14 @@ async function browseEvents() {
   clubLink.className = 'tl173-action';
   clubLink.href = 'https://www.coombesocialclub.co.uk/';
   clubLink.textContent = 'Visit the Coombe Social Club website';
-  content.replaceChildren(events, clubLink);
-  const count = await renderClubContent(await publicClient(), 'Events', notify, events);
+  const discovery = document.createElement('section');
+  discovery.id = 'venue-page-feed';
+  discovery.innerHTML = '<h2>What’s on at local venues</h2><p role="status"></p><div class="venue-page-feed-list"></div>';
+  content.replaceChildren(discovery, events, clubLink);
+  const client = await publicClient();
+  if (client) void renderVenuePageFeed(client, discovery, { discovery: true });
+  else discovery.querySelector('[role="status"]').textContent = 'Venue events are temporarily unavailable.';
+  const count = await renderClubContent(client, 'Events', notify, events);
   if (!count) events.textContent = count === 0 ? 'There are no public events to show.' : 'Public events are temporarily unavailable.';
   events.setAttribute('aria-busy', 'false');
 }
