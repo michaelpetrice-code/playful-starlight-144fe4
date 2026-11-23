@@ -76,6 +76,11 @@ begin
     if coalesce(length(trim(question->>'prompt')),0) not between 1 and 240
       or jsonb_typeof(question->'options') is distinct from 'array'
       or coalesce(question->>'correct','') !~ '^[0-3]$' then raise exception 'Invalid question'; end if;
+    if (question ? 'round' or question ? 'topic') and (
+      coalesce(question->>'round', '') !~ '^([1-9]|1[0-9]|20)$'
+      or jsonb_typeof(question->'topic') is distinct from 'string'
+      or coalesce(length(trim(question->>'topic')), 0) not between 1 and 60
+    ) then raise exception 'Invalid round number or topic'; end if;
     if jsonb_array_length(question->'options') <> 4 or exists (
       select 1 from jsonb_array_elements(question->'options') option
       where jsonb_typeof(option) <> 'string' or length(trim(option #>> '{}')) not between 1 and 120
@@ -163,6 +168,7 @@ begin
     'host', mine, 'team', team.name, 'position', room.current_question,
     'total', jsonb_array_length(room.questions), 'selected', selected,
     'prompt', prompt->>'prompt', 'options', prompt->'options',
+    'round', prompt->'round', 'topic', prompt->>'topic',
     'correct', case when room.phase='reveal' then prompt->'correct' end, 'scores', scores);
 end $$;
 

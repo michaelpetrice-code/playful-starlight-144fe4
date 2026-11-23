@@ -50,10 +50,21 @@ async function action(operation) {
   finally { busy = false; }
 }
 
-function addQuestion(data = { prompt: '', options: ['', '', '', ''], correct: 0 }) {
-  const list = byId('questions');
-  if (list.children.length >= 60) return;
+const rounds = byId('rounds');
+const topics = [
+  'General Knowledge', 'Music', 'Sport', 'History', 'TV & Film', 'Geography',
+  'Science & Nature', 'Food & Drink', 'Books & Comics', 'Gaming & Technology',
+  'Pop Culture', 'Local Knowledge', 'Family Trivia', 'Puzzles & Riddles',
+];
+for (const topic of topics) byId('round-topics').append(new Option(topic));
+
+function addQuestion(list, data = { prompt: '', options: ['', '', '', ''], correct: 0 }) {
+  if (rounds.querySelectorAll('.quiz-question').length >= 60) {
+    announce('A quiz can have up to 60 questions.');
+    return;
+  }
   const group = node('fieldset');
+  group.className = 'quiz-question';
   group.append(node('legend', 'Question'));
   const prompt = input(240, data.prompt);
   prompt.name = 'prompt';
@@ -78,13 +89,48 @@ const sample = [
   { prompt: 'Which band released the song “Here Comes the Sun”?', options: ['The Beatles', 'Queen', 'Fleetwood Mac', 'The Kinks'], correct: 0 },
   { prompt: 'What is the capital of Wales?', options: ['Swansea', 'Newport', 'Bangor', 'Cardiff'], correct: 3 },
 ];
-byId('add').onclick = () => addQuestion();
+function numberRounds() {
+  [...rounds.children].forEach((round, index) => {
+    round.querySelector('legend').textContent = 'Round ' + (index + 1);
+    round.querySelector('.quiz-remove-round').disabled = rounds.children.length === 1;
+  });
+}
+function addRound(topic, questions) {
+  if (rounds.children.length >= 20 || rounds.querySelectorAll('.quiz-question').length >= 60) {
+    announce('A quiz can have up to 20 rounds and 60 questions.');
+    return;
+  }
+  const round = node('fieldset');
+  round.append(node('legend'));
+  const topicInput = input(60, topic);
+  topicInput.name = 'round-topic';
+  topicInput.setAttribute('list', 'round-topics');
+  const list = node('div');
+  list.className = 'quiz-round-questions';
+  const remove = button('Remove round', () => {
+    round.remove();
+    numberRounds();
+  });
+  remove.className = 'quiz-remove-round';
+  const controls = node('div');
+  controls.className = 'actions';
+  controls.append(button('Add question to round', () => addQuestion(list)), remove);
+  round.append(field('Round topic', topicInput), list, controls);
+  rounds.append(round);
+  questions.forEach(question => addQuestion(list, question));
+  numberRounds();
+}
+byId('add').onclick = () => addRound('', [undefined]);
 byId('sample').onclick = () => {
-  const list = byId('questions');
-  if (list.children.length === 1 && ![...list.querySelectorAll('input')].some(item => item.value)) list.replaceChildren();
-  sample.forEach(addQuestion);
+  if (rounds.children.length === 1 && rounds.querySelectorAll('.quiz-question').length === 1
+    && rounds.querySelector('[name=round-topic]').value === 'General Knowledge'
+    && ![...rounds.querySelectorAll('.quiz-question input')].some(item => item.value)) {
+    rounds.replaceChildren();
+  }
+  addRound('General Knowledge', [sample[0], sample[1], sample[3]]);
+  addRound('Music', [sample[2]]);
 };
-addQuestion();
+addRound('General Knowledge', [undefined]);
 
 async function access() {
   const request = ++accessRequest;
@@ -111,11 +157,17 @@ setup.elements.venue.onchange = access;
 setup.onsubmit = event => {
   event.preventDefault();
   action(async () => {
-    const questions = [...byId('questions').children].map(group => ({
-      prompt: group.querySelector('[name=prompt]').value.trim(),
-      options: [...group.querySelectorAll('[name=option]')].map(option => option.value.trim()),
-      correct: Number(group.querySelector('select').value),
-    }));
+    const questions = [...rounds.children].flatMap((round, index) => {
+      const topic = round.querySelector('[name=round-topic]').value.trim();
+      if (!topic) throw Error('Give each round a topic.');
+      return [...round.querySelectorAll('.quiz-question')].map(group => ({
+        round: index + 1,
+        topic,
+        prompt: group.querySelector('[name=prompt]').value.trim(),
+        options: [...group.querySelectorAll('[name=option]')].map(option => option.value.trim()),
+        correct: Number(group.querySelector('select').value),
+      }));
+    });
     const result = await rpc('local_quiz_create', {
       p_venue: setup.elements.venue.value, p_title: setup.elements.title.value, p_questions: questions,
     });
@@ -187,6 +239,7 @@ function show(next) {
   if (next.team) room.append(node('p', 'Your team · ' + next.team));
   if (next.phase === 'lobby') room.append(node('p', 'Waiting for the host to start.'));
   if (next.prompt) {
+    if (next.topic) room.append(node('p', 'Round ' + next.round + ' · ' + next.topic));
     room.append(node('h3', 'Question ' + (next.position + 1) + ' of ' + next.total), node('p', next.prompt));
     const choices = node('div');
     choices.className = 'choices';

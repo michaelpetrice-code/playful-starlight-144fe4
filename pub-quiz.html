@@ -25,8 +25,11 @@
       <p id="access" role="status"></p>
       <a id="subscribe" href="for-venues.html#plans" hidden>View venue plans</a>
       <label>Quiz title <input name="title" maxlength="80" required value="Pub Quiz Night"></label>
-      <div id="questions"></div>
-      <div class="actions"><button type="button" id="sample">Load sample questions</button><button type="button" id="add">Add question</button><button id="create">Open lobby</button></div>
+      <h3>Quiz rounds</h3>
+      <p>Choose a topic or type your own. Add up to 20 rounds and 60 questions in total.</p>
+      <datalist id="round-topics"></datalist>
+      <div id="rounds"></div>
+      <div class="actions"><button type="button" id="sample">Add sample rounds</button><button type="button" id="add">Add round</button><button id="create">Open lobby</button></div>
     </form>
   </section>
   <section id="room" hidden aria-label="Quiz room"></section>
