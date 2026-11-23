@@ -34,7 +34,41 @@ if (feed) {
   for (const node of [document.querySelector('.chat-tools'), document.querySelector('.chat-gif-help'), byId('emojiPanel'), document.querySelector('.pub-compose > label'), byId('voiceNote'), byId('voiceStatus')]) {
     if (node) tools.append(node);
   }
-  byId('postForm').prepend(attachments);
+  const form = byId('postForm');
+  form.prepend(attachments);
+
+  const voiceNote = byId('voiceNote');
+  let idleTimer;
+  let filePickerOpen = false;
+  function restartIdleTimer() {
+    clearTimeout(idleTimer);
+    if (!attachments.open || filePickerOpen || voiceNote.disabled ||
+        voiceNote.textContent === 'Stop recording') return;
+    idleTimer = setTimeout(() => {
+      if (tools.contains(document.activeElement)) attachSummary.focus({preventScroll: true});
+      attachments.open = false;
+    }, 5000);
+  }
+  attachments.addEventListener('toggle', restartIdleTimer);
+  for (const event of ['pointermove', 'pointerdown', 'keydown', 'focusin', 'scroll', 'wheel']) {
+    tools.addEventListener(event, restartIdleTimer, {capture: true, passive: true});
+  }
+  form.addEventListener('click', event => {
+    if (attachments.open && event.target.matches('input[type="file"]')) {
+      filePickerOpen = true;
+      restartIdleTimer();
+    }
+  }, true);
+  for (const event of ['change', 'cancel']) {
+    form.addEventListener(event, event => {
+      if (!event.target.matches('input[type="file"]')) return;
+      filePickerOpen = false;
+      restartIdleTimer();
+    });
+  }
+  new MutationObserver(restartIdleTimer).observe(voiceNote, {
+    attributes: true, attributeFilter: ['disabled'], childList: true,
+  });
   const send = document.querySelector('.pub-compose button[type="submit"]');
   send.textContent = '➤';
   send.setAttribute('aria-label', 'Send message');
