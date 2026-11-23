@@ -7,7 +7,7 @@ import {footballView,mountFootball} from './football/hub.js';
 import {trackPage} from './analytics-track.js?v=174';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';
 import {prepareProfilePhoto} from './profile-photo.js?v=166';
-import {loadAdministration,mountAdministration} from './administration.js?v=197';
+import {loadAdministration,mountAdministration} from './administration.js?v=248';
 import {mountBilling} from './venue-billing.js?v=176';
 import {mountVenueBuilder} from './venue-app-builder.js?v=147';
 import {onlineCueView,bindOnlineCue} from './online-cue-v90.js';
@@ -439,6 +439,7 @@ if(tab==='Home'){
    <button type="button" data-go="Venue Hub">Find a Local</button>
    <a class="tl149-action" href="guest.html?page=events">Find something to do</a>
    <button type="button" data-go="Virtual Pub Tables">My tables</button>
+   <button type="button" class="community-build-app" data-go="Venue App Builder">Build your own app</button>
   </nav>
  </section>
  <section id="tl82-public"></section>

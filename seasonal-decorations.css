@@ -1,0 +1,11 @@
+html.local-dark-gold body>header .seasonal-button{grid-column:1/-1;justify-self:end;width:auto!important;min-height:44px;padding:8px 12px!important;font-size:.85rem!important;border:1px solid #a98a4c88!important;border-radius:12px;background:#16231c!important;color:#edcf8b!important;cursor:pointer}
+html.local-dark-gold body>header .seasonal-decoration{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:8px 0;border-top:1px solid #a98a4c55;color:#edcf8b;font-size:.95rem}
+html.local-dark-gold body>header .seasonal-decoration[hidden]{display:none!important}
+.seasonal-decoration>span:first-child{font-size:1.4rem;letter-spacing:.2em}
+.seasonal-poppy{display:inline-block;position:relative;width:24px;height:24px;background:#c52b34;border-radius:45% 55% 45% 55%;box-shadow:inset 0 0 0 1px #e2444a;transform:rotate(-15deg)}
+.seasonal-poppy::after{content:'';position:absolute;width:9px;height:9px;border-radius:50%;background:#111;left:8px;top:8px}
+.seasonal-dialog{box-sizing:border-box;width:min(420px,calc(100vw - 32px));max-height:80dvh;overflow:auto;padding:24px;border:1px solid #c9a75c;border-radius:18px;background:#111b17;color:#f4f1e6;box-shadow:0 16px 50px #0008}
+.seasonal-dialog::backdrop{background:#0009}
+.seasonal-dialog h2{margin-top:0;color:#edcf8b}.seasonal-dialog p{line-height:1.5}
+.seasonal-dialog label{display:block;margin-bottom:8px}.seasonal-dialog select,.seasonal-dialog button{box-sizing:border-box;display:block;width:100%;min-height:48px;margin:12px 0;padding:10px;border:1px solid #c9a75c;border-radius:10px;background:#1a2b21;color:#f4f1e6;font:inherit}
+.seasonal-button:focus-visible,.seasonal-dialog :focus-visible{outline:3px solid #edcf8b;outline-offset:3px}
