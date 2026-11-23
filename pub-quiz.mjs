@@ -1,3 +1,4 @@
+import { questionBank, questionsFor } from './pub-quiz-questions.mjs';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const byId = id => document.getElementById(id);
@@ -56,11 +57,7 @@ async function action(operation) {
 }
 
 const rounds = byId('rounds');
-const topics = [
-  'General Knowledge', 'Music', 'Sport', 'History', 'TV & Film', 'Geography',
-  'Science & Nature', 'Food & Drink', 'Books & Comics', 'Gaming & Technology',
-  'Pop Culture', 'Local Knowledge', 'Family Trivia', 'Puzzles & Riddles',
-];
+const topics = Object.keys(questionBank);
 for (const topic of topics) byId('round-topics').append(new Option(topic));
 
 function addQuestion(list, data = { prompt: '', options: ['', '', '', ''], correct: 0 }) {
@@ -112,19 +109,13 @@ function addQuestion(list, data = { prompt: '', options: ['', '', '', ''], corre
   group.append(media);
   list.append(group);
 }
-const sample = [
-  { prompt: 'Which city is home to the Roman Baths?', options: ['York', 'Bath', 'Chester', 'Oxford'], correct: 1 },
-  { prompt: 'How many sides does a hexagon have?', options: ['Five', 'Seven', 'Six', 'Eight'], correct: 2 },
-  { prompt: 'Which band released the song “Here Comes the Sun”?', options: ['The Beatles', 'Queen', 'Fleetwood Mac', 'The Kinks'], correct: 0 },
-  { prompt: 'What is the capital of Wales?', options: ['Swansea', 'Newport', 'Bangor', 'Cardiff'], correct: 3 },
-];
 function numberRounds() {
   [...rounds.children].forEach((round, index) => {
     round.querySelector('legend').textContent = 'Round ' + (index + 1);
     round.querySelector('.quiz-remove-round').disabled = rounds.children.length === 1;
   });
 }
-function addRound(topic, questions) {
+function addRound(topic, questions, level = 'Mix') {
   if (rounds.children.length >= 20 || rounds.querySelectorAll('.quiz-question').length >= 60) {
     announce('A quiz can have up to 20 rounds and 60 questions.');
     return;
@@ -143,23 +134,45 @@ function addRound(topic, questions) {
   remove.className = 'quiz-remove-round';
   const controls = node('div');
   controls.className = 'actions';
-  controls.append(button('Add question to round', () => addQuestion(list)), remove);
-  round.append(field('Round topic', topicInput), list, controls);
+  const difficulty = node('select');
+  difficulty.name = 'difficulty';
+  for (const label of ['Child', 'Teenager', 'Adult', 'Mix']) difficulty.add(new Option(label));
+  difficulty.value = level;
+  let changed = Boolean(questions);
+  list.addEventListener('input', () => { changed = true; });
+  list.addEventListener('click', event => { if (event.target.closest('button')) changed = true; });
+  function generate(explicit = false) {
+    const generated = questionsFor(topicInput.value, difficulty.value);
+    if (!generated.length) {
+      if (explicit) announce('Choose a listed topic for automatic questions, or write your own for a custom topic.');
+      return;
+    }
+    if (rounds.querySelectorAll('.quiz-question').length - list.children.length + generated.length > 60) {
+      announce('A quiz can have up to 60 questions.');
+      return;
+    }
+    if (changed && !window.confirm('Replace the questions already in this round?')) return;
+    list.replaceChildren();
+    generated.forEach(question => addQuestion(list, question));
+    changed = false;
+    announce();
+  }
+  topicInput.onchange = difficulty.onchange = () => generate();
+  controls.append(button('Generate questions', () => generate(true)),
+    button('Add question to round', () => { addQuestion(list); changed = true; }), remove);
+  round.append(field('Round topic', topicInput), field('Difficulty', difficulty), list, controls);
   rounds.append(round);
-  questions.forEach(question => addQuestion(list, question));
+  if (questions) questions.forEach(question => addQuestion(list, question));
+  else if (topic) generate();
+  else addQuestion(list);
   numberRounds();
 }
-byId('add').onclick = () => addRound('', [undefined]);
+byId('add').onclick = () => addRound('');
 byId('sample').onclick = () => {
-  if (rounds.children.length === 1 && rounds.querySelectorAll('.quiz-question').length === 1
-    && rounds.querySelector('[name=round-topic]').value === 'General Knowledge'
-    && ![...rounds.querySelectorAll('.quiz-question input')].some(item => item.value)) {
-    rounds.replaceChildren();
-  }
-  addRound('General Knowledge', [sample[0], sample[1], sample[3]]);
-  addRound('Music', [sample[2]]);
+  addRound('Music');
+  addRound('Sport');
 };
-addRound('General Knowledge', [undefined]);
+addRound('General Knowledge');
 
 function setMediaAccess(enabled) {
   mediaAllowed = enabled;
@@ -238,6 +251,7 @@ byId('quiz-checkout').onclick = () => action(async () => {
           title: setup.elements.title.value,
           rounds: [...rounds.children].map(round => ({
             topic: round.querySelector('[name=round-topic]').value,
+            difficulty: round.querySelector('[name=difficulty]').value,
             questions: [...round.querySelectorAll('.quiz-question')].map(readQuestion),
           })),
         }));
@@ -534,7 +548,7 @@ async function init() {
       if (draft?.rounds?.length) {
         setup.elements.title.value = draft.title;
         rounds.replaceChildren();
-        draft.rounds.forEach(round => addRound(round.topic, round.questions));
+        draft.rounds.forEach(round => addRound(round.topic, round.questions, round.difficulty));
       }
     } catch { announce('The saved party draft could not be loaded.'); }
   }
