@@ -71,3 +71,14 @@ html.table-conversation-open,html.table-conversation-open body{height:var(--conv
 .table-conversation-open #memberArea{display:flex;flex:1;min-height:0}
 .messenger-tables.table-conversation-open #feed:not([hidden]){flex:1;height:auto;min-height:0;margin:0!important}
 .table-conversation-open #postForm{flex:none}
+
+/* Preserve room for messages when the phone keyboard reduces the visible area. */
+.table-compact-chat.table-conversation-open #tableDetail>.table-profile{padding:5px 54px 5px 10px!important;margin:0!important;min-height:38px;box-sizing:border-box}
+.table-compact-chat.table-conversation-open #tableName{font-size:1rem!important;margin:0!important}
+.table-compact-chat.table-conversation-open :is(#tableVenueName,#memberState,.table-active-members){display:none!important}
+.table-compact-chat.table-conversation-open .table-profile>.messenger-menu>summary{top:0;right:6px;width:36px;height:36px}
+.table-compact-chat.table-conversation-open #feed .chat-head{padding:0 0 4px!important;min-height:32px;align-items:center}
+.table-compact-chat.table-conversation-open #feed .chat-head h3{font-size:.9rem!important}
+.table-compact-chat.table-conversation-open #tableDetail>#back{padding:3px 10px!important;min-height:30px;font-size:.9rem!important}
+.table-compact-chat.table-conversation-open #feed>#postForm{padding-top:5px!important;padding-bottom:4px!important}
+.table-compact-chat.table-conversation-open #feed.panel{padding:6px!important}
