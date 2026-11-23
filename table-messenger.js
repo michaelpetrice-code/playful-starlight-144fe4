@@ -31,7 +31,7 @@ if (feed) {
   const tools = document.createElement('div');
   tools.className = 'messenger-attachment-tools';
   attachments.append(attachSummary, tools);
-  for (const node of [document.querySelector('.chat-tools'), byId('emojiPanel'), document.querySelector('.pub-compose > label'), byId('voiceNote'), byId('voiceStatus')]) {
+  for (const node of [document.querySelector('.chat-tools'), document.querySelector('.chat-gif-help'), byId('emojiPanel'), document.querySelector('.pub-compose > label'), byId('voiceNote'), byId('voiceStatus')]) {
     if (node) tools.append(node);
   }
   byId('postForm').prepend(attachments);

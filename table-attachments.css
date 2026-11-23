@@ -1,0 +1,9 @@
+.table-attachment-preview{grid-column:1/-1;display:flex;align-items:center;gap:10px;min-width:0;padding:10px;border:1px solid #a98a4c88;border-radius:12px;background:#11251d;color:#ead5a2}
+.table-attachment-preview[hidden]{display:none!important}
+.table-attachment-preview img{width:64px;height:64px;object-fit:contain;border-radius:8px;flex:none}
+.table-attachment-preview img[hidden]{display:none}
+.table-attachment-preview span{min-width:0;overflow-wrap:anywhere;font-size:.85rem}
+.table-attachment-preview button{margin-left:auto;min-height:44px;background:#1a3026;color:#ead5a2;font-size:.8rem}
+.chat-gif-help{font-size:.8rem;line-height:1.5;color:#c8d0c6}
+.messenger-tables #postForm>.table-attachment-preview{grid-row:3}
+@media(max-width:400px){.table-attachment-preview{flex-wrap:wrap}.table-attachment-preview button{margin-left:0}}

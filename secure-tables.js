@@ -1,3 +1,4 @@
+import {attachmentTypes, bindTableAttachments} from './table-attachments.js?v=250';
 import {createPushClient} from './push-notifications.js?v=244';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';
 import {bindChatScreen} from './table-chat-screen.js?v=168';
@@ -90,12 +91,7 @@ $('tl163HidePresence').onchange = e => {
   if (!chatPrefs.hidePresence && table?.id && role) connectPresence(table.id);
 };
 
-const files = {
-  'image/jpeg':['jpg','image'], 'image/png':['png','image'], 'image/webp':['webp','image'],
-  'video/mp4':['mp4','video'], 'video/webm':['webm','video'],
-  'audio/webm':['webm','audio'], 'audio/ogg':['ogg','audio'], 'audio/mp4':['m4a','audio'],
-  'audio/mpeg':['mp3','audio'], 'application/pdf':['pdf','document']
-};
+const files = attachmentTypes;
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -591,7 +587,7 @@ async function sendMessage(event) {
   if (file?.size > 50 * 1024 * 1024) throw Error('Choose a file under 50 MB.');
   const contentType = file?.type.split(';')[0];
   const type = contentType ? files[contentType] : null;
-  if (file && !type) throw Error('Choose a supported photo, video, audio file or PDF.');
+  if (file && !type) throw Error('Choose a supported GIF, photo, video, audio file or PDF.');
   const submit = form.querySelector('button[type=submit]');
   if (submit.disabled) return;
   submit.disabled = true;
@@ -646,6 +642,7 @@ $('voiceNote').onclick = () => run(async()=>{
       const clip = new Blob(chunks,{type:captured.mimeType});
       recording = clip.size ? clip : null;
       $('postForm').elements.media.value = '';
+      tableAttachments.refresh();
       $('voiceStatus').textContent = recording ? 'Voice note ready to send.' : 'No audio was recorded.';
     };
     recorder.start();
@@ -661,6 +658,7 @@ $('voiceNote').onclick = () => run(async()=>{
     $('voiceNote').disabled = false;
   }
 });
+const tableAttachments = bindTableAttachments($('postForm'),$('chatBody'),{notice:msg,onSelect:()=>{recording=null;$('voiceStatus').textContent=''}});
 $('postForm').elements.media.onchange = () => {
   recording = null;
   $('voiceStatus').textContent = '';
