@@ -1,11 +1,10 @@
-name: DJ music source review
+name: DJ music source checks
 on:
   schedule:
     - cron: '0 19 * * 1'
   workflow_dispatch:
 permissions:
   contents: read
-  id-token: write
 jobs:
   source-report:
     runs-on: ubuntu-latest
@@ -17,26 +16,11 @@ jobs:
           python-version: '3.12'
       - name: Check approved suppliers for new catalogue candidates
         run: python pub-dj/scripts/check-music-sources.py
-      - name: Review source candidates with AI
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const token = await core.getIDToken('https://thelocal.me.uk/dj-source-review');
-            const report = JSON.parse(fs.readFileSync('music-source-review.json','utf8'));
-            const response = await fetch('https://huuqwjmztqurnyyokrxd.supabase.co/functions/v1/local-dj', {
-              method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
-              body:JSON.stringify({action:'catalogue-review',report}),signal:AbortSignal.timeout(40000)
-            });
-            const result = await response.json();
-            fs.writeFileSync('music-source-ai-review.json',JSON.stringify(result,null,2));
-            if(!response.ok) throw new Error(result.error||'AI source review failed');
-      - name: Save candidates for AI-assisted review
+      - name: Save source candidates and checks
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dj-music-source-review
           path: |
             music-source-review.json
-            music-source-ai-review.json
           retention-days: 30
