@@ -99,3 +99,7 @@ html.messenger-tables.table-conversation-open #feed:not([hidden]) {
   max-width: none;
   min-width: 0;
 }
+
+#chatGifPicker{grid-template-columns:repeat(2,minmax(0,1fr))}
+#chatGifPicker img{display:block;width:100%;height:auto;max-width:160px;margin:auto}
+#chatGifPicker [data-upload-gif]{grid-column:1/-1;padding:.4rem;font-size:1rem}

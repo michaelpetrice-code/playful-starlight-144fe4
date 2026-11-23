@@ -37,7 +37,36 @@ export function bindTableAttachments(form,body,{notice=()=>{},onSelect=()=>{},ur
  }
  input.addEventListener('change',show);
  gif.addEventListener('change',()=>{const file=gif.files?.[0];if(file)attach(file);gif.value=''});
- form.querySelector('#chooseChatGif')?.addEventListener('click',()=>gif.click());
+ const gifToggle=form.querySelector('#chooseChatGif');
+ if(gifToggle){
+  const picker=doc.getElementById('chatGifPicker');
+  if(picker){
+   gifToggle.addEventListener('click',()=>{
+    picker.hidden=!picker.hidden;
+    gifToggle.setAttribute('aria-expanded',String(!picker.hidden));
+   });
+   picker.querySelector('[data-upload-gif]').addEventListener('click',()=>gif.click());
+   for(const choice of picker.querySelectorAll('[data-chat-gif]')){
+    choice.addEventListener('click',async()=>{
+     choice.disabled=true;
+     try{
+      const response=await fetch(choice.dataset.chatGif);
+      if(!response.ok)throw Error('GIF unavailable');
+      const clip=await response.blob();
+      const filename=choice.dataset.chatGif.split('/').pop();
+      if(attach(new File([clip],filename,{type:'image/gif'}))){
+       picker.hidden=true;
+       gifToggle.setAttribute('aria-expanded','false');
+       body.focus();
+      }
+     }catch{notice('Couldn’t load that GIF. Try again or choose a saved GIF.')}
+     finally{choice.disabled=false}
+    });
+   }
+  }else{
+   gifToggle.addEventListener('click',()=>gif.click());
+  }
+ }
  body.addEventListener('paste',event=>{
   const file=event.clipboardData?.files?.[0];if(!file)return;
   if(attach(file))event.preventDefault();
