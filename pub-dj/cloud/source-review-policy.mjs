@@ -1,0 +1,2 @@
+export const reviewAudience='https://thelocal.me.uk/dj-source-review';
+export function allowedReviewClaims(p){return p?.repository==='michaelpetrice-code/playful-starlight-144fe4'&&p.sub==='repo:michaelpetrice-code/playful-starlight-144fe4:ref:refs/heads/main'&&p.ref==='refs/heads/main'&&p.workflow_ref==='michaelpetrice-code/playful-starlight-144fe4/.github/workflows/dj-source-review.yml@refs/heads/main'&&['schedule','workflow_dispatch'].includes(p.event_name);}
