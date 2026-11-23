@@ -241,31 +241,36 @@
       "id": "oga-holizna-chills",
       "licence_page": "https://opengameart.org/content/chills",
       "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "status": "metadata_and_audio_verified_pending_app_browser_test"
+      "status": "verified_in_app_browser_playback",
+      "checked": "2026-11-23"
     },
     {
       "id": "oga-look-up",
       "licence_page": "https://opengameart.org/content/look-up",
       "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "status": "metadata_and_audio_verified_pending_app_browser_test"
+      "status": "verified_in_app_browser_playback",
+      "checked": "2026-11-23"
     },
     {
       "id": "oga-jazz-aug-20",
       "licence_page": "https://opengameart.org/content/jazz-aug-20",
       "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "status": "metadata_and_audio_verified_pending_app_browser_test"
+      "status": "verified_in_app_browser_playback",
+      "checked": "2026-11-23"
     },
     {
       "id": "oga-moil",
       "licence_page": "https://opengameart.org/content/moil",
       "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "status": "metadata_and_audio_verified_pending_app_browser_test"
+      "status": "verified_in_app_browser_playback",
+      "checked": "2026-11-23"
     },
     {
       "id": "wm-chris-direct-to-video",
       "licence_page": "https://commons.wikimedia.org/wiki/File:Chris_Zabriskie_-_01_-_Direct_to_Video.ogg",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "status": "metadata_and_audio_verified_pending_app_browser_test"
+      "status": "verified_in_app_browser_playback",
+      "checked": "2026-11-23"
     }
   ]
 }
