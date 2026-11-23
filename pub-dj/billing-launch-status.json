@@ -1,0 +1,47 @@
+{
+  "feature": "pub_dj",
+  "stripe_account": "acct_1T7FH4RlvtejByKs",
+  "livemode": true,
+  "checkout_enabled": false,
+  "deployment_status": "held",
+  "pricing_status": "proposed",
+  "music_supply_included": false,
+  "plans": [
+    {
+      "plan": "venue_monthly",
+      "product": "prod_VgM3tFdTQjAn1g",
+      "price": "price_1UezLQRlvtejByKsbsDkruzo",
+      "currency": "gbp",
+      "amount": 1999,
+      "interval": "month",
+      "product_active": false
+    },
+    {
+      "plan": "subscriber_monthly",
+      "product": "prod_VgM3dC6yWrbvyC",
+      "price": "price_1UezLRRlvtejByKsQJvwTSWC",
+      "currency": "gbp",
+      "amount": 999,
+      "interval": "month",
+      "product_active": false,
+      "requires": "verified_active_paid_local_venue_subscription"
+    },
+    {
+      "plan": "party_once",
+      "product": "prod_VgM3tnQkv6Fp5D",
+      "price": "price_1UezLSRlvtejByKsBbkjdjLx",
+      "currency": "gbp",
+      "amount": 799,
+      "product_active": false,
+      "requires": "event_activation_and_expiry"
+    }
+  ],
+  "release_requirements": [
+    "Confirm final pricing after music supply costs",
+    "Implement authenticated venue checkout and verified webhook entitlements",
+    "Implement owner complimentary access without customer checkout",
+    "Verify mobile browsers and host speaker playback",
+    "Agree appropriate music supply and permissions",
+    "Clarify whether release follows tested checkout or first real payment"
+  ]
+}
