@@ -112,7 +112,10 @@ function groupShareButton(page, record, label) {
 }
 function bindPageSharing(view) {
   const pageButton=view.querySelector('#tl172-page-share');
-  if(pageButton)pageButton.onclick=()=>shareMemberPage(tab,notice);
+  if(pageButton)pageButton.onclick=()=>{
+   if(Object.values(memberPages).includes(tab)) return shareMemberPage(tab,notice);
+   return shareLocal({url:new URL('/',location.origin).href,notify:notice});
+  };
   view.querySelectorAll('[data-tl172-item]').forEach(button => {
     button.onclick = () => {
       const page = button.dataset.tl172Page;
@@ -313,7 +316,7 @@ const interiorPages={
 function premiumInterior(name,content){
 const [,description,theme]=interiorPages[name]||['EXPLORE THE LOCAL','Everything under one roof.','venues'];
 const safe=esc(pageLabel(name)),safeDescription=esc(description);
-return `<div class="local50-interior local50-${theme}"><section class="local50-page-hero"><div class="local50-hero-inner"><span class="local50-eyebrow"><img class="local55-mini-brand" src="icons/the-local-pint-transparent-v150.png" alt=""> The Local</span><h1>${safe}</h1><p>${safeDescription}</p><div class="local50-hero-links">${Object.values(memberPages).includes(name) ? shareButton("Share page","tl172-page-share") : ""}</div></div></section><section class="local50-page-body">${content}</section></div>`;
+return `<div class="local50-interior local50-${theme}"><section class="local50-page-hero"><div class="local50-hero-inner"><span class="local50-eyebrow"><img class="local55-mini-brand" src="icons/the-local-pint-transparent-v150.png" alt=""> The Local</span><h1>${safe}</h1><p>${safeDescription}</p><div class="local50-hero-links">${shareButton(Object.values(memberPages).includes(name) ? "Share page" : "Share The Local","tl172-page-share")}</div></div></section><section class="local50-page-body">${content}</section></div>`;
 }
 
 async function renderAnnouncements(){if(!sb)return;const view=document.getElementById('view');if(!view)return;const marker=document.createElement('section');marker.className='local-owner-news';marker.innerHTML='<h2>✦ News from The Local</h2><p>Loading announcements…</p>';const target=view.querySelector('.local50-page-body')||view;const content=view.querySelector('.tl149-home #tl82-public');if(content)content.after(marker);else target.prepend(marker);const news=await loadPublicAnnouncements(sb);if(!marker.isConnected)return;if(!news.length){marker.remove();return}marker.innerHTML='<h2>✦ News from The Local</h2>';for(const item of news){const article=document.createElement('article');const title=document.createElement('strong');title.textContent=item.title;const body=document.createElement('p');body.textContent=item.body;article.append(title,body);if(item.image_url&&/^https:\/\//.test(item.image_url)){const img=document.createElement('img');img.src=item.image_url;img.loading='lazy';img.alt='Announcement image';article.append(img)}marker.append(article)}}
@@ -518,7 +521,10 @@ if (!keepTables && !keepAdmin && !keepBilling) {
   const ownProfile = tab === 'Account' ? view.querySelector('.local-profile-panel') : null;
   const profileIdentity = cloud ? user?.id || 'signed-out' : 'demo';
   const retainProfile = ownProfile && view.dataset.profileIdentity === profileIdentity;
-  view.innerHTML = ['Home','Venue App Builder','Administration','Venue subscription'].includes(tab) ? h : premiumInterior(tab,h);
+  const ownLayout = ['Venue App Builder','Administration','Venue subscription'].includes(tab);
+  view.innerHTML = tab === 'Home' ? h : ownLayout
+    ? h + `<div class="local50-hero-links">${shareButton("Share The Local","tl172-page-share")}</div>`
+    : premiumInterior(tab,h);
   if (tab === 'Account') {
     view.dataset.profileIdentity = profileIdentity;
     if (retainProfile) view.querySelector('.local-profile-panel')?.replaceWith(ownProfile);
