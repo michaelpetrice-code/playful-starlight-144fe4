@@ -10,7 +10,7 @@ The server does not read OPENAI_API_KEY, call a model provider or use GitHub OID
 
 ## Free online recordings
 
-401 connected recordings: 400 Incompetech selections by Kevin MacLeod and Acoustic Rock by Jason Shaw/Audionautix. No mainstream chart catalogue is included. Source, artist and licence attribution travel with every recording. Audio is unchanged and streamed from fixed creator-published URLs. New rooms include this collection; existing hosts can explicitly replace their collection with it. Hosts must keep attribution visible to listeners. Normal data/hosting and venue permissions are separate from the absence of supplier fees.
+406 connected recordings: 400 Incompetech selections by Kevin MacLeod, Acoustic Rock by Jason Shaw/Audionautix, four CC0 OpenGameArt recordings, and Direct to Video by Chris Zabriskie via Wikimedia Commons. No mainstream chart catalogue is included. Source, artist and licence attribution travel with every recording. Audio is unchanged and streamed from fixed creator-published URLs. New rooms include this collection; existing hosts can explicitly replace their collection with it. Hosts must keep attribution visible to listeners. Normal data/hosting and venue permissions are separate from the absence of supplier fees.
 
 Audionautix Acoustic Rock decoded and advanced in the browser (166.9 seconds). ccMixter Connections, Audionautix Big Swing Band and Dirt Road Traveler failed browser playback and are excluded. Deferred records and licensing limitations are in `source-review-records.json`.
 
@@ -21,3 +21,5 @@ Audionautix Acoustic Rock decoded and advanced in the browser (166.9 seconds). c
 ## Validation
 
 Run `npm ci --prefix tests --ignore-scripts`, `node --test pub-dj/tests/*.mjs pub-dj/tests/*.cjs`, `python3 -m unittest discover -s pub-dj/tests -v`, and `python scripts/check_static.py`. Browser checks verify free-stream playback and staff request approval. Room polling reuses a hash-scoped catalogue cache, cleared when the room changes or the user signs out.
+
+Song cards show title and artist only. Supplier and licence information remains in listener credits, outside browsing controls. YouTube search opens the official site for personal discovery; no YouTube audio is imported, scraped, charged for or routed to venue decks.

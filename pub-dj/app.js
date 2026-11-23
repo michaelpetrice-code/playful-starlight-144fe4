@@ -96,11 +96,11 @@ function trackCard(track,index){
  const visual=element('div',undefined,'cover-wrap');visual.append(cover(track));
  const save=button(savedSongs.has(track.id)?'♥':'♡',()=>saveSong(track.id),'save-track');
  save.dataset.focusKey='save-'+track.id;save.setAttribute('aria-label',(savedSongs.has(track.id)?'Unsave ':'Save ')+track.title);save.setAttribute('aria-pressed',String(savedSongs.has(track.id)));visual.append(save);
- const info=element('div',undefined,'track-info');info.append(element('h4',track.title),element('p',track.artist),element('span',track.mood||'Venue collection','track-mood'));
+ const info=element('div',undefined,'track-info');info.append(element('h4',track.title),element('p',track.artist));
  card.append(element('span',String(index+1).padStart(2,'0'),'track-rank'),visual,info,requestButton(track));return card;
 }
 function renderCatalogue(){
- const query=$('search').value;const sourceFilter=$('source-filter').value,genreFilter=$('genre-filter').value;const signature=JSON.stringify([state.tracks,state.queue,state.joined,state.open,query,filter,libraryView,sourceFilter,genreFilter,visibleLimit,[...savedSongs]]);
+ const query=$('search').value;$('youtube-search').href='https://www.youtube.com/results?search_query='+encodeURIComponent(query.trim()||'music');const genreFilter=$('genre-filter').value;const signature=JSON.stringify([state.tracks,state.queue,state.joined,state.open,query,filter,libraryView,genreFilter,visibleLimit,[...savedSongs]]);
  if(signature===catalogueSignature)return;catalogueSignature=signature;
  const focused=document.activeElement?.dataset?.focusKey;
  for(const tab of $('browse-tabs').querySelectorAll('button'))tab.setAttribute('aria-pressed',String(tab.dataset.view===libraryView));
@@ -113,12 +113,13 @@ function renderCatalogue(){
  }));
  const popular=discovery.popular(state.tracks,state.queue);$('popular-section').hidden=!explore||!popular.length;
  $('popular-tracks').replaceChildren(...popular.slice(0,4).map(({track,votes})=>{
-  const row=element('div',undefined,'popular-track');const title=element('div',undefined,'popular-info');title.append(element('strong',track.title),element('small',votes+' vote'+(votes===1?'':'s')));row.append(cover(track,true),title,requestButton(track));return row;
+  const row=element('div',undefined,'popular-track');const title=element('div',undefined,'popular-info');title.append(element('strong',track.title),element('small',track.artist),element('small',votes+' vote'+(votes===1?'':'s')));row.append(cover(track,true),title,requestButton(track));return row;
  }));
  const enrich=t=>({...t,...(window.LocalDJFreeMusic?.track(t.id)||{}),id:t.id,title:t.title,artist:t.artist,mood:t.mood});
  const genres=[...new Set(state.tracks.map(t=>enrich(t).genre).filter(Boolean))].sort();const prior=$('genre-filter').value;const option=(text,value)=>{const o=document.createElement('option');o.textContent=text;o.value=value;return o;};$('genre-filter').replaceChildren(option('All genres',''),...genres.map(g=>option(g,g)));$('genre-filter').value=prior;
- const eligible=state.tracks.map(enrich).filter(t=>(!sourceFilter||(t.provider||'Venue files')===sourceFilter)&&(!genreFilter||t.genre===genreFilter));
+ const eligible=state.tracks.map(enrich).filter(t=>(!genreFilter||t.genre===genreFilter));
  const matches=discovery.select(eligible,{query,mood:filter,savedOnly:libraryView==='saved',saved:[...savedSongs]});
+ $('youtube-fallback').hidden=!query.trim()||matches.length>0;$('youtube-search').textContent='Find “'+query.trim()+'” on YouTube ↗';
  $('artists').hidden=libraryView!=='artists';$('tracks').hidden=libraryView==='artists';
  $('tracks').classList.toggle('song-list',libraryView==='songs');
  $('results-title').textContent=query.trim()?'Search results':libraryView==='saved'?'Your saved songs':libraryView==='artists'?'Meet the artists':filter!=='All music'?filter:libraryView==='songs'?'All songs':'Explore the collection';
@@ -147,7 +148,7 @@ async function syncAudio(){
   await audio.play();
  }catch(e){tell(e.name==='NotAllowedError'?'Press Play on the DJ deck to enable the speakers.':e.message);}
 }
-function runSearch(value=$('search').value){$('search').value=value;filter='All music';visibleLimit=48;$('source-filter').value='';$('genre-filter').value='';libraryView='songs';catalogueSignature='';render();hideSuggestions();$('results-title').scrollIntoView({block:'nearest',behavior:'smooth'});}
+function runSearch(value=$('search').value){$('search').value=value;filter='All music';visibleLimit=48;$('genre-filter').value='';libraryView='songs';catalogueSignature='';render();hideSuggestions();$('results-title').scrollIntoView({block:'nearest',behavior:'smooth'});}
 function hideSuggestions(){$('song-suggestions').hidden=true;$('search').setAttribute('aria-expanded','false');}
 function showSuggestions(){const matches=discovery.suggestions(state?.tracks||[],$('search').value);$('song-suggestions').replaceChildren(...matches.map(track=>{const b=button(track.title+' — '+track.artist,()=>runSearch(track.title),'ghost');b.type='button';return b;}));$('song-suggestions').hidden=!matches.length;$('search').setAttribute('aria-expanded',String(Boolean(matches.length)));}
 $('song-search-form').onsubmit=e=>{e.preventDefault();runSearch();};
@@ -226,6 +227,6 @@ $('cloud-signout').onclick=async()=>{audio.pause();await window.LocalDJCloud.log
 
 $('cloud-free-music').onclick=async()=>{try{if(!confirm('Load the free online collection into this room? This replaces its collection. Keep every artist’s licence credits visible to listeners.'))return;state=await window.LocalDJCloud.command('catalogue',{tracks:window.LocalDJFreeMusic.catalogue()});render();tell('Free online music loaded. Claim this playback device, then press Start. No supplier subscription is required.');}catch(error){tell(error.message);}};
 function drawMusicCredits(){const track=window.LocalDJFreeMusic?.track(state?.current?.track);$('current-music-credit').replaceChildren();if(track){const source=document.createElement('a');source.href=track.source;source.target='_blank';source.rel='noopener';source.textContent=track.credit;const license=document.createElement('a');license.href=track.license;license.textContent='Licence';license.target='_blank';license.rel='noopener';$('current-music-credit').append(source,document.createTextNode(' · '),license);}}
-$('free-collection-count').textContent=(window.LocalDJFreeMusic?.tracks.length||0)+' free online tracks across '+new Set((window.LocalDJFreeMusic?.tracks||[]).map(t=>t.provider)).size+' sources.';
+$('free-collection-count').textContent=(window.LocalDJFreeMusic?.tracks.length||0)+' songs in the free collection.';
 for(const track of window.LocalDJFreeMusic?.tracks||[]){const p=document.createElement('p');const a=document.createElement('a');a.href=track.source;a.target='_blank';a.rel='noopener';a.textContent=track.credit+' Source: '+track.provider;const licence=document.createElement('a');licence.href=track.license;licence.textContent='Licence';licence.target='_blank';licence.rel='noopener';p.append(a,document.createTextNode(' · '),licence);$('free-track-credits').append(p);}
-$('source-filter').onchange=$('genre-filter').onchange=()=>{visibleLimit=48;catalogueSignature='';renderCatalogue();};$('show-more-tracks').onclick=()=>{visibleLimit+=48;renderCatalogue();};
+$('genre-filter').onchange=()=>{visibleLimit=48;catalogueSignature='';renderCatalogue();};$('show-more-tracks').onclick=()=>{visibleLimit+=48;renderCatalogue();};

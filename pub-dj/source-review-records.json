@@ -2,7 +2,9 @@
   "checked": "2026-11-23",
   "included": {
     "Incompetech": 400,
-    "Audionautix": 1
+    "Audionautix": 1,
+    "OpenGameArt": 4,
+    "Wikimedia Commons": 1
   },
   "deferred": [
     {
@@ -208,6 +210,23 @@
           "reviewed": "2026-11-23"
         }
       ]
+    },
+    {
+      "provider": "OpenGameArt",
+      "reason": "Public Domain Jazz is only 40 seconds; retained as a candidate, excluded from song collection."
+    },
+    {
+      "provider": "YouTube",
+      "reason": "External personal discovery link only. No scraping, audio extraction or venue playback. UK terms restrict public music streaming.",
+      "source": "https://uk.youtube.com/terms?gl=GB&hl=en"
+    },
+    {
+      "provider": "Silverman Sound",
+      "reason": "Published terms restrict standalone audio redistribution; not included."
+    },
+    {
+      "provider": "Loyalty Freak Music",
+      "reason": "Artist FAQ contains redistribution restrictions; clarify suitability for a standalone music service before inclusion."
     }
   ],
   "automation_validation": {
@@ -216,5 +235,37 @@
     "method": "deterministic_source_checks",
     "external_ai_required": false,
     "auto_publish": false
-  }
+  },
+  "checks": [
+    {
+      "id": "oga-holizna-chills",
+      "licence_page": "https://opengameart.org/content/chills",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "status": "metadata_and_audio_verified_pending_app_browser_test"
+    },
+    {
+      "id": "oga-look-up",
+      "licence_page": "https://opengameart.org/content/look-up",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "status": "metadata_and_audio_verified_pending_app_browser_test"
+    },
+    {
+      "id": "oga-jazz-aug-20",
+      "licence_page": "https://opengameart.org/content/jazz-aug-20",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "status": "metadata_and_audio_verified_pending_app_browser_test"
+    },
+    {
+      "id": "oga-moil",
+      "licence_page": "https://opengameart.org/content/moil",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "status": "metadata_and_audio_verified_pending_app_browser_test"
+    },
+    {
+      "id": "wm-chris-direct-to-video",
+      "licence_page": "https://commons.wikimedia.org/wiki/File:Chris_Zabriskie_-_01_-_Direct_to_Video.ogg",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "status": "metadata_and_audio_verified_pending_app_browser_test"
+    }
+  ]
 }

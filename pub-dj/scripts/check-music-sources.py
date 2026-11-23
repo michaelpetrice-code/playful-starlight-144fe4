@@ -1,5 +1,6 @@
 """Refresh discovery reports only. Never approve licences or add playback URLs automatically."""
-import json, urllib.request, pathlib, datetime, re, collections
+import json, urllib.request, urllib.parse, pathlib, datetime, re, collections, html
+from concurrent.futures import ThreadPoolExecutor
 root=pathlib.Path(__file__).resolve().parents[1]
 src=(root/'free-music.js').read_text()
 tracks=json.loads(src.split('const tracks=',1)[1].split(';\nconst byId=',1)[0])
@@ -20,6 +21,22 @@ for name,url in [('Incompetech','https://incompetech.com/music/royalty-free/piec
   entry['candidate_count']=len(entry['candidates']);entry['candidates']=entry['candidates'][:50]
  except Exception as error:entry['error']=type(error).__name__
  report['sources'].append(entry)
+def watch_source(source):
+ entry={'provider':source['provider'],'source':source['url'],'status':'unavailable','candidates':[],'free_only':True}
+ try:
+  with urllib.request.urlopen(source['url'],timeout=15) as response: page=response.read(2000000).decode('utf-8',errors='replace')
+  entry['status']='reachable';seen=set();known={t['source'] for t in tracks}
+  for href,label in re.findall(r'<a\b[^>]*href=[\"\x27]([^\"\x27]+)[\"\x27][^>]*>(.*?)</a>',page,re.S|re.I):
+   url=urllib.parse.urljoin(source['url'],html.unescape(href));parts=urllib.parse.urlsplit(url)
+   title=html.unescape(re.sub(r'<[^>]*>','',label)).strip()
+   if parts.scheme!='https' or parts.hostname!=urllib.parse.urlsplit(source['url']).hostname or not parts.path.startswith(source['path_prefix']) or parts.fragment or parts.query or not title or len(title)>180 or url in seen or url in known: continue
+   seen.add(url);entry['candidates'].append({'title':title,'source':url,'required_review':source['review']})
+  entry['candidate_count']=len(entry['candidates']);entry['candidates']=entry['candidates'][:50]
+ except Exception as error:entry['error']=type(error).__name__
+ return entry
+watchlist=json.loads((root/'source-watchlist.json').read_text())
+with ThreadPoolExecutor(max_workers=5) as workers: report['sources'].extend(workers.map(watch_source,watchlist['sources']))
+report['free_only']=True
 report['review_method']='deterministic_source_checks'
 report['external_ai_required']=False
 report['summary']=[{'provider':s['provider'],'status':s['status'],'new_candidates':s.get('candidate_count',0),'next_step':'Check licences, contributor credits and browser playback before inclusion.'} for s in report['sources']]
