@@ -74,3 +74,12 @@ html.tl122-embedded body .table-quick-actions>span{display:none}
 
 /* Administration lives in More; suppress any legacy floating entry point. */
 #tl-venue-admin-cog,#tl128-admin-menu{display:none!important}
+
+/* Keep member alerts beside the brand at every viewport width. */
+html.local-dark-gold body>header.local-app-header{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:8px 12px!important}
+html.local-dark-gold body>header.local-app-header .tl-header-logo{grid-column:1;grid-row:1;min-width:0;margin:0!important;text-align:left!important}
+html.local-dark-gold body>header.local-app-header .tl-header-logo img{width:min(220px,100%)!important;max-width:100%!important}
+html.local-dark-gold body>header.local-app-header #member-notifications{grid-column:2;grid-row:1;justify-self:end;align-self:center;margin:0!important;float:none!important}
+html.local-dark-gold body>header.local-app-header #member-notifications summary{display:flex!important;align-items:center;justify-content:center;gap:4px;min-width:44px;min-height:44px;list-style:none}
+html.local-dark-gold body>header.local-app-header #member-notifications summary::-webkit-details-marker{display:none}
+html.local-dark-gold body .community-home-shortcuts .community-build-app{border-color:#edcf8b!important;background:linear-gradient(145deg,#3b3420,#1b241b)!important;color:#ffe3a2!important;box-shadow:inset 0 1px 0 #ffe3a233,0 3px 8px #0004!important}

@@ -1,3 +1,4 @@
+import { seasonalAdminView, bindSeasonalAdmin } from './seasonal-decorations.js?v=248';
 import { mountAnalytics } from './analytics-dashboard.js?v=196';
 import { ownerView, bindOwner } from './owner-dashboard.js';
 import { adminView, bindAdmin } from './local-admin.js';
@@ -31,6 +32,7 @@ export function mountAdministration(root, context, access, openPane) {
   if (access.owner) panes.push(['overview', 'Owner dashboard', ownerView, () => bindOwner(context)]);
   if (access.owner) panes.push(['analytics', 'Analytics', () => '', () => mountAnalytics(content, context.sb)]);
   if (access.owner || access.local) {
+    panes.push(['seasonal', 'Seasonal decorations', seasonalAdminView, () => bindSeasonalAdmin(content)]);
     panes.push(['content', 'Club content & notifications', () => '', () => mountClubAdmin(context.sb, context.user, content)]);
     panes.push(['market', 'Marketplace & trades', adminView, () => bindAdmin(context)]);
   }
