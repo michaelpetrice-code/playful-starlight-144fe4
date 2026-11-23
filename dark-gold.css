@@ -51,3 +51,11 @@ html.local-dark-gold body #bottomNav button.active{background:linear-gradient(18
 @media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){html.local-dark-gold:not(.local-reduce-motion) body :is(.guest-feature,.tl149-feature,.market-card):hover{transform:translateY(-2px)}html.local-dark-gold:not(.local-reduce-motion) body button:active{transform:translateY(1px)}}
 
 html.local-dark-gold body .member-messenger.is-chat-open{height:var(--private-chat-height,min(700px,78dvh))!important;min-height:180px!important}
+
+/* Feed introduction and nested composer surfaces also use the shared dark palette. */
+html.local-dark-gold body :is(.local-feed-intro,.local-composer-page){background:linear-gradient(145deg,#17241d,#111b17 48%,#0c140f)!important;color:#f4f1e6!important;border:1px solid #b3935488!important;box-shadow:inset 0 1px 0 #fff0bf14,0 3px 0 #02060499,0 10px 24px #0005!important}
+html.local-dark-gold body .local-feed-intro h2{color:#edcf8b!important}
+html.local-dark-gold body .local-feed-intro p{color:#c8cec4!important}
+html.local-dark-gold body .local-compose-launch span:last-child{background:linear-gradient(180deg,#132219,#0b160f)!important;color:#d8dfd2!important;border:1px solid #a98a4c88!important;box-shadow:inset 0 2px 5px #0005!important}
+html.local-dark-gold body .local-composer-tools label{background:#17291e!important;color:#edcf8b!important;border:1px solid #a98a4c88!important}
+html.local-dark-gold body :is(.local-compose-actions,.local-compose-heading,.local-post-buttons){border-color:#a98a4c66!important}
