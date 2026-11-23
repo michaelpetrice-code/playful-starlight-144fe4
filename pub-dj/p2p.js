@@ -14,7 +14,7 @@
   if(typeof input!=='string'||input.length>4096||!/^magnet:\?/i.test(input))throw Error('Paste a magnet link or choose a .torrent file.');
   const url=new URL(input);if(!/^urn:btih:(?:[a-f0-9]{40}|[a-z2-7]{32})$/i.test(url.searchParams.get('xt')||''))throw Error('Use a valid BitTorrent magnet link.');return input;
  }
- function create({loadClient=async()=> (await import('./vendor/webtorrent.min.js')).default,onStatus=()=>{},timeout=90000}={}){
+ function create({loadClient=async()=> (await import('./vendor/webtorrent.min.js')).default,onStatus=()=>{},timeout=300000}={}){
   let client=null,torrent=null,cancelPending=null,generation=0;
   function stop(){generation++;const cancel=cancelPending;cancelPending=null;cancel?.(Error('P2P transfer stopped.'));const old=client;client=null;torrent=null;old?.destroy();}
   async function inspect(input,{rights=false,vpn=false,direct=false}={}){
