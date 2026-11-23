@@ -351,6 +351,7 @@ async function refreshMembership(id, first = false) {
       return;
     }
     updateShortcutLink();
+    if(parent!==window && role){parent.postMessage({type:'tl-table-route',table:table.id,venue:venue.id},location.origin);parent.postMessage({type:'tl-table-draft-request',table:table.id,venue:venue.id},location.origin);}
     if (first || !before || (!admin() && ['owner','moderator'].includes(before))) showTab('feed');
   }
   if (role && (first || !before)) {
@@ -604,7 +605,8 @@ async function sendMessage(event) {
       throw error;
     }
     if (table?.id !== id) return;
-    form.reset();
+    const nextDraft=$('chatBody').value.trim()===body?'':$('chatBody').value;
+    form.reset();$('chatBody').value=nextDraft;publishTableDraft();
     recording = null;
     $('voiceStatus').textContent = '';
     clearReply();
@@ -764,7 +766,7 @@ $('tableVenue').onchange = () => {
   msg('');
   run(loadTables);
 };
-$('back').onclick = () => { stopRecorder(); run(loadTables); };
+$('back').onclick = () => { stopRecorder(); if(parent!==window){parent.postMessage({type:'tl-table-route-clear'},location.origin);return;}run(loadTables); };
 $('newTable').onsubmit = event => {
   event.preventDefault();
   run(async()=>{
@@ -877,3 +879,10 @@ $('enableTableAlerts').onclick = async () => {
  if(parent !== window){parent.postMessage({type:'tl-enable-message-alerts'},location.origin);return;}
  try{msg(await phoneAlerts.enable(user?.id));}catch(error){msg(error.message);}
 };
+
+function publishTableDraft(){if(parent!==window && table?.id && venue?.id && role)parent.postMessage({type:'tl-table-draft',table:table.id,venue:venue.id,body:$('chatBody').value},location.origin)}
+$('chatBody').addEventListener('input',publishTableDraft);
+window.addEventListener('message',event=>{
+ const data=event.data;if(event.origin!==location.origin||event.source!==parent||data?.type!=='tl-table-restore-draft'||!role||data.table!==table?.id||data.venue!==venue?.id||typeof data.body!=='string')return;
+ if(!$('chatBody').value)$('chatBody').value=data.body.slice(0,5000);
+});
