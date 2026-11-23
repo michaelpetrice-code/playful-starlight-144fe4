@@ -13,7 +13,7 @@ export function createSocialExperience({win=window,doc=document,openPage,openTab
  function openDock(t){
   if(!win.matchMedia('(min-width:1200px)').matches){openTable(t);return;}
   closeDock();dock=doc.createElement('section');dock.className='social-chat-dock';dock.setAttribute('aria-label',t.name+' conversation');
-  dock.innerHTML=`<header><strong>${esc(t.name)}</strong><button type="button" data-expand aria-label="Open conversation page">↗</button><button type="button" data-close aria-label="Close conversation">×</button></header><iframe title="${esc(t.name)} table chat" allow="camera 'self'; microphone 'self'; autoplay 'self'"></iframe>`;
+  dock.innerHTML=`<div class="social-chat-heading"><strong>${esc(t.name)}</strong><button type="button" data-expand aria-label="Open conversation page">↗</button><button type="button" data-close aria-label="Close conversation">×</button></div><iframe title="${esc(t.name)} table chat" allow="camera 'self'; microphone 'self'; autoplay 'self'"></iframe>`;
   dock.querySelector('iframe').src='secure-tables.html?'+new URLSearchParams({table:t.id,venue:t.venue_id,embedded:'1'});
   dock.querySelector('[data-close]').onclick=closeDock;dock.querySelector('[data-expand]').onclick=()=>{closeDock();openTable(t)};doc.body.append(dock);
  }
