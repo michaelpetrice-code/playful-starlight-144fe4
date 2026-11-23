@@ -24,6 +24,12 @@ const launchCard = document.createElement('section');
 launchCard.className = 'tl198-launch-card';
 launchCard.innerHTML = `<div class="tl198-launch-copy"><span class="tl198-eyebrow">YOUR VENUE APP</span><h2>Ready to go live?</h2><p>Build, preview and publish your app for members. You can update or unpublish it later.</p><p class="tl198-launch-state" role="status">Checking publishing access…</p></div><div class="tl198-launch-actions"><a class="tl198-publish-button" href="index.html?section=venue-app-builder">🚀 Publish My App</a><span>Opens the secure app builder and publishing checklist</span></div>`;
 target.prepend(launchCard);
+const quizLink = document.createElement('a');
+quizLink.className = 'tl198-publish-button';
+quizLink.href = 'pub-quiz.html';
+quizLink.textContent = 'Open Pub Quiz';
+launchCard.querySelector('.tl198-launch-actions').append(quizLink);
+
 const launchState = launchCard.querySelector('.tl198-launch-state');
 Promise.resolve().then(async () => {
  const {data,error} = await sb.rpc('local_builder_get');
