@@ -1,60 +1,58 @@
-# The Local DJ — working venue pilot
+# The Local DJ
 
-A dark green and gold jukebox alternative for The Local. Includes a static interactive demo, three original short instrumental samples, a real multi-device venue queue, staff approval, voting, automatic next-track playback, mood-based fallback music and a separate silent screen view.
+Venue music software with a hosted customer queue, Spotify-style discovery and responsive DJ decks. The song sits beside the console on desktop; below 720px the console stacks underneath. The B platter shows the upcoming song rather than a second audio channel. No crossfade, beat matching, AI music generation or commercial streaming catalogue is advertised.
 
-## Try the demo
+## Published routes
 
-Open `pub-dj/index.html` through any static web server. Use code **123456**, request a song, unlock demo staff controls and approve it, then start playback. Demo state stays in that tab; customer and staff controls are deliberately available for demonstration. Original samples are short loops and repeat as the queue advances. The demo is not shared between devices. The product page is `pub-dj-pro.html`.
+- `pub-dj-pro.html`: plans, music requirements and hosting entry.
+- `pub-dj/index.html`: hosted DJ, Local account sign-in and guest-code entry.
+- `pub-dj/index.html?demo=1`: interactive original-sample demo; its state stays in that tab.
+- `pub-dj/index.html?room=CODE`: shared queue join link.
+- Add `screen=1` for a silent display; screen views cannot control playback.
 
-## Run a real venue pilot
+## Venue hosting
 
-Requires Python 3.10+; no third-party packages. Start from the repository root:
+Sign in with an existing confirmed Local account. The hosted backend derives venue-management access from the platform-owner registry, App Builder ownership/team membership, verified venue owners and Coombe's registered hosts. A private party needs no venue. Complimentary personal and venue grants are checked server-side before any payment request. Michael's owner account and Coombe have permanent grants requiring no payment card.
 
-```sh
-export DJ_HOST_PASSWORD='replace-with-a-unique-long-password'
-export DJ_VENUE='Coombe Social Club'
-export DJ_JOIN_CODE='385217'
-export DJ_MUSIC_DIR='/absolute/path/to/authorised/music'
-python3 pub-dj/server.py
-```
+Select the approved venue or private event, then open a room with existing access or use Stripe checkout. Choose authorised music files on the host device, confirm permission to use them, and select Use selected music. Filename convention: `Artist - Song title - Mood.mp3`; unlabelled files use their filenames. Up to 500 MP3, WAV, OGG or M4A files, 50 MB per file. Codec support depends on the host browser. Only metadata is sent to the service, never the audio files.
 
-Visit http://127.0.0.1:8787. Staff log in using Staff controls. Customers join with the six-digit code. The server uses a persistent SQLite database in `pub-dj/data/dj.sqlite`; audio stays in the configured folder. Point `DJ_MUSIC_DIR` at `pub-dj/demo` for sample audio, though its simple filenames will appear without full song metadata. Never commit credentials, venue audio or the database.
+Claim playback on exactly one device and press Start. A subsequent claim stops the old host audio on its next successful poll (normally three seconds). The host tab must remain open and the device awake. Reloading loses file handles: reselect the same files, then reclaim playback. Reselecting existing tracks preserves their queued requests. Approved songs play in vote order, oldest first for ties; the chosen background mix fills empty queues. Volume, seek and pause are local to the designated host; guests do not receive a fictitious synchronised playhead.
 
-For phones on a trusted private LAN, set `DJ_BIND=0.0.0.0` and visit the host computer’s LAN address on port 8787. Guest Wi-Fi isolation/firewall rules must allow this access. The host computer must remain awake. For internet access, deploy behind an HTTPS reverse proxy, use `DJ_SECURE_COOKIES=1`, restrict host login at the proxy, and set upstream request/body/time limits. Do not expose the development HTTP server directly to the internet. Sharing a join link does not carry credentials or the join code.
+Guests use a six-digit code or join link, without an account or download. Sessions are per browser tab and room. Guests submit up to three requests in ten minutes; staff approve them; a guest session can vote once per approved request. Room-code join attempts are limited to twenty per IP per minute and rooms to 500 guest sessions. These anonymous controls are not identity-based fraud prevention and codes do not prove physical presence. Rooms close after twelve hours. Guests cannot call privileged database functions or read private tables.
 
-Put authorised `.mp3`, `.wav`, `.ogg` or `.m4a` files directly in the music folder. Filename convention: `Artist - Song title - Mood.mp3`. Moods become filters and staff background-mix options. Symlinks and paths outside this directory are not served. Customers receive metadata only; audio routes require a valid staff session. Files are loaded into host browser memory, so keep files reasonably sized. Browser codec support varies.
+## Pricing and verified access
 
-The host opens this app in **one playback tab**, connects its audio output to the pub speakers and presses Start / next song. A browser may require pressing the audio play control once. Leave the tab open and the device awake; automatic playback cannot survive a suspended browser. Use Open screen view for a silent projector window. The pilot has no playback leader election: a second staff playback tab can produce duplicate audio. Do not use a second playback tab. Screen view deliberately disables audio.
+- Venue Monthly: £19.99/month, one approved venue.
+- Local Subscriber Add-on: £9.99/month, verified active paid Local venue subscription required throughout.
+- Party Pass: £7.99 once, one room of up to twelve hours, activated within thirty days. Room closure is capped at the pass expiry.
+- Guest requesting and voting are free.
 
-Requests need approval; the next approved request with most votes plays first, with oldest request winning ties. When none are approved the selected background mix supplies the next track. There is no generative AI DJ, crossfade, beat matching or speech synthesis. Staff can review every track; no automatic explicit-content classifier is included.
+These are software charges. Music supply and public-performance/recording permissions are separate. The original short sample recordings included in `demo/` may be used to try the controls. No third-party songs or streaming credentials are bundled.
 
-## Sales integration
+`cloud/index.ts` uses the existing live restricted Stripe secret in the deployed environment. No secret appears in this repository. It checks active live GBP prices, product tier, exact amounts and recurrence. Server leases and Stripe idempotency prevent parallel checkout creation; an existing open checkout is reused. Checkout completion redirects do not grant access. Creating/reopening a room validates the stored purchaser's Stripe Checkout Session, line items, live mode, amount, customer subscription, latest paid invoice, PaymentIntent and Charge. Refunded or disputed payments do not grant new access. A room's host entitlement is rechecked on polling, with a maximum two-minute cached verification for paid sessions. These checks are performed on demand rather than through a webhook; an unattended tab does not proactively poll subscriptions. Subscription cancellations are available in Manage DJ billing.
 
-`for-venues.html` links to the new product page. Prices shown are proposals, **not** live Stripe products: £19.99/month standalone software; £9.99/month for existing Local subscribers; £7.99/event. Costs and margins must be reviewed after music supply is priced. No existing billing or owner subscription was changed. No money is collected. The pilot does not yet enforce paid entitlements or integrate Local accounts, and runs as one venue per server instance. Owner complimentary entitlements belong in that future authenticated billing integration, not a public client-side bypass.
+No real payment has been submitted by the development agent. Automated tests cover positive and negative billing fixtures; production status verifies price/read permissions. A real completed customer payment and a venue-speaker/device check are separate acceptance checks.
 
-Before commercial launch: agree a permitted on-demand jukebox catalogue/provider integration and appropriate supplier rights, confirm each venue’s music permissions, implement authenticated venue tenancy and Stripe webhook entitlements including owner complimentary access, add staff logout and session administration, deployment monitoring, backups, multi-host playback control, fuller abuse controls and a verified mobile/browser acceptance run. The ordinary consumer Spotify service is unsuitable for pub playback.
+## Hosted service
 
-The anonymous pilot uses 12-hour HttpOnly SameSite sessions, checks mutation origins and JSON content type, validates staff actions, rate-limits login/code attempts to 20 per IP per minute and requests to three per guest session per ten minutes. Votes are unique per guest session. Anonymous guests can obtain new sessions: this is not robust identity-based fraud prevention. The join code grants participation to anyone who knows it; it does not prove physical presence. Queue state persists across restarts; the host restarts the intended track if needed. Renewing sessions requires joining/logging in again.
+`cloud/install.sql` defines the tables and trusted-service RPCs. Tables have RLS enabled, browser-role grants revoked and service-role grants limited to the server. The Edge Function verifies host tokens through Auth, checks confirmed accounts and entitlement, and hashes anonymous guest secrets. `local_dj_command` serialises room changes under a row lock. A claimed playback client is required for stop/next. Browser code cannot change grants or forge purchaser IDs. Expired rooms are inaccessible; retention/cleanup of old queue data should be configured as usage grows.
+
+Environment: existing `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`; live `STRIPE_RESTRICTED_KEY` (or `QUIZ_STRIPE_KEY` fallback). The function performs its own host/guest authentication, so the gateway JWT check is disabled. CORS allows The Local's production domains and this repository's Netlify deploy previews.
+
+Deploy the `local-dj` Edge Function with `index.ts` and `billing-core.mjs`. Apply database schema changes through migrations. `billing-launch-status.json` contains non-secret catalogue IDs. The existing venue and quiz billing functions are unchanged.
+
+## Local-network alternative
+
+The independent `server.py` remains available for a local Python 3.10+ venue pilot. Set a strong 12+ character `DJ_HOST_PASSWORD`, optional six-digit `DJ_JOIN_CODE`, `DJ_VENUE` and `DJ_MUSIC_DIR`, then run `python3 pub-dj/server.py`. It defaults to localhost port 8787 and stores its own SQLite queue under `pub-dj/data`. `DJ_BIND=0.0.0.0` makes it reachable on a trusted LAN; do not expose its development HTTP server directly to the internet. This independent pilot uses a staff password and does not consume hosted billing entitlements.
 
 ## Verification
 
 ```sh
+npm ci --prefix tests --ignore-scripts
+node --test pub-dj/tests/*.cjs pub-dj/tests/*.mjs
 python3 -m unittest discover -s pub-dj/tests -v
 node --check pub-dj/app.js
+node --check pub-dj/cloud/index.ts
 ```
 
-Integration tests cover access boundaries, origin rejection, duplicate requests, pending-request visibility, moderation, unique voting, queue advancement, audio access, request pausing, invalid inputs, rate limits, tie order and background mood selection. Browser/device and live speaker tests remain necessary.
-
-## Rights references
-
-- https://support.spotify.com/uk/article/spotify-public-commercial-use/
-- https://www.ppluk.com/licensing/music-services-and-dubbing/
-- https://pplprs.co.uk/jukeboxes/
-
-Original sample audio was generated specifically for this prototype. No third-party recordings are bundled. Commercial playback requires rights appropriate to the use; venue and supplier permissions are separate questions.
-
-## DJ deck controls
-
-The now-playing panel places song details on the left and a compact two-platter console on the right on desktop. At widths of 720px and below the console stacks directly under the song. Staff controls include play/pause, restart, next, stop, forward 15 seconds, seeking, mute and master volume. The first platter follows actual host audio playback; the second is an up-next display, not a second audio player or crossfader. The centre mixer markings are decorative. Guests and projector views cannot operate the deck. Playback position, pause and volume are local to the single host device; guest views do not claim synchronised audio timing. The original control-room volume slider stays in sync with the deck. No Stripe, entitlement or deployment settings were changed for this UI update.
-
-Deck-controller tests use a media stub to verify pause/resume without advancing the queue, start/next callbacks, guest and projector restrictions, seeking boundaries, mute restoration, unknown duration formatting and browser play errors. Together with discovery and HTTP integration tests, 19 tests pass. Visual/mobile acceptance remains outstanding because Chromium startup is blocked in the current environment.
+The suite checks billing failures, guest restrictions, queue/voting behavior, playback controls, saved songs/search, DOM interaction and served scripts. Live database assertions check owner/Coombe grants, guest moderation rejection, unique votes, catalogue retention and playback-client enforcement. DOM tests use Happy DOM; they do not replace actual mobile and speaker testing.

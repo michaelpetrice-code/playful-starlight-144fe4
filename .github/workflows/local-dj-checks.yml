@@ -1,0 +1,25 @@
+name: The Local DJ checks
+on:
+  pull_request:
+    paths: ['pub-dj/**', 'pub-dj-pro.html', '.github/workflows/local-dj-checks.yml']
+  push:
+    branches: [main]
+    paths: ['pub-dj/**', 'pub-dj-pro.html', '.github/workflows/local-dj-checks.yml']
+permissions:
+  contents: read
+jobs:
+  dj:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --prefix tests --ignore-scripts
+      - run: node --test pub-dj/tests/*.cjs pub-dj/tests/*.mjs
+      - run: python3 -m unittest discover -s pub-dj/tests -v
+      - run: node --check pub-dj/app.js && node --check pub-dj/cloud-client.js && node --check pub-dj/cloud/index.ts

@@ -1,6 +1,6 @@
 'use strict';
 const $=id=>document.getElementById(id);
-let state, demo=false, filter='All music', playingKey='', audioURL='', busy=false;
+let state, cloudMode=false, cloudAccess=null, demo=false, filter='All music', playingKey='', audioURL='', busy=false;
 const audio=$('audio'); audio.volume=.75;
 const seed=[{id:'golden',title:'Golden Hour',artist:'The Local Studio',mood:'Laid back'},{id:'friday',title:'Friday Lights',artist:'The Local Studio',mood:'Party'},{id:'after',title:'After Hours',artist:'The Local Studio',mood:'Laid back'}];
 const voted=new Set();
@@ -16,6 +16,11 @@ function saveSong(id){
 
 function tell(message){$('notice').textContent=message;}
 async function api(path,data){
+ if(cloudMode){
+  if(path==='login'){cloudAccess=await window.LocalDJCloud.login($('login-email').value,data.password);await showCloudAccess();await refresh();return {ok:true};}
+  if(path==='join')state=await window.LocalDJCloud.join(data.code);else state=await window.LocalDJCloud.command(path,data||{});
+  render();return {ok:true};
+ }
  if(demo){
   if(path==='join')state.joined=true;
   if(path==='login')state.host=true;
@@ -43,13 +48,17 @@ async function api(path,data){
 function element(tag,text,cls){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;}
 function button(label,fn,cls){const el=element('button',label,cls);el.type='button';el.onclick=async()=>{el.disabled=true;try{await fn();}catch(e){tell(e.message);}finally{el.disabled=false;}};return el;}
 function trackById(id){return state.tracks.find(t=>t.id===id);}
-async function refresh(){if(demo)return;const response=await fetch('api/state',{cache:'no-store'});if(!response.ok)throw Error('Venue connection unavailable');state=await response.json();render();}
+async function refresh(){if(demo)return;if(cloudMode){state=await window.LocalDJCloud.state();render();return;}const response=await fetch('api/state',{cache:'no-store'});if(!response.ok||!response.headers.get('content-type')?.includes('application/json'))throw Error('Venue connection unavailable');state=await response.json();render();}
 function render(){
- $('connection').textContent=demo?'INTERACTIVE DEMO · THIS DEVICE':'VENUE PILOT · CONNECTED';
+ $('connection').textContent=demo?'INTERACTIVE DEMO · THIS DEVICE':cloudMode?'THE LOCAL DJ · CONNECTED':'VENUE PILOT · CONNECTED';
  $('venue').textContent=demo?'Try the customer experience and staff controls.':state.venue+' · Make tonight sound like you.';
  $('join-form').hidden=state.joined;
  $('join-info').textContent=state.joined?(state.open?'You’re in. Request a song or vote for your favourite.':'Requests are paused by the venue.'):(demo?'Use code 123456. Demo changes stay on this device.':'Ask staff for tonight’s venue code.');
  $('share').hidden=demo||!state.host;
+ $('cloud-music').hidden=!cloudMode||!state.host;
+ $('email-label').hidden=!cloudMode;$('login-email').required=cloudMode;
+ $('password-label').textContent=cloudMode?'Local account password':'Host password';
+ $('login-help').textContent=cloudMode?'Sign in with your existing Local account. Complimentary owners need no payment card.':'Keep the music in safe hands.';
  $('host-panel').hidden=!state.host;
  $('host-button').textContent=state.host?'Staff controls unlocked':'Staff controls';
  $('host-code').textContent='VENUE CODE · '+(state.code||'123456');
@@ -123,12 +132,13 @@ $('browse-tabs').onclick=e=>{const tab=e.target.closest('button[data-view]');if(
 $('browse-all').onclick=()=>{libraryView='songs';filter='All music';$('search').value='';render();$('results-title').scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});};
 function queueRow(r,pending){const track=trackById(r.track);const row=element('div',undefined,'queue-row');const song=element('div',undefined,'song');song.append(element('strong',track?.title||'Unavailable track'),element('small',track?.artist||''));row.append(song);if(pending){row.append(button('Approve',()=>api('moderate',{id:r.id,status:'approved'})),button('Decline',()=>api('moderate',{id:r.id,status:'rejected'}),'ghost'));}else{const vote=button('↑ '+r.votes,()=>api('vote',{id:r.id}),'ghost');vote.setAttribute('aria-label','Vote for '+(track?.title||'song')+' · '+r.votes+' votes');vote.disabled=!state.joined||!state.open||r.voted;row.append(vote);if(state.host)row.append(button('Remove',()=>api('moderate',{id:r.id,status:'rejected'}),'ghost'));}return row;}
 async function syncAudio(){
- const key=state.host&&state.current?state.current.track+':'+state.current.started:'';
+ const key=canPlayHere()&&state.current?state.current.track+':'+state.current.started:'';
  if(key===playingKey)return;playingKey=key;audio.pause();$('audio').closest('.playing').classList.remove('active');
  if(audioURL){URL.revokeObjectURL(audioURL);audioURL='';}audio.removeAttribute('src');
  if(!key)return;
  try{
   if(demo){audio.src='demo/'+state.current.track+'.wav';}
+  else if(cloudMode){audio.src=window.LocalDJCloud.audioURL(state.current.track);if(audio.src.startsWith('blob:'))audioURL=audio.src;}
   else{const response=await fetch('api/audio/'+state.current.track);if(!response.ok)throw Error('Unable to load audio');const blob=await response.blob();if(key!==playingKey)return;audioURL=URL.createObjectURL(blob);audio.src=audioURL;}
   await audio.play();
  }catch(e){tell(e.name==='NotAllowedError'?'Press Play on the DJ deck to enable the speakers.':e.message);}
@@ -142,15 +152,16 @@ async function hostAction(path,data){if(busy)return;busy=true;updateDeck();try{a
 $('next').onclick=()=>hostAction('next');$('stop').onclick=()=>hostAction('stop');
 $('requests').onclick=()=>hostAction('settings',{open:!state.open});$('mix').onchange=()=>hostAction('settings',{mode:$('mix').value});
 $('volume').oninput=()=>runDeck(()=>deckController.volume(Number($('volume').value)/100));
-$('screen').onclick=()=>window.open(location.pathname+'?screen=1','local-dj-screen','noopener');
-$('share').onclick=async()=>{try{const url=new URL(location.href);url.search='';url.hash='';await navigator.clipboard.writeText(url.href);tell('Join link copied. Display the venue code alongside it.');}catch(e){tell('Copy this page’s address and share the venue code.');}};
+$('screen').onclick=()=>{const url=new URL(location.href);url.searchParams.set('screen','1');window.open(url.href,'local-dj-screen','noopener');};
+$('share').onclick=async()=>{try{const url=new URL(location.href);url.search='';if(cloudMode)url.searchParams.set('room',state.code);url.hash='';await navigator.clipboard.writeText(url.href);tell('Join link copied. Display the venue code alongside it.');}catch(e){tell('Copy this page’s address and share the venue code.');}};
 // The projector never plays a second audio stream, even if it shares the staff cookie.
 const projector=new URLSearchParams(location.search).has('screen');
 if(projector){document.body.classList.add('screen');syncAudio=()=>{};}
-const deckController=window.LocalDJDeck.create({audio,canControl:()=>Boolean(state?.host)&&!projector,hasTrack:()=>Boolean(state?.current),next:()=>hostAction('next')});
+function canPlayHere(){return Boolean(state?.host)&&!projector&&(!cloudMode||state.playback_client===window.LocalDJCloud.clientId);}
+const deckController=window.LocalDJDeck.create({audio,canControl:canPlayHere,hasTrack:()=>Boolean(state?.current),next:()=>hostAction('next')});
 async function runDeck(action){try{await action();}catch(error){tell(error.message);}finally{updateDeck();}}
 function updateDeck(){
- if(!state)return;const allowed=Boolean(state.host)&&!projector;const current=Boolean(state.current);const loaded=current&&Boolean(audio.getAttribute('src'));const playing=allowed&&loaded&&!audio.paused;
+ if(!state)return;const allowed=canPlayHere();const current=Boolean(state.current);const loaded=current&&Boolean(audio.getAttribute('src'));const playing=allowed&&loaded&&!audio.paused;
  $('audio').closest('.playing').classList.toggle('active',playing);
  $('deck-play').disabled=!allowed||busy;$('deck-next').disabled=!allowed||busy;
  for(const id of ['deck-restart','deck-forward','deck-stop'])$(id).disabled=!allowed||!current||busy;
@@ -165,13 +176,38 @@ function updateDeck(){
  const percent=Math.round(audio.volume*100);$('deck-volume').value=String(percent);$('volume').value=String(percent);$('deck-volume-value').textContent=!allowed?'Staff':audio.muted?'Muted':percent+'%';$('deck-mute').textContent=audio.muted||audio.volume===0?'Unmute':'Mute';$('deck-mute').setAttribute('aria-pressed',String(audio.muted||audio.volume===0));
  const next=state.queue.filter(r=>r.status==='approved'&&trackById(r.track)).sort((a,b)=>b.votes-a.votes||a.id-b.id)[0];$('deck-next-title').textContent=next?trackById(next.track).title:state.mode==='All music'?'Background mix':state.mode+' mix';
 }
-$('deck-play').onclick=()=>runDeck(()=>deckController.toggle());$('deck-next').onclick=()=>runDeck(()=>deckController.next());$('deck-restart').onclick=()=>runDeck(()=>deckController.restart());$('deck-forward').onclick=()=>runDeck(()=>deckController.forward());$('deck-stop').onclick=()=>runDeck(()=>{if(!state?.host||projector)throw Error('Only staff can stop playback.');return hostAction('stop');});
+$('deck-play').onclick=()=>runDeck(()=>deckController.toggle());$('deck-next').onclick=()=>runDeck(()=>deckController.next());$('deck-restart').onclick=()=>runDeck(()=>deckController.restart());$('deck-forward').onclick=()=>runDeck(()=>deckController.forward());$('deck-stop').onclick=()=>runDeck(()=>{if(!canPlayHere())throw Error('Use the designated playback device to stop music.');return hostAction('stop');});
 $('deck-seek').oninput=()=>runDeck(()=>deckController.seek($('deck-seek').value));$('deck-volume').oninput=()=>runDeck(()=>deckController.volume(Number($('deck-volume').value)/100));$('deck-mute').onclick=()=>runDeck(()=>deckController.mute());
 for(const event of ['play','pause','timeupdate','durationchange','loadedmetadata','volumechange','emptied','ended'])audio.addEventListener(event,updateDeck);
 audio.onended=()=>hostAction('next');audio.onplay=()=>$('audio').closest('.playing').classList.add('active');audio.onpause=()=>$('audio').closest('.playing').classList.remove('active');
 audio.onerror=()=>{if(audio.getAttribute('src'))tell('Audio could not play. Check this file or choose the next song.');};
+function useDemo(){demo=true;state={venue:'The Local',joined:false,host:false,open:true,current:null,mode:'All music',tracks:seed,queue:[{id:1,track:'friday',status:'approved',votes:4}]};render();tell('Interactive demo: join with 123456, then try staff controls. Changes stay in this tab.');}
+async function showCloudAccess(){
+ if(!cloudAccess)return;$('cloud-hosting').hidden=false;
+ const selected=$('cloud-venue').value;$('cloud-venue').replaceChildren();const personal=element('option','Private party / personal room');personal.value='';$('cloud-venue').append(personal);
+ for(const venue of cloudAccess.venues){const option=element('option',venue.name+(venue.complimentary?' · complimentary':''));option.value=venue.id;$('cloud-venue').append(option);}
+ $('cloud-venue').value=selected;
+ const chosen=cloudAccess.venues.find(v=>v.id===$('cloud-venue').value);const free=cloudAccess.personal||chosen?.complimentary;
+ $('cloud-access').textContent=free?'Complimentary hosting · no payment or card required.':'Choose a venue subscription or a single-event party pass. Existing access is checked when you open a room.';
+ $('cloud-checkout').hidden=Boolean(free);$('cloud-checkout').disabled=!cloudAccess.checkoutConfigured;
+ if(!free&&!cloudAccess.checkoutConfigured)$('cloud-access').textContent+=' Paid checkout is currently unavailable.';
+ $('cloud-name-label').hidden=Boolean(chosen);
+ $('cloud-rooms').replaceChildren(...cloudAccess.rooms.map(room=>button('Reopen '+room.name+' · '+room.code,async()=>{state=await window.LocalDJCloud.join(room.code);render();},'ghost')));
+}
+$('cloud-venue').onchange=()=>showCloudAccess();
+$('cloud-create').onclick=async()=>{try{const result=await window.LocalDJCloud.call('create',{venue:$('cloud-venue').value||null,name:$('cloud-name').value});state=await window.LocalDJCloud.join(result.code);render();tell('Room opened. Choose the venue music, then claim playback on this device.');cloudAccess=await window.LocalDJCloud.access();await showCloudAccess();$('host-panel').scrollIntoView({block:'start'});}catch(error){tell(error.message);}};
+$('cloud-checkout').onclick=async()=>{const b=$('cloud-checkout');b.disabled=true;try{const result=await window.LocalDJCloud.call('checkout',{venue:$('cloud-venue').value||null,attempt:crypto.randomUUID()});const url=new URL(result.url);if(url.protocol!=='https:'||url.hostname!=='checkout.stripe.com')throw Error('Unexpected checkout address');location.assign(url.href);}catch(error){tell(error.message);}finally{b.disabled=false;}};
+$('cloud-portal').onclick=async()=>{try{const result=await window.LocalDJCloud.call('portal');const url=new URL(result.url);if(url.protocol!=='https:'||url.hostname!=='billing.stripe.com')throw Error('Unexpected billing address');location.assign(url.href);}catch(error){tell(error.message);}};
+$('cloud-import').onclick=async()=>{try{if(!$('music-rights').checked)throw Error('Confirm the venue has permission to use its music.');const files=[...$('music-files').files];if(!files.length)throw Error('Choose your music files first.');state=await window.LocalDJCloud.importFiles(files);render();tell('Music collection updated. Claim playback on this device and press Start.');}catch(error){tell(error.message);}};
+$('cloud-samples').onclick=async()=>{try{state=await window.LocalDJCloud.command('catalogue',{tracks:seed});render();tell('Original sample tracks loaded. Claim this playback device, then start the music.');}catch(error){tell(error.message);}};
+$('cloud-claim').onclick=async()=>{try{state=await window.LocalDJCloud.command('claim',{client:window.LocalDJCloud.clientId});render();tell('This is now the playback device. Audio on another host tab will stop when it refreshes.');}catch(error){tell(error.message);}};
+$('cloud-signout').onclick=async()=>{audio.pause();await window.LocalDJCloud.logout();cloudAccess=null;$('cloud-hosting').hidden=true;await refresh();tell('Signed out of DJ hosting.');};
 (async()=>{
+ if(new URLSearchParams(location.search).get('demo')==='1'){useDemo();return;}
  try{await refresh();}
- catch(e){demo=true;state={venue:'The Local',joined:false,host:false,open:true,current:null,mode:'All music',tracks:seed,queue:[{id:1,track:'friday',status:'approved',votes:4}]};render();tell('Interactive preview: join with 123456, then try staff controls. Changes are local to this tab.');}
- if(!demo)setInterval(()=>refresh().catch(()=>tell('Connection lost. Reconnecting…')),3000);
+ catch(localError){
+  try{await window.LocalDJCloud.status();cloudMode=true;if(window.LocalDJCloud.room){try{state=await window.LocalDJCloud.join(window.LocalDJCloud.room);render();}catch(roomError){window.LocalDJCloud.setRoom('');await refresh();}}else await refresh();try{cloudAccess=await window.LocalDJCloud.access();await showCloudAccess();}catch(authError){if(new URLSearchParams(location.search).has('host'))$('login').showModal();}tell('Join with a venue code, or open Staff controls to host with your Local account.');}
+  catch(error){state={venue:'The Local',host:false,joined:false,open:false,current:null,mode:'All music',tracks:[],queue:[]};render();tell('The live DJ connection is unavailable. Refresh to retry, or open the interactive demo from the pricing page.');return;}
+ }
+ setInterval(()=>refresh().catch(()=>{audio.pause();tell('Connection lost. Playback paused while reconnecting.');}),3000);
 })();

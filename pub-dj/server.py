@@ -99,7 +99,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_response(200); self.send_header('Content-Type',mimetypes.guess_type(path.name)[0] or 'audio/mpeg')
                 self.send_header('Cache-Control','no-store'); self.send_header('Content-Length',str(len(body)))
                 self.end_headers(); self.wfile.write(body); return
-            allowed={'/':'index.html','/index.html':'index.html','/app.js':'app.js','/discovery.js':'discovery.js','/deck-controller.js':'deck-controller.js','/style.css':'style.css'}
+            allowed={'/':'index.html','/index.html':'index.html','/app.js':'app.js','/discovery.js':'discovery.js','/deck-controller.js':'deck-controller.js','/cloud-client.js':'cloud-client.js','/config.js':'../config.js','/style.css':'style.css'}
             if route not in allowed: return self.reply({'error':'Not found'},404)
             path=ROOT/allowed[route]; body=path.read_bytes()
             self.send_response(200); self.send_header('Content-Type',mimetypes.guess_type(path.name)[0] or 'text/plain')
