@@ -4,6 +4,16 @@ let state, demo=false, filter='All music', playingKey='', audioURL='', busy=fals
 const audio=$('audio'); audio.volume=.75;
 const seed=[{id:'golden',title:'Golden Hour',artist:'The Local Studio',mood:'Laid back'},{id:'friday',title:'Friday Lights',artist:'The Local Studio',mood:'Party'},{id:'after',title:'After Hours',artist:'The Local Studio',mood:'Laid back'}];
 const voted=new Set();
+const discovery=window.LocalDJDiscovery;
+let libraryView='discover', catalogueSignature='';
+let savedSongs=new Set();
+try{const stored=JSON.parse(localStorage.getItem('local-dj-saved-v1')||'[]');if(Array.isArray(stored))savedSongs=new Set(stored.filter(id=>typeof id==='string'));}catch(e){}
+function saveSong(id){
+ if(savedSongs.has(id))savedSongs.delete(id);else savedSongs.add(id);
+ try{localStorage.setItem('local-dj-saved-v1',JSON.stringify([...savedSongs]));}catch(e){tell('Saved for this visit. Your browser has disabled saved-song storage.');}
+ renderCatalogue();
+}
+
 function tell(message){$('notice').textContent=message;}
 async function api(path,data){
  if(demo){
@@ -46,12 +56,8 @@ function render(){
  $('requests').textContent=state.open?'Pause requests':'Reopen requests';
  $('collection-note').textContent=demo?'Original instrumental demos included. No commercial song catalogue connected.':state.tracks.length?'Venue-managed collection · Requests need staff approval.':'Join the venue to browse. Staff: add authorised audio files to the configured music folder.';
  const moods=['All music',...new Set(state.tracks.map(t=>t.mood).filter(m=>m!=='All music'))];
- $('filters').replaceChildren(...moods.map(m=>{const b=button(m,()=>{filter=m;render();});b.setAttribute('aria-pressed',String(m===filter));return b;}));
+ renderCatalogue();
  const selected=$('mix').value; $('mix').replaceChildren(...moods.map(m=>{const o=element('option',m);o.value=m;return o;}));$('mix').value=state.mode||selected;
- const query=$('search').value.toLowerCase();
- const tracks=state.tracks.filter(t=>(filter==='All music'||t.mood===filter)&&(t.title+' '+t.artist).toLowerCase().includes(query));
- $('tracks').replaceChildren(...tracks.map(t=>{const card=element('article',undefined,'track');const art=element('div','♫','art');art.setAttribute('aria-hidden','true');const info=element('div',undefined,'track-info');info.append(element('h3',t.title),element('p',t.artist+' · '+t.mood));const req=button('＋ Request song',async()=>{await api('request',{track:t.id});tell('Request sent. Staff will review it.');});req.disabled=!state.joined||!state.open;info.append(req);card.append(art,info);return card;}));
- if(state.tracks.length&&!tracks.length)$('tracks').append(element('p','No songs match your search.'));
  const approved=state.queue.filter(r=>r.status==='approved').sort((a,b)=>b.votes-a.votes||a.id-b.id);
  $('queue-count').textContent=approved.length+' SONG'+(approved.length===1?'':'S');
  $('queue').replaceChildren(...approved.map(r=>queueRow(r,false)));
@@ -64,6 +70,56 @@ function render(){
  $('audio-note').textContent=state.host?'Keep this host tab open. Connect this device to your pub speakers.':'Music plays through the pub speakers, not customer phones.';
  syncAudio();
 }
+function cover(track,small=false){
+ const art=element('div',undefined,'cover-art tone-'+discovery.colour(track.id)+(small?' cover-small':''));art.setAttribute('aria-hidden','true');
+ art.append(element('span',discovery.initials(track.title),'cover-letter'),element('span','THE LOCAL · MUSIC ROOM','cover-label'));return art;
+}
+function requestButton(track){
+ const queued=state.queue.find(r=>r.track===track.id&&['pending','approved'].includes(r.status));
+ const req=button(queued?(queued.status==='pending'?'Awaiting approval':'In the queue'):'＋ Request',async()=>{await api('request',{track:track.id});tell('Request sent. Staff will review it.');},'request-track');
+ req.setAttribute('aria-label',(queued?'Already requested: ':'Request ')+track.title+' by '+track.artist);req.dataset.focusKey='request-'+track.id;
+ req.disabled=!state.joined||!state.open||Boolean(queued);return req;
+}
+function trackCard(track,index){
+ const card=element('article',undefined,'track discovery-track');
+ const visual=element('div',undefined,'cover-wrap');visual.append(cover(track));
+ const save=button(savedSongs.has(track.id)?'♥':'♡',()=>saveSong(track.id),'save-track');
+ save.dataset.focusKey='save-'+track.id;save.setAttribute('aria-label',(savedSongs.has(track.id)?'Unsave ':'Save ')+track.title);save.setAttribute('aria-pressed',String(savedSongs.has(track.id)));visual.append(save);
+ const info=element('div',undefined,'track-info');info.append(element('h4',track.title),element('p',track.artist),element('span',track.mood||'Venue collection','track-mood'));
+ card.append(element('span',String(index+1).padStart(2,'0'),'track-rank'),visual,info,requestButton(track));return card;
+}
+function renderCatalogue(){
+ const query=$('search').value;const signature=JSON.stringify([state.tracks,state.queue,state.joined,state.open,query,filter,libraryView,[...savedSongs]]);
+ if(signature===catalogueSignature)return;catalogueSignature=signature;
+ const focused=document.activeElement?.dataset?.focusKey;
+ for(const tab of $('browse-tabs').querySelectorAll('button'))tab.setAttribute('aria-pressed',String(tab.dataset.view===libraryView));
+ const moods=['All music',...new Set(state.tracks.map(t=>t.mood).filter(m=>m&&m!=='All music'))];
+ $('filters').replaceChildren(...moods.map(m=>{const b=button(m,()=>{filter=m;renderCatalogue();});b.dataset.focusKey='mood-'+m;b.setAttribute('aria-pressed',String(m===filter));return b;}));
+ const explore=libraryView==='discover'&&!query.trim()&&filter==='All music';
+ $('discovery-feature').hidden=!explore;$('mood-section').hidden=!explore||!state.tracks.length;
+ $('mood-cards').replaceChildren(...discovery.moods(state.tracks).map(m=>{
+  const b=button('',()=>{filter=m.name;libraryView='songs';renderCatalogue();},'mood-card tone-'+discovery.colour(m.name));b.append(element('strong',m.name),element('small',m.count+' song'+(m.count===1?'':'s')),element('span','↗','mood-arrow'));return b;
+ }));
+ const popular=discovery.popular(state.tracks,state.queue);$('popular-section').hidden=!explore||!popular.length;
+ $('popular-tracks').replaceChildren(...popular.slice(0,4).map(({track,votes})=>{
+  const row=element('div',undefined,'popular-track');const title=element('div',undefined,'popular-info');title.append(element('strong',track.title),element('small',votes+' vote'+(votes===1?'':'s')));row.append(cover(track,true),title,requestButton(track));return row;
+ }));
+ const matches=discovery.select(state.tracks,{query,mood:filter,savedOnly:libraryView==='saved',saved:[...savedSongs]});
+ $('artists').hidden=libraryView!=='artists';$('tracks').hidden=libraryView==='artists';
+ $('tracks').classList.toggle('song-list',libraryView==='songs');
+ $('results-title').textContent=query.trim()?'Search results':libraryView==='saved'?'Your saved songs':libraryView==='artists'?'Meet the artists':filter!=='All music'?filter:libraryView==='songs'?'All songs':'Explore the collection';
+ $('results-count').textContent=matches.length+' song'+(matches.length===1?'':'s');
+ $('tracks').replaceChildren(...matches.map(trackCard));
+ $('artists').replaceChildren(...discovery.artists(matches).map(artist=>{
+  const b=button('',()=>{$('search').value=artist.name;libraryView='songs';renderCatalogue();},'artist-card');
+  b.append(element('span',discovery.initials(artist.name),'artist-avatar tone-'+discovery.colour(artist.name)),element('strong',artist.name),element('small',artist.tracks.length+' song'+(artist.tracks.length===1?'':'s')));b.setAttribute('aria-label','Browse songs by '+artist.name);return b;
+ }));
+ if(!matches.length){const empty=element('div',undefined,'library-empty');empty.append(element('strong',libraryView==='saved'?'Your favourites start here':'No songs to show yet'),element('p',libraryView==='saved'?'Tap a heart on a song to save it on this device.':!state.tracks.length?'Join the venue to discover its music collection.':'Try a different search or choose All music.'));(libraryView==='artists'?$('artists'):$('tracks')).append(empty);}
+ if(libraryView==='saved')$('collection-note').textContent='Saved on this device · Requesting a song still needs staff approval.';
+ if(focused){const target=[...document.querySelectorAll('[data-focus-key]')].find(el=>el.dataset.focusKey===focused);if(target&&!target.disabled)target.focus({preventScroll:true});}
+}
+$('browse-tabs').onclick=e=>{const tab=e.target.closest('button[data-view]');if(tab){libraryView=tab.dataset.view;render();}};
+$('browse-all').onclick=()=>{libraryView='songs';filter='All music';$('search').value='';render();$('results-title').scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});};
 function queueRow(r,pending){const track=trackById(r.track);const row=element('div',undefined,'queue-row');const song=element('div',undefined,'song');song.append(element('strong',track?.title||'Unavailable track'),element('small',track?.artist||''));row.append(song);if(pending){row.append(button('Approve',()=>api('moderate',{id:r.id,status:'approved'})),button('Decline',()=>api('moderate',{id:r.id,status:'rejected'}),'ghost'));}else{const vote=button('↑ '+r.votes,()=>api('vote',{id:r.id}),'ghost');vote.setAttribute('aria-label','Vote for '+(track?.title||'song')+' · '+r.votes+' votes');vote.disabled=!state.joined||!state.open||r.voted;row.append(vote);if(state.host)row.append(button('Remove',()=>api('moderate',{id:r.id,status:'rejected'}),'ghost'));}return row;}
 async function syncAudio(){
  const key=state.host&&state.current?state.current.track+':'+state.current.started:'';

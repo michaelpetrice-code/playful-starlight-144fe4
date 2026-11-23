@@ -21,6 +21,9 @@ class PilotTests(unittest.TestCase):
   except urllib.error.HTTPError as e:return e.code,json.loads(e.read())
  def login(self):self.assertEqual(self.call(self.host,'/api/login',{'password':'a-long-test-password'})[0],200)
  def join(self,c=None):self.assertEqual(self.call(c or self.guest,'/api/join',{'code':'123456'})[0],200)
+ def test_discovery_script_is_served(self):
+  with self.guest.open(self.url+'/discovery.js') as r:
+   self.assertEqual(r.status,200);self.assertIn(b'LocalDJDiscovery',r.read())
  def test_access_boundaries(self):
   status,state=self.call(self.guest,'/api/state');self.assertFalse(state['host']);self.assertIsNone(state['code']);self.assertEqual(state['tracks'],[])
   self.assertEqual(self.call(self.guest,'/api/next',{})[0],403)
