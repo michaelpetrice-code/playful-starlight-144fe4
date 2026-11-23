@@ -143,7 +143,15 @@ async function syncAudio(){
   await audio.play();
  }catch(e){tell(e.name==='NotAllowedError'?'Press Play on the DJ deck to enable the speakers.':e.message);}
 }
-$('search').oninput=()=>state&&render();
+function runSearch(value=$('search').value){$('search').value=value;filter='All music';libraryView='songs';catalogueSignature='';render();hideSuggestions();$('results-title').scrollIntoView({block:'nearest',behavior:'smooth'});}
+function hideSuggestions(){$('song-suggestions').hidden=true;$('search').setAttribute('aria-expanded','false');}
+function showSuggestions(){const matches=discovery.suggestions(state?.tracks||[],$('search').value);$('song-suggestions').replaceChildren(...matches.map(track=>{const b=button(track.title+' — '+track.artist,()=>runSearch(track.title),'ghost');b.type='button';return b;}));$('song-suggestions').hidden=!matches.length;$('search').setAttribute('aria-expanded',String(Boolean(matches.length)));}
+$('song-search-form').onsubmit=e=>{e.preventDefault();runSearch();};
+$('search').oninput=()=>{if(state){filter='All music';libraryView='songs';render();showSuggestions();}};
+$('search').onkeydown=e=>{if(e.key==='Escape')hideSuggestions();if(e.key==='ArrowDown'&&!$('song-suggestions').hidden){e.preventDefault();$('song-suggestions').querySelector('button')?.focus();}};
+$('song-suggestions').onkeydown=e=>{const buttons=[...$('song-suggestions').querySelectorAll('button')];const i=buttons.indexOf(document.activeElement);if(e.key==='Escape'){$('search').focus();hideSuggestions();}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();buttons[(i+(e.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}};
+document.addEventListener('click',e=>{if(!e.target.closest('#song-search-form'))hideSuggestions();});
+$('music-assistant-form').onsubmit=async e=>{e.preventDefault();const question=$('music-question').value.trim();if(!question)return;$('music-ask').disabled=true;$('music-answer').textContent='Looking through this venue’s music…';$('music-picks').replaceChildren();try{let picks,answer;if(cloudMode&&!demo){const result=await window.LocalDJCloud.call('assist',{question});picks=(result.ids||[]).map(id=>state.tracks.find(t=>t.id===id)).filter(Boolean);answer=result.answer;}else{picks=discovery.localHelp(state?.tracks||[],question);answer=picks.length?'Local catalogue matches — choose a song to see it in the collection.':'No matching songs in this collection. Try a song title, artist or mood.';}$('music-answer').textContent=answer;$('music-picks').replaceChildren(...picks.map(track=>{const b=button(track.title+' — '+track.artist,()=>runSearch(track.title),'ghost');b.type='button';return b;}));}catch(error){$('music-answer').textContent=error.message+' You can still use Search and the song suggestions.';}finally{$('music-ask').disabled=false;}};
 $('join-form').onsubmit=async e=>{e.preventDefault();try{if(demo&&$('code').value!=='123456')throw Error('Use demo venue code 123456');await api('join',{code:$('code').value});tell('Welcome. Pick something you love.');}catch(err){tell(err.message);}};
 $('host-button').onclick=()=>{if(state?.host){$('host-panel').scrollIntoView({behavior:'smooth'});return;}if(demo){api('login');tell('Demo staff controls unlocked. Live venues require a host password.');}else $('login').showModal();};
 $('cancel-login').onclick=()=>$('login').close();

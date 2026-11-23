@@ -56,3 +56,5 @@ node --check pub-dj/cloud/index.ts
 ```
 
 The suite checks billing failures, guest restrictions, queue/voting behavior, playback controls, saved songs/search, DOM interaction and served scripts. Live database assertions check owner/Coombe grants, guest moderation rejection, unique votes, catalogue retention and playback-client enforcement. DOM tests use Happy DOM; they do not replace actual mobile and speaker testing.
+
+Search includes an explicit submit button, Enter support and catalogue suggestions with arrow-key navigation. Music Assistant uses the server-side OPENAI_API_KEY (optional DJ_AI_MODEL, default gpt-5-mini). Joined guests/authorised hosts can ask about the current room catalogue. Apply cloud/assistant.sql before deploying index.ts. AI requests are capped atomically at 100 per room and rate-limited; failed provider requests count towards this cap. No AI action submits requests or controls playback. Demo/local mode explicitly uses deterministic catalogue matching. AI requires room membership and never returns song IDs outside the current catalogue.
