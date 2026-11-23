@@ -219,3 +219,6 @@ $('cloud-signout').onclick=async()=>{audio.pause();await window.LocalDJCloud.log
  }
  setInterval(()=>refresh().catch(()=>{audio.pause();tell('Connection lost. Playback paused while reconnecting.');}),3000);
 })();
+
+$('cloud-free-music').onclick=async()=>{try{if(!confirm('Load the free online collection into this room? This replaces its collection. Keep Kevin MacLeod’s credits visible to listeners.'))return;state=await window.LocalDJCloud.command('catalogue',{tracks:window.LocalDJFreeMusic.catalogue()});render();tell('Free online music loaded. Claim this playback device, then press Start. No supplier subscription is required.');}catch(error){tell(error.message);}};
+for(const track of window.LocalDJFreeMusic?.tracks||[]){const a=document.createElement('a');a.href=track.source;a.target='_blank';a.rel='noopener';a.textContent=track.title+' — Kevin MacLeod';$('free-track-credits').append(a,document.createTextNode(' · '));}
