@@ -1,0 +1,24 @@
+name: DJ music source review
+on:
+  schedule:
+    - cron: '0 19 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check approved suppliers for new catalogue candidates
+        run: python pub-dj/scripts/check-music-sources.py
+      - name: Save candidates for AI-assisted review
+        uses: actions/upload-artifact@v4
+        with:
+          name: dj-music-source-review
+          path: music-source-review.json
+          retention-days: 30

@@ -5,7 +5,7 @@ const audio=$('audio'); audio.volume=.75;
 const seed=[{id:'golden',title:'Golden Hour',artist:'The Local Studio',mood:'Laid back'},{id:'friday',title:'Friday Lights',artist:'The Local Studio',mood:'Party'},{id:'after',title:'After Hours',artist:'The Local Studio',mood:'Laid back'}];
 const voted=new Set();
 const discovery=window.LocalDJDiscovery;
-let libraryView='discover', catalogueSignature='';
+let libraryView='discover', catalogueSignature='', visibleLimit=48;
 let savedSongs=new Set();
 try{const stored=JSON.parse(localStorage.getItem('local-dj-saved-v1')||'[]');if(Array.isArray(stored))savedSongs=new Set(stored.filter(id=>typeof id==='string'));}catch(e){}
 function saveSong(id){
@@ -50,6 +50,7 @@ function button(label,fn,cls){const el=element('button',label,cls);el.type='butt
 function trackById(id){return state.tracks.find(t=>t.id===id);}
 async function refresh(){if(demo)return;if(cloudMode){state=await window.LocalDJCloud.state();render();return;}const response=await fetch('api/state',{cache:'no-store'});if(!response.ok||!response.headers.get('content-type')?.includes('application/json'))throw Error('Venue connection unavailable');state=await response.json();render();}
 function render(){
+ drawMusicCredits();
  $('connection').textContent=demo?'INTERACTIVE DEMO · THIS DEVICE':cloudMode?'THE LOCAL DJ · CONNECTED':'VENUE PILOT · CONNECTED';
  $('venue').textContent=demo?'Try the customer experience and staff controls.':state.venue+' · Make tonight sound like you.';
  $('join-form').hidden=state.joined;
@@ -99,7 +100,7 @@ function trackCard(track,index){
  card.append(element('span',String(index+1).padStart(2,'0'),'track-rank'),visual,info,requestButton(track));return card;
 }
 function renderCatalogue(){
- const query=$('search').value;const signature=JSON.stringify([state.tracks,state.queue,state.joined,state.open,query,filter,libraryView,[...savedSongs]]);
+ const query=$('search').value;const sourceFilter=$('source-filter').value,genreFilter=$('genre-filter').value;const signature=JSON.stringify([state.tracks,state.queue,state.joined,state.open,query,filter,libraryView,sourceFilter,genreFilter,visibleLimit,[...savedSongs]]);
  if(signature===catalogueSignature)return;catalogueSignature=signature;
  const focused=document.activeElement?.dataset?.focusKey;
  for(const tab of $('browse-tabs').querySelectorAll('button'))tab.setAttribute('aria-pressed',String(tab.dataset.view===libraryView));
@@ -114,12 +115,15 @@ function renderCatalogue(){
  $('popular-tracks').replaceChildren(...popular.slice(0,4).map(({track,votes})=>{
   const row=element('div',undefined,'popular-track');const title=element('div',undefined,'popular-info');title.append(element('strong',track.title),element('small',votes+' vote'+(votes===1?'':'s')));row.append(cover(track,true),title,requestButton(track));return row;
  }));
- const matches=discovery.select(state.tracks,{query,mood:filter,savedOnly:libraryView==='saved',saved:[...savedSongs]});
+ const enrich=t=>({...t,...(window.LocalDJFreeMusic?.track(t.id)||{}),id:t.id,title:t.title,artist:t.artist,mood:t.mood});
+ const genres=[...new Set(state.tracks.map(t=>enrich(t).genre).filter(Boolean))].sort();const prior=$('genre-filter').value;const option=(text,value)=>{const o=document.createElement('option');o.textContent=text;o.value=value;return o;};$('genre-filter').replaceChildren(option('All genres',''),...genres.map(g=>option(g,g)));$('genre-filter').value=prior;
+ const eligible=state.tracks.map(enrich).filter(t=>(!sourceFilter||(t.provider||'Venue files')===sourceFilter)&&(!genreFilter||t.genre===genreFilter));
+ const matches=discovery.select(eligible,{query,mood:filter,savedOnly:libraryView==='saved',saved:[...savedSongs]});
  $('artists').hidden=libraryView!=='artists';$('tracks').hidden=libraryView==='artists';
  $('tracks').classList.toggle('song-list',libraryView==='songs');
  $('results-title').textContent=query.trim()?'Search results':libraryView==='saved'?'Your saved songs':libraryView==='artists'?'Meet the artists':filter!=='All music'?filter:libraryView==='songs'?'All songs':'Explore the collection';
  $('results-count').textContent=matches.length+' song'+(matches.length===1?'':'s');
- $('tracks').replaceChildren(...matches.map(trackCard));
+ $('tracks').replaceChildren(...matches.slice(0,visibleLimit).map(trackCard));$('show-more-tracks').hidden=matches.length<=visibleLimit||libraryView==='artists';
  $('artists').replaceChildren(...discovery.artists(matches).map(artist=>{
   const b=button('',()=>{$('search').value=artist.name;libraryView='songs';renderCatalogue();},'artist-card');
   b.append(element('span',discovery.initials(artist.name),'artist-avatar tone-'+discovery.colour(artist.name)),element('strong',artist.name),element('small',artist.tracks.length+' song'+(artist.tracks.length===1?'':'s')));b.setAttribute('aria-label','Browse songs by '+artist.name);return b;
@@ -143,11 +147,11 @@ async function syncAudio(){
   await audio.play();
  }catch(e){tell(e.name==='NotAllowedError'?'Press Play on the DJ deck to enable the speakers.':e.message);}
 }
-function runSearch(value=$('search').value){$('search').value=value;filter='All music';libraryView='songs';catalogueSignature='';render();hideSuggestions();$('results-title').scrollIntoView({block:'nearest',behavior:'smooth'});}
+function runSearch(value=$('search').value){$('search').value=value;filter='All music';visibleLimit=48;$('source-filter').value='';$('genre-filter').value='';libraryView='songs';catalogueSignature='';render();hideSuggestions();$('results-title').scrollIntoView({block:'nearest',behavior:'smooth'});}
 function hideSuggestions(){$('song-suggestions').hidden=true;$('search').setAttribute('aria-expanded','false');}
 function showSuggestions(){const matches=discovery.suggestions(state?.tracks||[],$('search').value);$('song-suggestions').replaceChildren(...matches.map(track=>{const b=button(track.title+' — '+track.artist,()=>runSearch(track.title),'ghost');b.type='button';return b;}));$('song-suggestions').hidden=!matches.length;$('search').setAttribute('aria-expanded',String(Boolean(matches.length)));}
 $('song-search-form').onsubmit=e=>{e.preventDefault();runSearch();};
-$('search').oninput=()=>{if(state){filter='All music';libraryView='songs';render();showSuggestions();}};
+$('search').oninput=()=>{if(state){visibleLimit=48;filter='All music';libraryView='songs';render();showSuggestions();}};
 $('search').onkeydown=e=>{if(e.key==='Escape')hideSuggestions();if(e.key==='ArrowDown'&&!$('song-suggestions').hidden){e.preventDefault();$('song-suggestions').querySelector('button')?.focus();}};
 $('song-suggestions').onkeydown=e=>{const buttons=[...$('song-suggestions').querySelectorAll('button')];const i=buttons.indexOf(document.activeElement);if(e.key==='Escape'){$('search').focus();hideSuggestions();}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();buttons[(i+(e.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}};
 document.addEventListener('click',e=>{if(!e.target.closest('#song-search-form'))hideSuggestions();});
@@ -220,5 +224,8 @@ $('cloud-signout').onclick=async()=>{audio.pause();await window.LocalDJCloud.log
  setInterval(()=>refresh().catch(()=>{audio.pause();tell('Connection lost. Playback paused while reconnecting.');}),3000);
 })();
 
-$('cloud-free-music').onclick=async()=>{try{if(!confirm('Load the free online collection into this room? This replaces its collection. Keep Kevin MacLeod’s credits visible to listeners.'))return;state=await window.LocalDJCloud.command('catalogue',{tracks:window.LocalDJFreeMusic.catalogue()});render();tell('Free online music loaded. Claim this playback device, then press Start. No supplier subscription is required.');}catch(error){tell(error.message);}};
-for(const track of window.LocalDJFreeMusic?.tracks||[]){const a=document.createElement('a');a.href=track.source;a.target='_blank';a.rel='noopener';a.textContent=track.title+' — Kevin MacLeod';$('free-track-credits').append(a,document.createTextNode(' · '));}
+$('cloud-free-music').onclick=async()=>{try{if(!confirm('Load the free online collection into this room? This replaces its collection. Keep every artist’s licence credits visible to listeners.'))return;state=await window.LocalDJCloud.command('catalogue',{tracks:window.LocalDJFreeMusic.catalogue()});render();tell('Free online music loaded. Claim this playback device, then press Start. No supplier subscription is required.');}catch(error){tell(error.message);}};
+function drawMusicCredits(){const track=window.LocalDJFreeMusic?.track(state?.current?.track);$('current-music-credit').replaceChildren();if(track){const source=document.createElement('a');source.href=track.source;source.target='_blank';source.rel='noopener';source.textContent=track.credit;const license=document.createElement('a');license.href=track.license;license.textContent='Licence';license.target='_blank';license.rel='noopener';$('current-music-credit').append(source,document.createTextNode(' · '),license);}}
+$('free-collection-count').textContent=(window.LocalDJFreeMusic?.tracks.length||0)+' free online tracks across '+new Set((window.LocalDJFreeMusic?.tracks||[]).map(t=>t.provider)).size+' sources.';
+for(const track of window.LocalDJFreeMusic?.tracks||[]){const p=document.createElement('p');const a=document.createElement('a');a.href=track.source;a.target='_blank';a.rel='noopener';a.textContent=track.credit+' Source: '+track.provider;const licence=document.createElement('a');licence.href=track.license;licence.textContent='Licence';licence.target='_blank';licence.rel='noopener';p.append(a,document.createTextNode(' · '),licence);$('free-track-credits').append(p);}
+$('source-filter').onchange=$('genre-filter').onchange=()=>{visibleLimit=48;catalogueSignature='';renderCatalogue();};$('show-more-tracks').onclick=()=>{visibleLimit+=48;renderCatalogue();};
