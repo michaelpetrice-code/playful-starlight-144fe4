@@ -24,6 +24,9 @@ class PilotTests(unittest.TestCase):
  def test_discovery_script_is_served(self):
   with self.guest.open(self.url+'/discovery.js') as r:
    self.assertEqual(r.status,200);self.assertIn(b'LocalDJDiscovery',r.read())
+ def test_deck_controller_is_served(self):
+  with self.guest.open(self.url+'/deck-controller.js') as r:
+   self.assertEqual(r.status,200);self.assertIn(b'LocalDJDeck',r.read())
  def test_access_boundaries(self):
   status,state=self.call(self.guest,'/api/state');self.assertFalse(state['host']);self.assertIsNone(state['code']);self.assertEqual(state['tracks'],[])
   self.assertEqual(self.call(self.guest,'/api/next',{})[0],403)

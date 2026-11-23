@@ -66,9 +66,10 @@ function render(){
  if(!$('pending').children.length)$('pending').append(element('p','All caught up. New requests will appear here.','muted'));
  const now=trackById(state.current?.track);
  $('now-title').textContent=now?.title||'Ready when you are';$('now-artist').textContent=now?.artist||'Staff can start the music from the control room.';
- $('audio').hidden=!state.host;
+ $('audio').hidden=true;
  $('audio-note').textContent=state.host?'Keep this host tab open. Connect this device to your pub speakers.':'Music plays through the pub speakers, not customer phones.';
  syncAudio();
+ updateDeck();
 }
 function cover(track,small=false){
  const art=element('div',undefined,'cover-art tone-'+discovery.colour(track.id)+(small?' cover-small':''));art.setAttribute('aria-hidden','true');
@@ -130,22 +131,43 @@ async function syncAudio(){
   if(demo){audio.src='demo/'+state.current.track+'.wav';}
   else{const response=await fetch('api/audio/'+state.current.track);if(!response.ok)throw Error('Unable to load audio');const blob=await response.blob();if(key!==playingKey)return;audioURL=URL.createObjectURL(blob);audio.src=audioURL;}
   await audio.play();
- }catch(e){tell(e.name==='NotAllowedError'?'Press play on the audio controls to enable the speakers.':e.message);}
+ }catch(e){tell(e.name==='NotAllowedError'?'Press Play on the DJ deck to enable the speakers.':e.message);}
 }
 $('search').oninput=()=>state&&render();
 $('join-form').onsubmit=async e=>{e.preventDefault();try{if(demo&&$('code').value!=='123456')throw Error('Use demo venue code 123456');await api('join',{code:$('code').value});tell('Welcome. Pick something you love.');}catch(err){tell(err.message);}};
 $('host-button').onclick=()=>{if(state?.host){$('host-panel').scrollIntoView({behavior:'smooth'});return;}if(demo){api('login');tell('Demo staff controls unlocked. Live venues require a host password.');}else $('login').showModal();};
 $('cancel-login').onclick=()=>$('login').close();
 $('login-form').onsubmit=async e=>{e.preventDefault();try{await api('login',{password:$('password').value});$('password').value='';$('login').close();}catch(err){$('login-error').textContent=err.message;}};
-async function hostAction(path,data){if(busy)return;busy=true;try{await api(path,data);}catch(e){tell(e.message);}finally{busy=false;}}
+async function hostAction(path,data){if(busy)return;busy=true;updateDeck();try{await api(path,data);}catch(e){tell(e.message);}finally{busy=false;updateDeck();}}
 $('next').onclick=()=>hostAction('next');$('stop').onclick=()=>hostAction('stop');
 $('requests').onclick=()=>hostAction('settings',{open:!state.open});$('mix').onchange=()=>hostAction('settings',{mode:$('mix').value});
-$('volume').oninput=()=>audio.volume=Number($('volume').value)/100;
+$('volume').oninput=()=>runDeck(()=>deckController.volume(Number($('volume').value)/100));
 $('screen').onclick=()=>window.open(location.pathname+'?screen=1','local-dj-screen','noopener');
 $('share').onclick=async()=>{try{const url=new URL(location.href);url.search='';url.hash='';await navigator.clipboard.writeText(url.href);tell('Join link copied. Display the venue code alongside it.');}catch(e){tell('Copy this page’s address and share the venue code.');}};
 // The projector never plays a second audio stream, even if it shares the staff cookie.
 const projector=new URLSearchParams(location.search).has('screen');
 if(projector){document.body.classList.add('screen');syncAudio=()=>{};}
+const deckController=window.LocalDJDeck.create({audio,canControl:()=>Boolean(state?.host)&&!projector,hasTrack:()=>Boolean(state?.current),next:()=>hostAction('next')});
+async function runDeck(action){try{await action();}catch(error){tell(error.message);}finally{updateDeck();}}
+function updateDeck(){
+ if(!state)return;const allowed=Boolean(state.host)&&!projector;const current=Boolean(state.current);const loaded=current&&Boolean(audio.getAttribute('src'));const playing=allowed&&loaded&&!audio.paused;
+ $('audio').closest('.playing').classList.toggle('active',playing);
+ $('deck-play').disabled=!allowed||busy;$('deck-next').disabled=!allowed||busy;
+ for(const id of ['deck-restart','deck-forward','deck-stop'])$(id).disabled=!allowed||!current||busy;
+ for(const id of ['deck-mute','deck-volume'])$(id).disabled=!allowed;
+ $('deck-play-symbol').textContent=playing?'Ⅱ':'▶';$('deck-play-label').textContent=playing?'Pause':current?'Play':'Start';
+ $('deck-play').setAttribute('aria-label',playing?'Pause current song':current?'Resume current song':'Start music');
+ $('deck-status').textContent=!current?'STANDBY':projector||!allowed?'VENUE PLAYBACK':playing?'ON AIR':'PAUSED';
+ $('deck-permission').textContent=projector?'Screen view · audio stays on the host device.':allowed?'Live controls · this device feeds the pub speakers.':'Staff control playback from the host device.';
+ const duration=Number.isFinite(audio.duration)?audio.duration:0;const position=Number.isFinite(audio.currentTime)?audio.currentTime:0;
+ $('deck-seek').disabled=!allowed||!loaded||duration<=0;$('deck-seek').max=String(duration||1);$('deck-seek').value=String(position);$('deck-seek').setAttribute('aria-valuetext',window.LocalDJDeck.clock(position)+' of '+window.LocalDJDeck.clock(duration));
+ $('deck-elapsed').textContent=allowed?window.LocalDJDeck.clock(position):'—';$('deck-duration').textContent=allowed?window.LocalDJDeck.clock(duration):'—';
+ const percent=Math.round(audio.volume*100);$('deck-volume').value=String(percent);$('volume').value=String(percent);$('deck-volume-value').textContent=!allowed?'Staff':audio.muted?'Muted':percent+'%';$('deck-mute').textContent=audio.muted||audio.volume===0?'Unmute':'Mute';$('deck-mute').setAttribute('aria-pressed',String(audio.muted||audio.volume===0));
+ const next=state.queue.filter(r=>r.status==='approved'&&trackById(r.track)).sort((a,b)=>b.votes-a.votes||a.id-b.id)[0];$('deck-next-title').textContent=next?trackById(next.track).title:state.mode==='All music'?'Background mix':state.mode+' mix';
+}
+$('deck-play').onclick=()=>runDeck(()=>deckController.toggle());$('deck-next').onclick=()=>runDeck(()=>deckController.next());$('deck-restart').onclick=()=>runDeck(()=>deckController.restart());$('deck-forward').onclick=()=>runDeck(()=>deckController.forward());$('deck-stop').onclick=()=>runDeck(()=>{if(!state?.host||projector)throw Error('Only staff can stop playback.');return hostAction('stop');});
+$('deck-seek').oninput=()=>runDeck(()=>deckController.seek($('deck-seek').value));$('deck-volume').oninput=()=>runDeck(()=>deckController.volume(Number($('deck-volume').value)/100));$('deck-mute').onclick=()=>runDeck(()=>deckController.mute());
+for(const event of ['play','pause','timeupdate','durationchange','loadedmetadata','volumechange','emptied','ended'])audio.addEventListener(event,updateDeck);
 audio.onended=()=>hostAction('next');audio.onplay=()=>$('audio').closest('.playing').classList.add('active');audio.onpause=()=>$('audio').closest('.playing').classList.remove('active');
 audio.onerror=()=>{if(audio.getAttribute('src'))tell('Audio could not play. Check this file or choose the next song.');};
 (async()=>{

@@ -52,3 +52,9 @@ Integration tests cover access boundaries, origin rejection, duplicate requests,
 - https://pplprs.co.uk/jukeboxes/
 
 Original sample audio was generated specifically for this prototype. No third-party recordings are bundled. Commercial playback requires rights appropriate to the use; venue and supplier permissions are separate questions.
+
+## DJ deck controls
+
+The now-playing panel places song details on the left and a compact two-platter console on the right on desktop. At widths of 720px and below the console stacks directly under the song. Staff controls include play/pause, restart, next, stop, forward 15 seconds, seeking, mute and master volume. The first platter follows actual host audio playback; the second is an up-next display, not a second audio player or crossfader. The centre mixer markings are decorative. Guests and projector views cannot operate the deck. Playback position, pause and volume are local to the single host device; guest views do not claim synchronised audio timing. The original control-room volume slider stays in sync with the deck. No Stripe, entitlement or deployment settings were changed for this UI update.
+
+Deck-controller tests use a media stub to verify pause/resume without advancing the queue, start/next callbacks, guest and projector restrictions, seeking boundaries, mute restoration, unknown duration formatting and browser play errors. Together with discovery and HTTP integration tests, 19 tests pass. Visual/mobile acceptance remains outstanding because Chromium startup is blocked in the current environment.
