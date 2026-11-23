@@ -209,5 +209,12 @@
         }
       ]
     }
-  ]
+  ],
+  "automation_validation": {
+    "checked": "2026-11-23",
+    "workflow": "dj-source-review.yml",
+    "method": "deterministic_source_checks",
+    "external_ai_required": false,
+    "auto_publish": false
+  }
 }

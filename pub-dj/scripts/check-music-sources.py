@@ -20,6 +20,9 @@ for name,url in [('Incompetech','https://incompetech.com/music/royalty-free/piec
   entry['candidate_count']=len(entry['candidates']);entry['candidates']=entry['candidates'][:50]
  except Exception as error:entry['error']=type(error).__name__
  report['sources'].append(entry)
+report['review_method']='deterministic_source_checks'
+report['external_ai_required']=False
+report['summary']=[{'provider':s['provider'],'status':s['status'],'new_candidates':s.get('candidate_count',0),'next_step':'Check licences, contributor credits and browser playback before inclusion.'} for s in report['sources']]
 pathlib.Path('music-source-review.json').write_text(json.dumps(report,indent=2))
 print(json.dumps({k:v for k,v in report.items() if k!='sources'}))
 print('Candidate lists are discovery reports, not licence approvals or live additions.')
