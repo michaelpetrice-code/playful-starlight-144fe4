@@ -26,7 +26,7 @@ async function api(path,data){
   if(path==='login')state.host=true;
   if(path==='request'){
    if(!state.open)throw Error('Requests are paused');
-   if(state.queue.some(r=>r.track===data.track))throw Error('Already in the queue — give it a vote.');
+   if(state.queue.some(r=>r.track===data.track&&['pending','approved'].includes(r.status)))throw Error('Already in the queue — give it a vote.');
    state.queue.push({id:Date.now(),track:data.track,status:'pending',votes:0});
   }
   if(path==='vote'){const row=state.queue.find(r=>r.id===data.id);if(!voted.has(row.id)){row.votes++;row.voted=true;voted.add(row.id);}}
@@ -142,7 +142,7 @@ async function syncAudio(){
  if(audioURL){URL.revokeObjectURL(audioURL);audioURL='';}audio.removeAttribute('src');
  if(!key)return;
  try{
-  if(demo){audio.src=window.LocalDJFreeMusic?.url(state.current.track)||'demo/'+state.current.track+'.wav';}
+  if(demo){audio.src=window.LocalDJCloud?.audioURL(state.current.track)||window.LocalDJFreeMusic?.url(state.current.track)||'demo/'+state.current.track+'.wav';if(audio.src.startsWith('blob:'))audioURL=audio.src;}
   else if(cloudMode){audio.src=window.LocalDJCloud.audioURL(state.current.track);if(audio.src.startsWith('blob:'))audioURL=audio.src;}
   else{const response=await fetch('api/audio/'+state.current.track);if(!response.ok)throw Error('Unable to load audio');const blob=await response.blob();if(key!==playingKey)return;audioURL=URL.createObjectURL(blob);audio.src=audioURL;}
   await audio.play();
@@ -208,13 +208,13 @@ async function showCloudAccess(){
  $('cloud-rooms').replaceChildren(...cloudAccess.rooms.map(room=>button('Reopen '+room.name+' · '+room.code,async()=>{state=await window.LocalDJCloud.join(room.code);render();},'ghost')));
 }
 $('cloud-venue').onchange=()=>showCloudAccess();
-$('cloud-create').onclick=async()=>{try{const result=await window.LocalDJCloud.call('create',{venue:$('cloud-venue').value||null,name:$('cloud-name').value});state=await window.LocalDJCloud.join(result.code);render();tell('Room opened. Choose the venue music, then claim playback on this device.');cloudAccess=await window.LocalDJCloud.access();await showCloudAccess();$('host-panel').scrollIntoView({block:'start'});}catch(error){tell(error.message);}};
+$('cloud-create').onclick=async()=>{stopP2P();try{const result=await window.LocalDJCloud.call('create',{venue:$('cloud-venue').value||null,name:$('cloud-name').value});state=await window.LocalDJCloud.join(result.code);render();tell('Room opened. Choose the venue music, then claim playback on this device.');cloudAccess=await window.LocalDJCloud.access();await showCloudAccess();$('host-panel').scrollIntoView({block:'start'});}catch(error){tell(error.message);}};
 $('cloud-checkout').onclick=async()=>{const b=$('cloud-checkout');b.disabled=true;try{const result=await window.LocalDJCloud.call('checkout',{venue:$('cloud-venue').value||null,attempt:crypto.randomUUID()});const url=new URL(result.url);if(url.protocol!=='https:'||url.hostname!=='checkout.stripe.com')throw Error('Unexpected checkout address');location.assign(url.href);}catch(error){tell(error.message);}finally{b.disabled=false;}};
 $('cloud-portal').onclick=async()=>{try{const result=await window.LocalDJCloud.call('portal');const url=new URL(result.url);if(url.protocol!=='https:'||url.hostname!=='billing.stripe.com')throw Error('Unexpected billing address');location.assign(url.href);}catch(error){tell(error.message);}};
 $('cloud-import').onclick=async()=>{try{if(!$('music-rights').checked)throw Error('Confirm the venue has permission to use its music.');const files=[...$('music-files').files];if(!files.length)throw Error('Choose your music files first.');state=await window.LocalDJCloud.importFiles(files);render();tell('Music collection updated. Claim playback on this device and press Start.');}catch(error){tell(error.message);}};
 $('cloud-samples').onclick=async()=>{try{state=await window.LocalDJCloud.command('catalogue',{tracks:seed});render();tell('Original sample tracks loaded. Claim this playback device, then start the music.');}catch(error){tell(error.message);}};
 $('cloud-claim').onclick=async()=>{try{state=await window.LocalDJCloud.command('claim',{client:window.LocalDJCloud.clientId});render();tell('This is now the playback device. Audio on another host tab will stop when it refreshes.');}catch(error){tell(error.message);}};
-$('cloud-signout').onclick=async()=>{audio.pause();await window.LocalDJCloud.logout();cloudAccess=null;$('cloud-hosting').hidden=true;await refresh();tell('Signed out of DJ hosting.');};
+$('cloud-signout').onclick=async()=>{stopP2P();audio.pause();await window.LocalDJCloud.logout();cloudAccess=null;$('cloud-hosting').hidden=true;await refresh();tell('Signed out of DJ hosting.');};
 (async()=>{
  if(new URLSearchParams(location.search).get('demo')==='1'){useDemo();return;}
  try{await refresh();}
@@ -230,3 +230,26 @@ function drawMusicCredits(){const track=window.LocalDJFreeMusic?.track(state?.cu
 $('free-collection-count').textContent=(window.LocalDJFreeMusic?.tracks.length||0)+' songs in the free collection.';
 for(const track of window.LocalDJFreeMusic?.tracks||[]){const p=document.createElement('p');const a=document.createElement('a');a.href=track.source;a.target='_blank';a.rel='noopener';a.textContent=track.credit+' Source: '+track.provider;const licence=document.createElement('a');licence.href=track.license;licence.textContent='Licence';licence.target='_blank';licence.rel='noopener';p.append(a,document.createTextNode(' · '),licence);$('free-track-credits').append(p);}
 $('genre-filter').onchange=()=>{visibleLimit=48;catalogueSignature='';renderCatalogue();};$('show-more-tracks').onclick=()=>{visibleLimit+=48;renderCatalogue();};
+
+let p2pSession=null;
+const p2pStatus=message=>{$('p2p-status').textContent=message;};
+function stopP2P(){p2pSession?.stop();p2pSession=null;$('p2p-files').replaceChildren();$('p2p-import').disabled=true;$('p2p-connect').disabled=false;p2pStatus('Disconnected. No active P2P transfer.');}
+$('p2p-stop').onclick=stopP2P;
+$('p2p-support').onclick=async()=>{try{await window.LocalDJP2P.checkSupport();p2pStatus('Browser P2P support is available. No peers connected. VPN status is not verified.');}catch(error){p2pStatus(error.message);}};
+$('p2p-connection').onchange=()=>{stopP2P();$('p2p-vpn-label').hidden=$('p2p-connection').value==='direct';$('p2p-vpn').checked=false;};
+$('p2p-vpn').onchange=()=>{if(!$('p2p-vpn').checked)stopP2P();};
+$('p2p-rights').onchange=()=>{if(!$('p2p-rights').checked)stopP2P();};
+$('p2p-form').onsubmit=async e=>{e.preventDefault();if((!cloudMode&&!demo)||!state?.host){p2pStatus('Open a host room to import music.');return;}const connect=$('p2p-connect');connect.disabled=true;try{
+ p2pSession?.stop();p2pSession=window.LocalDJP2P.create({onStatus:p2pStatus});$('p2p-files').replaceChildren();$('p2p-import').disabled=true;
+ const file=$('p2p-torrent').files[0];if(file&&file.size>2*1024*1024)throw Error('Use a torrent file below 2 MB.');
+ const input=file?new Uint8Array(await file.arrayBuffer()):$('p2p-magnet').value.trim();
+ const entries=await p2pSession.inspect(input,{rights:$('p2p-rights').checked,vpn:$('p2p-vpn').checked,direct:$('p2p-connection').value==='direct'});
+ for(const entry of entries){const label=element('label');const check=element('input');check.type='checkbox';check.value=String(entry.index);label.append(check,document.createTextNode(' '+entry.name+' ('+(entry.length/1024/1024).toFixed(1)+' MB)'));$('p2p-files').append(label);}
+ $('p2p-import').disabled=false;
+ }catch(error){p2pSession?.stop();p2pStatus(error.message);}finally{connect.disabled=false;}};
+$('p2p-import').onclick=async()=>{const b=$('p2p-import');b.disabled=true;try{
+ if((!cloudMode&&!demo)||!state?.host||!$('p2p-rights').checked||($('p2p-connection').value!=='direct'&&!$('p2p-vpn').checked))throw Error('Confirm host access, recording permissions and your connection option first.');
+ const indices=[...$('p2p-files').querySelectorAll('input:checked')].map(e=>Number(e.value));
+ const room=window.LocalDJCloud.room;const files=await p2pSession.download(indices);if(room!==window.LocalDJCloud.room)throw Error('The room changed. Reconnect before importing into another room.');if(demo){const added=await window.LocalDJCloud.prepareFiles(files);if(state.tracks.length+added.length>500)throw Error('The room supports up to 500 songs.');state.tracks.push(...added);}else state=await window.LocalDJCloud.importFiles(files,state.tracks);render();$('p2p-files').replaceChildren();p2pStatus(files.length+' songs added. Peers disconnected. Use this playback device, then request or play a song.');
+ }catch(error){p2pSession?.stop();p2pStatus(error.message);}finally{$('p2p-connect').disabled=false;}};
+window.addEventListener('pagehide',()=>p2pSession?.stop());

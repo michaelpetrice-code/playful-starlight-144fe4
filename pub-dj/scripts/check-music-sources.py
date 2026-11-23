@@ -36,6 +36,19 @@ def watch_source(source):
  return entry
 watchlist=json.loads((root/'source-watchlist.json').read_text())
 with ThreadPoolExecutor(max_workers=5) as workers: report['sources'].extend(workers.map(watch_source,watchlist['sources']))
+archive_query='mediatype:audio AND (creator:HoliznaCC0 OR creator:"Chris Zabriskie") AND format:"Archive BitTorrent"'
+archive_url='https://archive.org/advancedsearch.php?'+urllib.parse.urlencode({'q':archive_query,'output':'json','rows':25,'fl[]':['identifier','title','licenseurl']},doseq=True)
+entry={'provider':'Internet Archive P2P candidates','source':archive_url,'status':'unavailable','candidates':[],'free_only':True}
+try:
+ with urllib.request.urlopen(archive_url,timeout=20) as response: docs=json.load(response)['response']['docs']
+ entry['status']='reachable'
+ for item in docs:
+  licence=item.get('licenseurl','');licence=licence[0] if isinstance(licence,list) and licence else licence
+  if not isinstance(licence,str) or not re.fullmatch(r'https?://creativecommons.org/(?:publicdomain/zero/1\.0|licenses/by/(?:3\.0|4\.0))/?',licence):continue
+  entry['candidates'].append({'title':item.get('title'),'source':'https://archive.org/details/'+urllib.parse.quote(item['identifier'],safe=''),'license':licence,'required_review':'Verify artist provenance, recording rights, free download and torrent metadata; browser peers/web seeds and VPN are separate checks.'})
+ entry['candidate_count']=len(entry['candidates'])
+except Exception as error:entry['error']=type(error).__name__
+report['sources'].append(entry)
 report['free_only']=True
 report['review_method']='deterministic_source_checks'
 report['external_ai_required']=False
