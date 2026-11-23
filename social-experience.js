@@ -7,8 +7,27 @@ export function createSocialExperience({win=window,doc=document,openPage,openTab
  let bar=doc.getElementById('local-page-navigation');if(!bar){bar=doc.createElement('nav');bar.id='local-page-navigation';bar.hidden=true;bar.setAttribute('aria-label','Page navigation');}layout.before(bar);
  const left=doc.createElement('aside');left.className='social-left';left.setAttribute('aria-label','Explore The Local');
  const right=doc.createElement('aside');right.className='social-right';right.setAttribute('aria-label','Your tables and plans');layout.append(left,view,right);
- const common=[['Home','⌂','Home'],['Venue Hub','⌖','Find a Local'],['Virtual Pub Tables','♧','My tables'],['Who’s Up for It?','▦','What’s on'],['Private Chats','☏','Messages'],['Buy, Sell or Give Away','▱','Marketplace'],['Arcade','♜','Games Room']];
- function bind(root){root.querySelectorAll('[data-social-page]').forEach(b=>b.onclick=()=>openPage(b.dataset.socialPage));}
+ const common=[
+  ['Home','⌂','Home'],
+  ['Venue Hub','⌖','Find a Local'],
+  ['Virtual Pub Tables','♧','Virtual Tables'],
+  ['Football','⚽','Football'],
+  ['Pub Quiz Pro','★','Pub Quiz Pro'],
+  ['Buy, Sell or Give Away','▱','Buy, Sell or Give Away'],
+  ['Trades & Services','⚒','Local Tradesman'],
+  ['Who’s Up for It?','▦','What’s on'],
+  ['Private Chats','☏','Messages'],
+  ['Arcade','♜','Games Room'],
+ ];
+ function bind(root){
+  root.querySelectorAll('[data-social-page]').forEach(button=>{
+   button.onclick=()=>{
+    const page=button.dataset.socialPage;
+    if(page==='Pub Quiz Pro')win.location.assign('pub-quiz-pro.html');
+    else openPage(page);
+   };
+  });
+ }
  function closeDock(){dock?.remove();dock=null;}
  function openDock(t){
   if(!win.matchMedia('(min-width:1200px)').matches){openTable(t);return;}
