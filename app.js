@@ -67,8 +67,8 @@ const groupItemPages = new Set(['updates', 'plans', 'events', 'photos']);
 const tableDestination = builderLink.get('section') === 'tables' ? readTableChatLink(builderLink) : null;
 if (builderLink.get('section') === 'tables') tab = 'Virtual Pub Tables';
 let tableFrameUrl = tableDestination
-  ? tableChatLink('secure-tables.html', location.href, tableDestination, {embedded:'1', v:'170', ...(builderLink.get('invite') ? {invite:builderLink.get('invite')} : {})}).href
-  : 'secure-tables.html?embedded=1&v=170';
+  ? tableChatLink('secure-tables.html', location.href, tableDestination, {embedded:'1', v:'250', ...(builderLink.get('invite') ? {invite:builderLink.get('invite')} : {})}).href
+  : 'secure-tables.html?embedded=1&v=250';
 if (builderLink.get('section') === 'venue-app-builder') tab = 'Venue App Builder';
 if (builderLink.get('section') === 'venue-applications') tab = 'Venue Applications';
 if (builderLink.get('section') === 'football') tab = 'Football';
@@ -363,8 +363,8 @@ function updateNotificationBell() {
 const tableDrafts=createDraftStore();
 const navigation=createAppNavigation({win:window,doc:document,getScope:()=>`${user?.id||'guest'}:${groupId||''}`,getPage:()=>tab,setPage:page=>{tab=page},render:()=>render(),label:page=>pageLabel(page),setDetail:detail=>{
  notificationRoom=detail.room||null;
- if(detail.table&&detail.venue)tableFrameUrl=tableChatLink('secure-tables.html',location.href,{venue:detail.venue,table:detail.table},{embedded:'1',v:'242',...(new URLSearchParams(location.search).get('invite')?{invite:new URLSearchParams(location.search).get('invite')}:{})}).href;
- else tableFrameUrl='secure-tables.html?embedded=1&v=242';
+ if(detail.table&&detail.venue)tableFrameUrl=tableChatLink('secure-tables.html',location.href,{venue:detail.venue,table:detail.table},{embedded:'1',v:'250',...(new URLSearchParams(location.search).get('invite')?{invite:new URLSearchParams(location.search).get('invite')}:{})}).href;
+ else tableFrameUrl='secure-tables.html?embedded=1&v=250';
 }});
 function render(){
  if (Object.hasOwn(legacyAdmin,tab)) { adminPane=legacyAdmin[tab];tab='Administration'; }
@@ -713,7 +713,7 @@ window.addEventListener('message',event=>{
  if(uuid.test(detail.table||'')&&uuid.test(detail.venue||'')){
   frame.dataset.openTable=detail.table;frame.dataset.openVenue=detail.venue;
   const old=navigation.detail();if(old.table===detail.table&&old.venue===detail.venue)return;
-  navigation.openDetail({table:detail.table,venue:detail.venue});tableFrameUrl=tableChatLink('secure-tables.html',location.href,{table:detail.table,venue:detail.venue},{embedded:'1',v:'242'}).href;
+  navigation.openDetail({table:detail.table,venue:detail.venue});tableFrameUrl=tableChatLink('secure-tables.html',location.href,{table:detail.table,venue:detail.venue},{embedded:'1',v:'250'}).href;
  }
 });
 
