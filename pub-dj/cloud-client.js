@@ -19,6 +19,6 @@
   for(const file of selected){if(!/\.(mp3|wav|ogg|m4a)$/i.test(file.name)||file.size>50*1024*1024)throw Error('Use MP3, WAV, OGG or M4A files below 50 MB each.');const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(file.name+'|'+file.size+'|'+file.lastModified));const id=Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,'0')).join('');files.set(id,file);const parts=file.name.replace(/\.[^.]+$/,'').split(' - ');tracks.push({id,title:(parts.length>1?parts[1]:parts[0]).slice(0,140),artist:(parts.length>1?parts[0]:'Venue collection').slice(0,140),mood:(parts[2]||'All music').slice(0,60)});}
   return call('catalogue',{data:{tracks}});
  }
- function audioURL(id){if(files.has(id))return URL.createObjectURL(files.get(id));if(['golden','friday','after'].includes(id))return 'demo/'+id+'.wav';throw Error('Select the venue music files on this playback device again.');}
+ function audioURL(id){const free=root.LocalDJFreeMusic?.url(id);if(free)return free;if(files.has(id))return URL.createObjectURL(files.get(id));if(['golden','friday','after'].includes(id))return 'demo/'+id+'.wav';throw Error('Select the venue music files on this playback device again.');}
  root.LocalDJCloud={clientId,status:()=>call('status'),state:()=>call('state'),access:()=>call('access'),login,join,setRoom,get room(){return room;},call,importFiles,audioURL,async logout(){auth=null;write('local-dj-auth',null);write('local-dj-signed-out','1');},command:(action,data)=>call(action,{data:{...data,client:clientId}})};
 })(window);

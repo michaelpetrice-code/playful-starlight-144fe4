@@ -1,3 +1,4 @@
+import './free-music.js';
 import {plans,validPrice,paidUntil} from './billing-core.mjs';
 const env=n=>Deno.env.get(n)||'';
 const dbURL=env('SUPABASE_URL');const service=env('SUPABASE_SERVICE_ROLE_KEY');
@@ -94,7 +95,7 @@ Deno.serve(async req=>{
    const party=paid?.plan==='party_once';if(party){const existing=await db('local_dj_rooms?party_checkout=eq.'+paid.id+'&select=code,expires_at');if(existing[0])return Date.parse(existing[0].expires_at)>Date.now()?out({code:existing[0].code}):out({error:'This event pass has already been used'},409);}
    const roomCode=String(100000+crypto.getRandomValues(new Uint32Array(1))[0]%900000);const expires=new Date(Math.min(Date.now()+12*3600000,free?Infinity:Date.parse(paid.access_until))).toISOString();
    const name=v?.name||String(input.name||'Private party').trim().slice(0,90)||'Private party';
-   try{await db('local_dj_rooms',{code:roomCode,host_id:u.id,venue_id:venue||null,name,expires_at:expires,party_checkout:party?paid.id:null});}catch{return out({error:'Room creation is busy. Try again.'},409);}
+   try{await db('local_dj_rooms',{code:roomCode,host_id:u.id,venue_id:venue||null,name,tracks:globalThis.LocalDJFreeMusic.catalogue(),expires_at:expires,party_checkout:party?paid.id:null});}catch{return out({error:'Room creation is busy. Try again.'},409);}
    return out({code:roomCode});
   }
   if(action==='assist'&&!code)return out({error:'Join a venue before asking the music assistant.'},403);

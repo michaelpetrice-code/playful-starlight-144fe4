@@ -35,9 +35,9 @@ async function api(path,data){
   if(path==='stop')state.current=null;
   if(path==='next'){
    const row=state.queue.filter(r=>r.status==='approved').sort((a,b)=>b.votes-a.votes||a.id-b.id)[0];
-   const eligible=seed.filter(t=>state.mode==='All music'||t.mood===state.mode);
+   const eligible=state.tracks.filter(t=>state.mode==='All music'||t.mood===state.mode);
    const options=eligible.filter(t=>t.id!==state.current?.track);
-   state.current={track:row?.track||(options[0]||eligible[0]||seed[0]).id,started:Date.now()};
+   state.current={track:row?.track||(options[0]||eligible[0]||state.tracks[0]).id,started:Date.now()};
    if(row)row.status='played';
   }
   render();return {ok:true};
@@ -137,7 +137,7 @@ async function syncAudio(){
  if(audioURL){URL.revokeObjectURL(audioURL);audioURL='';}audio.removeAttribute('src');
  if(!key)return;
  try{
-  if(demo){audio.src='demo/'+state.current.track+'.wav';}
+  if(demo){audio.src=window.LocalDJFreeMusic?.url(state.current.track)||'demo/'+state.current.track+'.wav';}
   else if(cloudMode){audio.src=window.LocalDJCloud.audioURL(state.current.track);if(audio.src.startsWith('blob:'))audioURL=audio.src;}
   else{const response=await fetch('api/audio/'+state.current.track);if(!response.ok)throw Error('Unable to load audio');const blob=await response.blob();if(key!==playingKey)return;audioURL=URL.createObjectURL(blob);audio.src=audioURL;}
   await audio.play();
@@ -189,7 +189,7 @@ $('deck-seek').oninput=()=>runDeck(()=>deckController.seek($('deck-seek').value)
 for(const event of ['play','pause','timeupdate','durationchange','loadedmetadata','volumechange','emptied','ended'])audio.addEventListener(event,updateDeck);
 audio.onended=()=>hostAction('next');audio.onplay=()=>$('audio').closest('.playing').classList.add('active');audio.onpause=()=>$('audio').closest('.playing').classList.remove('active');
 audio.onerror=()=>{if(audio.getAttribute('src'))tell('Audio could not play. Check this file or choose the next song.');};
-function useDemo(){demo=true;state={venue:'The Local',joined:false,host:false,open:true,current:null,mode:'All music',tracks:seed,queue:[{id:1,track:'friday',status:'approved',votes:4}]};render();tell('Interactive demo: join with 123456, then try staff controls. Changes stay in this tab.');}
+function useDemo(){demo=true;const tracks=new URLSearchParams(location.search).get('free')==='1'?window.LocalDJFreeMusic.catalogue():seed;state={venue:'The Local',joined:false,host:false,open:true,current:null,mode:'All music',tracks,queue:[{id:1,track:tracks[1].id,status:'approved',votes:4}]};render();tell('Interactive demo: join with 123456, then try staff controls. Changes stay in this tab.');}
 async function showCloudAccess(){
  if(!cloudAccess)return;$('cloud-hosting').hidden=false;
  const selected=$('cloud-venue').value;$('cloud-venue').replaceChildren();const personal=element('option','Private party / personal room');personal.value='';$('cloud-venue').append(personal);
@@ -219,3 +219,6 @@ $('cloud-signout').onclick=async()=>{audio.pause();await window.LocalDJCloud.log
  }
  setInterval(()=>refresh().catch(()=>{audio.pause();tell('Connection lost. Playback paused while reconnecting.');}),3000);
 })();
+
+$('cloud-free-music').onclick=async()=>{try{if(!confirm('Load the free online collection into this room? This replaces its collection. Keep Kevin MacLeod’s credits visible to listeners.'))return;state=await window.LocalDJCloud.command('catalogue',{tracks:window.LocalDJFreeMusic.catalogue()});render();tell('Free online music loaded. Claim this playback device, then press Start. No supplier subscription is required.');}catch(error){tell(error.message);}};
+for(const track of window.LocalDJFreeMusic?.tracks||[]){const a=document.createElement('a');a.href=track.source;a.target='_blank';a.rel='noopener';a.textContent=track.title+' — Kevin MacLeod';$('free-track-credits').append(a,document.createTextNode(' · '));}
