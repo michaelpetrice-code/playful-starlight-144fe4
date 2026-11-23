@@ -5,6 +5,7 @@ const { supabaseUrl, supabaseAnonKey } = window.LADS_CONFIG;
 const db = createClient(supabaseUrl, supabaseAnonKey);
 const setup = byId('setup-form');
 const room = byId('room');
+const answerLetters = ['A', 'B', 'C', 'D'];
 let code, state, busy = false, refreshTimer, accessRequest = 0;
 
 function node(tag, text) {
@@ -61,8 +62,8 @@ function addQuestion(data = { prompt: '', options: ['', '', '', ''], correct: 0 
   data.options.forEach((value, index) => {
     const option = input(120, value);
     option.name = 'option';
-    group.append(field('Answer ' + (index + 1), option));
-    correct.add(new Option('Answer ' + (index + 1), index));
+    group.append(field('Answer ' + answerLetters[index], option));
+    correct.add(new Option('Answer ' + answerLetters[index], index));
   });
   correct.name = 'correct';
   correct.value = data.correct;
@@ -190,7 +191,7 @@ function show(next) {
     const choices = node('div');
     choices.className = 'choices';
     next.options.forEach((choice, index) => {
-      const label = choice + (next.selected === index ? ' · Your answer' : '') + (Number(next.correct) === index && next.correct !== null ? ' · Correct' : '');
+      const label = answerLetters[index] + '. ' + choice + (next.selected === index ? ' · Your answer' : '') + (Number(next.correct) === index && next.correct !== null ? ' · Correct' : '');
       const choiceButton = button(label, () => actOnRoom('answer', { p_question: next.position, p_choice: index }));
       choiceButton.disabled = !next.team || next.selected !== null || next.phase !== 'open';
       choices.append(choiceButton);
