@@ -378,11 +378,7 @@ function render(){
  trackPage(user && (memberStatus==='active' || ownerAccess) ? analyticsPage : 'welcome');
  if (tab!=='Administration' || !adminAccess || memberStatus!=='active' && !ownerAccess) adminRoot=null;
  if (tab!=='Venue subscription' || billingUser!==user?.id) billingRoot=null;
- const cog=document.getElementById('tl-venue-admin-cog');
- if(cog){
-  cog.hidden=!adminAccess || memberStatus!=='active' && !ownerAccess;
-  cog.onclick=event=>{event.preventDefault();tab='Administration';render();$('administration')?.querySelector('h1')?.focus();window.scrollTo(0,0)};
- }
+ document.getElementById('tl-venue-admin-cog')?.remove();
  if(['Chat','Chat & Media Settings'].includes(tab))tab='Virtual Pub Tables'; if(memberStatus!=='active'&&!ownerAccess){$('tabs').innerHTML='';$('view').innerHTML=`<section class="panel" style="margin:40px auto;max-width:600px"><h2>Account ${memberStatus==='banned'?'banned':'suspended'}</h2><p>Your account is currently restricted. Contact the platform owner if you believe this is an error.</p><button id="restrictedSignOut">Sign out</button></section>`;document.getElementById('restrictedSignOut').onclick=()=>sb?.auth.signOut();return} const visibleNames=names;$('tabs').innerHTML=visibleNames.map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}">${esc(pageLabel(n))}</button>`).join('');
 const quick=['Home','Virtual Pub Tables','Who’s Up for It?','Private Chats'];
 const labels={Home:`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8 M5 10v11h14V10 M9 21v-7h6v7"/></svg>`,'Virtual Pub Tables':`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h11v13H5z M16 9h3a3 3 0 0 1 0 6h-3 M7 4h7 M8 2v2 M12 2v2 M8 11v5 M12 11v5"/></svg>`,'Who’s Up for It?':`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2 M17 5a3 3 0 0 1 0 6 M18 14a5 5 0 0 1 3 5v1"/></svg>`,'Venue Hub':`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8 M5 10v11h14V10 M9 21v-7h6v7"/></svg>`,Arcade:`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="5"/><path d="M7 11v4 M5 13h4 M15 12h.01 M18 14h.01"/></svg>`};
@@ -393,6 +389,7 @@ if(bottom)bottom.innerHTML=quick.map(n=>`<button data-tab="${n}" class="${tab===
 const more=document.getElementById('moreMenu');
 if(more){
  const groups=[['Explore',['Venue Hub','Events','Buy, Sell or Give Away','Trades & Services']],['Your community',['Local Updates','Community','Photos','Rounds','Kitty']],['Games & football',['Arcade','Football','Quiz','Games','More Games','Tournaments','Leaderboard']],['Your account',['Alerts','Account','Install','Report Behaviour']],['For venues',['Venue App Builder','Venue Applications','Venue subscription']]];
+ if(adminAccess && (ownerAccess || adminAccess.local || adminAccess.staff?.length))groups.push(['Management',['Administration']]);
  more.innerHTML='<label for="moreSearch">Find a feature</label><input id="moreSearch" type="search" placeholder="Search features…">'+groups.map(([title,pages])=>`<section data-more-group><h3>${esc(title)}</h3><div class="more-feature-grid">${pages.filter(n=>!quick.includes(n)).map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}">${esc(pageLabel(n))}</button>`).join('')}</div></section>`).join('')+'<p id="moreSearchEmpty" hidden>No matching features. Try another word.</p>';
 }
 

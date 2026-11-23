@@ -71,3 +71,6 @@ html.tl122-embedded body main #tables.panel{padding:16px!important}
 html.tl122-embedded body #tables>h2{font-size:1.35rem!important;margin:0 0 12px!important}
 html.tl122-embedded body .table-quick-actions{margin:12px 0!important}
 html.tl122-embedded body .table-quick-actions>span{display:none}
+
+/* Administration lives in More; suppress any legacy floating entry point. */
+#tl-venue-admin-cog,#tl128-admin-menu{display:none!important}
