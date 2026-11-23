@@ -63,6 +63,7 @@ export async function mountVenueBuilder(root, sb, user) {
     if (!addError) { teamInput.value = ''; await refreshTeam(); }
     teamAdd.disabled = false;
   });
+  teamPanel.append(el('a', {href:'venue-marketing.html'}, 'Open AI Marketing Assistant'), document.createTextNode(' · '), el('a', {href:'race-night/index.html'}, 'Host a Race Night'));
   root.prepend(teamPanel);
   refreshTeam();
 

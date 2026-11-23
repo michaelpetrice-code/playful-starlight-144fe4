@@ -1,0 +1,15 @@
+import {dateLabel,themes} from './core.mjs';
+export const formats={square:[1080,1080],portrait:[1080,1350],story:[1080,1920],a4:[2480,3508]};
+function lines(ctx,text,width){const words=String(text||'').split(/\s+/);const result=[];let row='';for(const word of words){if(ctx.measureText(row?row+' '+word:word).width>width&&row){result.push(row);row=word;}else row+=(row?' ':'')+word;}if(row)result.push(row);return result;}
+export function paintPoster(canvas,brief,content,venue,format='square',image=null){
+ const [w,h]=formats[format]||formats.square;canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');if(!ctx)return;const scale=w/1080;ctx.scale(scale,scale);const height=h/scale;const [dark,gold]=themes[brief.theme]||themes.emerald;
+ ctx.fillStyle=dark;ctx.fillRect(0,0,1080,height);
+ if(image){const ratio=Math.max(1080/image.width,height/image.height);const iw=image.width*ratio,ih=image.height*ratio;ctx.drawImage(image,(1080-iw)/2,(height-ih)/2,iw,ih);const shade=ctx.createLinearGradient(0,0,0,height);shade.addColorStop(0,'#06130c77');shade.addColorStop(.3,'#07130c88');shade.addColorStop(1,'#06110cf5');ctx.fillStyle=shade;ctx.fillRect(0,0,1080,height);}else{const glow=ctx.createRadialGradient(850,100,10,850,100,800);glow.addColorStop(0,gold+'55');glow.addColorStop(1,dark+'00');ctx.fillStyle=glow;ctx.fillRect(0,0,1080,height);ctx.strokeStyle=gold+'33';ctx.lineWidth=2;for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(1030,height*.52,180+i*65,0,Math.PI*2);ctx.stroke();}}
+ ctx.strokeStyle=gold;ctx.lineWidth=2;ctx.strokeRect(35,35,1010,height-70);ctx.textAlign='center';ctx.fillStyle=gold;ctx.font='italic 36px Georgia';ctx.fillText('the local',540,103);ctx.font='600 26px system-ui';ctx.fillStyle='#f3ead7';ctx.fillText(String(venue||'YOUR VENUE').slice(0,60),540,159);
+ const top=Math.max(220,height*.22);let size=90;let titleLines;do{ctx.font='800 '+size+'px system-ui';titleLines=lines(ctx,brief.title||'Your next great event',890);if(titleLines.length<=3)break;size-=4;}while(size>42);let y=top;ctx.fillStyle='#fff7e8';for(const row of titleLines.slice(0,4)){ctx.fillText(row,540,y);y+=size*1.13;}
+ ctx.font='italic 34px Georgia';ctx.fillStyle=gold;const tagline=lines(ctx,content.posterTagline||'',870);y+=36;for(const row of tagline.slice(0,2)){ctx.fillText(row,540,y);y+=44;}
+ y=Math.max(y+54,height*.62);ctx.strokeStyle=gold+'88';ctx.beginPath();ctx.moveTo(330,y-34);ctx.lineTo(750,y-34);ctx.stroke();
+ const facts=[dateLabel(brief.date),brief.time&&'From '+brief.time,brief.location,brief.price].filter(Boolean);ctx.fillStyle='#fff4da';ctx.font='500 29px system-ui';for(const fact of facts){for(const row of lines(ctx,fact,890).slice(0,2)){ctx.fillText(row,540,y);y+=38;}}
+ if(brief.booking){ctx.font='400 20px system-ui';ctx.fillStyle=gold;let display=brief.booking;try{const u=new URL(display);display=u.hostname+u.pathname+(u.search?' · Full link in caption':'');}catch{}ctx.fillText(display.length>70?display.slice(0,67)+'…':display,540,Math.min(y+24,height-96));}
+ ctx.font='500 17px system-ui';ctx.fillStyle=gold;ctx.fillText('Find the details. Bring good company.',540,height-58);
+}
