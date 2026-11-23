@@ -50,3 +50,21 @@ html.local-dark-gold body :is(.social-feature-card,.guest-feature,.market-card){
 @media(prefers-reduced-motion:reduce){html.local-dark-gold body :is(button,a,.social-feature-card){transition:none!important;transform:none!important}}
 html.local-reduce-motion body :is(button,a,.social-feature-card){transition:none!important;transform:none!important}
 @media(forced-colors:active){html.local-dark-gold body :is(.panel,.card,button,input,select,textarea){box-shadow:none!important;border:1px solid CanvasText!important}}
+
+/* Finish for the public guides and dedicated product, football and competition pages. */
+.tl-audit-logo { display:block; width:min(155px, 36vw); height:auto; margin-block:.35rem; }
+html.local-dark-gold body :is(.tl149-feature,.social-feature-card,.guest-feature,.market-card,.tl-an-card,.tl149-plan-summary,.admin-task-content,.football-hub .football-card) {
+  box-shadow: inset 0 1px 0 var(--finish-highlight), 0 3px 0 #060b07, 0 10px 25px #0005;
+}
+html.local-dark-gold body :is(.tl149-public-header,.guest-header) {
+  border-bottom-color: var(--finish-line);
+  box-shadow: inset 0 1px var(--finish-highlight), 0 4px 14px #0004;
+}
+body:has(.quiz-product) .quiz-benefits article {
+  background:linear-gradient(155deg,#222c20,#151c15);
+  box-shadow:inset 0 1px #fff1bf1a,0 3px #080c08,0 8px 18px #0004;
+}
+body:has(#setup-form) #setup fieldset {
+  background:linear-gradient(155deg,#1f291d,#182219);
+  box-shadow:inset 0 1px #fff1bf12,0 3px 8px #0003;
+}
