@@ -1,4 +1,4 @@
-import {featureGallery,visitorIntroduction} from './social-features.js?v=260';
+import {featureGallery,visitorIntroduction} from './social-features.js?v=278';
 import { renderVenuePageFeed } from './venue-page-feed.js?v=232';
 import { trackPage } from './analytics-track.js?v=174';
 import { memberPageUrl, sharedPage } from './page-share.js?v=173';
@@ -131,21 +131,20 @@ if (!isPublicPage) {
 
 // v209: informative guest previews for features requiring membership.
 const guestPreview = {
-  tables: ['Virtual Pub Tables', 'Join conversations and invite friends once you have an account.'],
-  games: ['Games Room', 'Try the public arcade. Play against the computer or practise on your own.'],
-  trades: ['Local Tradesmen', 'Browse local services when public listings are available. Sign in to contact providers.'],
-  challenges: ['Challenges & Competitions', 'Sign in to join challenges and track your progress.'],
-  rewards: ['Rewards & Membership', 'Participating venues can offer rewards to registered members.'],
-  rounds: ['Buy a Round', 'Sign in to organise rounds with other members.'],
-  friends: ['Friends & Groups', 'Sign in to connect with other members.'],
-  photos: ['Photos & Videos', 'Member galleries may require sign-in to protect privacy.'],
-  tickets: ['Tickets & Bookings', 'Check public events or sign in for member booking options.']
+  tables: 'Join conversations and invite friends once you have an account.',
+  games: 'Try the public arcade. Play against the computer or practise on your own.',
+  trades: 'Browse local services when public listings are available. Sign in to contact providers.',
+  challenges: 'Sign in to join challenges and track your progress.',
+  rewards: 'Participating venues can offer rewards to registered members.',
+  rounds: 'Sign in to organise rounds with other members.',
+  friends: 'Sign in to connect with other members.',
+  photos: 'Member galleries may require sign-in to protect privacy.',
+  tickets: 'Check public events or sign in for member booking options.'
 };
 if (isPublicPage && guestPreview[page]) {
-  const [heading, description] = guestPreview[page];
+  const description = guestPreview[page];
   const panel = document.createElement('section');
   panel.className = 'guest-preview-panel';
-  const h = document.createElement('h2'); h.textContent = heading;
   const p = document.createElement('p'); p.textContent = description;
   const login = document.createElement('a'); login.className = 'guest-button';
   if (page === 'games') {
@@ -156,7 +155,7 @@ if (isPublicPage && guestPreview[page]) {
     login.textContent = 'Log in or create an account';
   }
   const back = document.createElement('a'); back.href = 'guest.html'; back.textContent = '← Explore all features';
-  panel.append(h, p, login, back);
+  panel.append(p, login, back);
   content.replaceChildren(panel);
 }
 

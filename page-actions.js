@@ -21,7 +21,7 @@
   function simplify() {
     // Share actions are secondary; posting, replying, booking and purchasing stay visible.
     document.querySelectorAll('button.tl172-share:not([type="submit"])').forEach(button => {
-      if (button.closest('form, #tl-auth-gate')) return;
+      if (button.id === 'tl172-page-share' || button.hasAttribute('data-tl172-public-share') || button.closest('form, #tl-auth-gate')) return;
       tuck(button, button.textContent.trim() || 'Share options', true);
     });
     document.querySelectorAll('.tl-install-banner').forEach(banner => tuck(banner, 'Get the app'));

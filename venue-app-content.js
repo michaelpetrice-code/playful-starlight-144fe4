@@ -1,14 +1,14 @@
-import { featureLabel, sectorForType } from './venue-sectors.js';
+import { featureLabel } from './venue-sectors.js';
 export const features = {
   events: { label: 'What’s On', image: 'assets/feature-slides/whos-up-for-it.webp', action: 'Event details' },
-  tickets: { label: 'Events & Tickets', image: 'assets/feature-slides/whos-up-for-it.webp', action: 'Open ticket provider' },
-  room: { label: 'Room Hire', image: 'assets/feature-slides/discover-venues.webp', action: 'Room details' },
-  bingo: { label: 'Kids’ Bingo', image: 'assets/feature-slides/virtual-pub-tables.webp', action: 'Bingo details' },
-  draw: { label: 'Chase the Lady', image: 'assets/feature-slides/buy-a-round.webp', action: 'Club draw details' },
+  tickets: { label: 'Events & Tickets', image: 'assets/builder-library/ticket.svg', action: 'Open ticket provider' },
+  room: { label: 'Room Hire', image: 'assets/builder-library/home.svg', action: 'Room details' },
+  bingo: { label: 'Kids’ Bingo', image: 'assets/builder-library/gamepad.svg', action: 'Bingo details' },
+  draw: { label: 'Chase the Lady', image: 'assets/arcade-previews/solitaire.svg', action: 'Club draw details' },
   rewards: { label: 'Member Rewards', image: 'assets/feature-slides/rewards-membership.webp', action: 'Reward details' },
-  gallery: { label: 'Gallery', image: 'assets/feature-slides/virtual-pub-tables.webp', action: 'View album' },
+  gallery: { label: 'Gallery', image: 'assets/pub-v97/photos.webp', action: 'View album' },
   games: { label: 'Games Room', image: 'assets/feature-slides/games-room.webp', action: 'Game details' },
-  contact: { label: 'Contact the Venue', image: 'assets/feature-slides/discover-venues.webp', action: 'Venue website' }
+  contact: { label: 'Contact the Venue', image: 'assets/builder-library/users.svg', action: 'Venue website' }
 };
 
 export const themes = ['emerald', 'burgundy', 'navy', 'charcoal'];
@@ -83,7 +83,7 @@ export function renderVenue(app, { preview = false, enquire } = {}) {
     const cards = app.features[key];
     if (!preview && !cards.length && !['room', 'contact', 'games', 'bingo'].includes(key)) continue;
     const section = el('section', { className: 'vb-feature' },
-      el('img', { src: (key !== 'games' && sectorForType(app.type)?.image) || info.image, alt: '', loading: 'lazy' }), el('h3', {}, featureLabel(app.type, key, info.label)));
+      el('img', { src: info.image, alt: '', loading: 'lazy' }), el('h3', {}, featureLabel(app.type, key, info.label)));
     for (const card of cards) {
       const url = httpsUrl(card.url);
       const article = el('article', {}, el('h4', {}, card.title), card.detail && el('p', {}, card.detail));

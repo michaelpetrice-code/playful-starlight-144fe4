@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { shareLocal } from './share.js?v=172';
+import { shareLocal } from './share.js?v=277';
 import { el, renderVenue } from './venue-app-content.js';
 
 const root = document.getElementById('venue-app');
