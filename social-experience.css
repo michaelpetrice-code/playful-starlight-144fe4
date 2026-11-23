@@ -106,3 +106,5 @@ html.social-member .community-home .social-feature-grid{grid-template-columns:re
 html.local-dark-gold #tabs{display:none!important}
 
 .social-guest-home :is(#guest-title,#guest-intro){position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap!important}
+/* Search results must stay hidden even when legacy button styles set display. */
+#moreMenu [hidden],#moreDrawer[hidden]{display:none!important}
