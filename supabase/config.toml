@@ -1,2 +1,5 @@
 [functions.quiz-billing]
 verify_jwt = false
+
+[functions.quiz-ai]
+verify_jwt = false
