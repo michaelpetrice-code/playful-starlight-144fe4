@@ -14,7 +14,7 @@
       "currency": "gbp",
       "amount": 1999,
       "interval": "month",
-      "product_active": false
+      "product_active": true
     },
     {
       "plan": "subscriber_monthly",
@@ -23,7 +23,7 @@
       "currency": "gbp",
       "amount": 999,
       "interval": "month",
-      "product_active": false,
+      "product_active": true,
       "requires": "verified_active_paid_local_venue_subscription"
     },
     {
@@ -32,7 +32,7 @@
       "price": "price_1UezLSRlvtejByKsBbkjdjLx",
       "currency": "gbp",
       "amount": 799,
-      "product_active": false,
+      "product_active": true,
       "requires": "event_activation_and_expiry"
     }
   ],
@@ -43,5 +43,7 @@
     "Verify mobile browsers and host speaker playback",
     "Agree appropriate music supply and permissions",
     "Clarify whether release follows tested checkout or first real payment"
-  ]
+  ],
+  "catalogue_active": true,
+  "catalogue_verified_date": "2026-11-23"
 }
