@@ -59,3 +59,12 @@ test('opting out while registration is pending prevents a late subscription from
  while(!finish)await new Promise(resolve=>setImmediate(resolve));
  await c.disable();finish();await pending;assert.equal((await c.init()).User.PushSubscription.optedIn,false);assert(!s.calls.includes('register'));assert(s.calls.includes('unsubscribe'));
 });
+
+ test('allowed browser permission reconnects automatically without prompting',async()=>{
+ const {createNativePushClient}=await from('native-push.js');const s=setup();const c=createNativePushClient(s.win,{supabaseUrl:'https://example.supabase.co'},s.client);
+ await c.sync('me');assert((await c.init()).User.PushSubscription.optedIn);assert(!s.calls.includes('permission'));
+ });
+ test('connection failure gives a useful recovery address rather than a raw fetch error',async()=>{
+ const {createNativePushClient}=await from('native-push.js');const s=setup();s.win.fetch=async()=>{throw new TypeError('Failed to fetch')};const c=createNativePushClient(s.win,{supabaseUrl:'https://example.supabase.co'},s.client);
+ await assert.rejects(c.enable('me'),/https:\/\/thelocal.me.uk/);assert(!(await c.init()).User.PushSubscription.optedIn);
+ });

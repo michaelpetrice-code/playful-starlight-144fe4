@@ -2,7 +2,7 @@ import {createClient} from 'npm:@supabase/supabase-js@2.57.4';
 import webPush from 'npm:web-push@3.6.7';
 import {validSubscription,permittedRecipient,allowsNotification,messageNotification} from './core.mjs';
 const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false,autoRefreshToken:false}});
-const origins=new Set(['https://thelocal.me.uk','https://www.thelocal.me.uk','https://playful-starlight-144fe4.netlify.app']);
+const origins=new Set(['https://thelocal.me.uk','https://www.thelocal.me.uk','https://playful-starlight-144fe4.netlify.app','https://tourmaline-chebakia-f1e2ac.netlify.app']);
 const uuid=/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 async function result(query:any){const r=await query;if(r.error)throw new Error('Database operation failed');return r.data;}
 async function hash(text:string){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text))),b=>b.toString(16).padStart(2,'0')).join('');}
@@ -68,7 +68,7 @@ async function dispatch(cfg:any){
 }
 Deno.serve(async(req:Request)=>{
  const origin=req.headers.get('origin');const headers:any={'Content-Type':'application/json','Cache-Control':'no-store','Vary':'Origin'};
- if(origin && !origins.has(origin))return new Response('Forbidden',{status:403});
+ if(origin && !origins.has(origin)){console.warn('Push request rejected for origin:',origin);return new Response('Open The Local at https://thelocal.me.uk to enable alerts.',{status:403,headers});}
  if(origin)Object.assign(headers,{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Headers':'authorization,apikey,content-type','Access-Control-Allow-Methods':'GET,POST,OPTIONS'});
  const json=(body:any,status=200)=>new Response(JSON.stringify(body),{status,headers});
  if(req.method==='OPTIONS')return new Response(null,{status:204,headers});

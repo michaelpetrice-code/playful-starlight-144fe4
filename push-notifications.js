@@ -1,4 +1,4 @@
-import {createNativePushClient} from './native-push.js?v=241';
+import {createNativePushClient} from './native-push.js?v=244';
 // Shared by the main app and standalone table pages. Never stores a REST API key.
 export function createPushClient(win, doc, config, client) {
   if(config.webPushEnabled && client)return createNativePushClient(win,config,client);

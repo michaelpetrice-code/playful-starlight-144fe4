@@ -4,11 +4,14 @@ export function createNativePushClient(win, config, client) {
   function disabled(){try{return win.localStorage?.getItem('local-device-push-disabled')==='1'}catch{return false}}
   const supported=()=>Boolean(win.Notification && win.navigator?.serviceWorker && win.PushManager);
   const state={User:{PushSubscription:{get optedIn(){return registered}}}};
+  async function request(address,options){
+    try{return await win.fetch(address,options)}catch{throw new Error('Message alerts could not connect. Open The Local at https://thelocal.me.uk and try Enable notifications again.')}
+  }
   async function api(action,body={}){
     const {data}=await client.auth.getSession();const token=data.session?.access_token;
     if(!token)throw new Error('Sign in to manage message alerts.');
-    const response=await win.fetch(url+'?action='+action,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token,apikey:config.supabaseAnonKey},body:JSON.stringify(body)});
-    const result=await response.json();
+    const response=await request(url+'?action='+action,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token,apikey:config.supabaseAnonKey},body:JSON.stringify(body)});
+    const result=await response.json().catch(()=>({error:'Open The Local at https://thelocal.me.uk and try Enable notifications again.'}));
     if(!response.ok)throw new Error(result.error || (response.status===409?'Enable notifications on this device first.':'Message alerts could not connect. Please try again.'));
     return result;
   }
@@ -19,7 +22,7 @@ export function createNativePushClient(win, config, client) {
   }
   async function subscription(service){
     const existing=await service.pushManager.getSubscription();if(existing)return existing;
-    const response=await win.fetch(url+'?action=public-key',{cache:'no-store'});
+    const response=await request(url+'?action=public-key',{cache:'no-store'});
     const data=await response.json();if(!response.ok || !data.publicKey)throw new Error('Message alerts could not connect. Please try again.');
     const base64=data.publicKey.replace(/-/g,'+').replace(/_/g,'/');
     const bytes=Uint8Array.from(win.atob(base64+'='.repeat((4-base64.length%4)%4)),c=>c.charCodeAt(0));
