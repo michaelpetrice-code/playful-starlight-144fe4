@@ -25,7 +25,7 @@ import {venueDirectoryView,bindVenueDirectory,venueNames} from './venue-director
 import {safetyView,bindSafety} from './safety-reporting.js';
 import {initLounge,decorateLounge,uploadTablePhoto,uploadProfilePhoto,loadProfileAvatar,renderLiveGame,bindLiveGame} from './realtime-lounge.js?v=166';
 import {virtualTablesView,meetupsView,venueView,bindCommunityHub,hubEntries} from './community-hub.js?v=173';
-import {shareLocal} from './share.js?v=172';
+import {shareLocal} from './share.js?v=277';
 import { memberPages, sharedPage, shareButton, shareMemberPage, pageLabel, shareItem, focusSharedItem } from './page-share.js?v=173';
 import {privateChatView,bindPrivateChat,disposePrivateChat} from './private-chat.js?v=242';
 import {appearancePanel,bindAppearance} from './theme-settings.js?v=242';

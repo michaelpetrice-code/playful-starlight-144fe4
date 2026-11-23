@@ -1,4 +1,4 @@
-import { shareLocal } from './share.js?v=172';
+import { shareLocal } from './share.js?v=277';
 import { memberPageUrl, shareButton } from './page-share.js?v=173';
 import {startYatzy,startPinball} from './pub-arcade-v86.js';
 import {startBattleships,startWordSearch,startCrossword,startBlocks} from './arcade-games-v74.js?v=88';

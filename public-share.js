@@ -1,4 +1,4 @@
-import { shareLocal } from './share.js?v=172';
+import { shareLocal } from './share.js?v=277';
 
 document.querySelectorAll('[data-tl172-public-share]').forEach(button => {
   const status = document.createElement('span');

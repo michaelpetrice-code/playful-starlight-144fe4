@@ -1,5 +1,5 @@
 import { track } from './analytics-track.js?v=174';
-import { shareLocal } from './share.js?v=172';
+import { shareLocal } from './share.js?v=277';
 import { sharedPage, memberPageUrl, focusSharedItem } from './page-share.js?v=173';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, character =>
