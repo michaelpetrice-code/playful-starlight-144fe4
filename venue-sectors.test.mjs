@@ -33,7 +33,13 @@ for (const profile of venueSectors) {
   const app = { ...blankApp, type: profile.type, name: '<script>Example</script>', features: Object.fromEntries(profile.keys.map(k => [k, [{ title: 'Example', detail: 'Details', url: '' }]])) };
   const nodes = walk(renderVenue(app, { preview: true }));
   for (const key of profile.keys) assert(nodes.some(n => n.tag === 'h3' && n.children.includes(featureLabel(profile.type, key, features[key].label))));
-  assert(nodes.some(n => n.tag === 'img' && n.attrs.src === profile.image));
+  // The current renderer uses each feature's own artwork to avoid repeated sector icons.
+  for (const key of profile.keys) {
+    const label = featureLabel(profile.type, key, features[key].label);
+    const section = nodes.find(n => n.tag === 'section' && n.children.some(child => child instanceof Element && child.tag === 'h3' && child.children.includes(label)));
+    assert(section, profile.id + ': missing feature section ' + key);
+    assert(section.children.some(child => child instanceof Element && child.tag === 'img' && child.attrs.src === features[key].image), profile.id + ': incorrect feature artwork ' + key);
+  }
   assert(!nodes.some(n => n.tag === 'script'));
 }
 console.log(`PASS: ${venueSectors.length} venue profiles, existing schema compatibility, aliases, AI briefs and rendered headings/assets`);
