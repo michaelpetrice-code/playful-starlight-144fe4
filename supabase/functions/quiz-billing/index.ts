@@ -2,11 +2,15 @@ import Stripe from 'npm:stripe@22.3.0';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const env = (name: string) => Deno.env.get(name) ?? '';
-const origin = env('QUIZ_APP_ORIGIN');
+const origin = env('QUIZ_APP_ORIGIN') || 'https://thelocal.me.uk';
 const live = env('QUIZ_STRIPE_MODE') === 'live';
 const partyPrice = env('QUIZ_PARTY_PRICE');
 const prices = { standard: env('QUIZ_STANDARD_PRICE'), subscriber: env('QUIZ_SUBSCRIBER_PRICE') };
-const stripe = new Stripe(env('QUIZ_STRIPE_KEY'), { httpClient: Stripe.createFetchHttpClient() });
+const key = env('QUIZ_STRIPE_KEY');
+const webhookSecret = env('QUIZ_STRIPE_WEBHOOK_SECRET');
+const checkoutReady = env('QUIZ_CHECKOUT_ENABLED') === 'true' && live &&
+  Boolean(origin && key && webhookSecret && prices.standard && prices.subscriber && partyPrice);
+const stripe = key ? new Stripe(key, { httpClient: Stripe.createFetchHttpClient() }) : null;
 const cryptoProvider = Stripe.createSubtleCryptoProvider();
 const headers = { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS', Vary: 'Origin' };
 const json = (body: object, status = 200) => Response.json(body, { status, headers });
@@ -14,6 +18,9 @@ const id = (value: unknown) => typeof value === 'string' && /^[0-9a-f]{8}(-[0-9a
 
 async function checkout(request: Request) {
   if (request.headers.get('origin') !== origin) return json({ message: 'Unexpected origin.' }, 403);
+  const body = await request.json();
+  if (body?.status === true) return json({ checkoutReady });
+  if (!checkoutReady || !stripe) return json({ message: 'Paid quiz checkout is coming soon.' }, 503);
   const authorization = request.headers.get('authorization');
   if (!authorization?.startsWith('Bearer ')) return json({ message: 'Sign in to continue.' }, 401);
   const db = createClient(env('SUPABASE_URL'), env('SUPABASE_ANON_KEY'), {
@@ -21,7 +28,7 @@ async function checkout(request: Request) {
   });
   const { data: { user }, error } = await db.auth.getUser();
   if (error || !user?.email_confirmed_at) return json({ message: 'Sign in with a confirmed email.' }, 401);
-  const { venue, party, attempt } = await request.json();
+  const { venue, party, attempt } = body;
   if (party === true) {
     const { data: complimentary, error: accessError } = await db.rpc('local_quiz_party_complimentary');
     if (accessError) throw accessError;
@@ -76,9 +83,9 @@ async function checkout(request: Request) {
 }
 
 async function webhook(request: Request) {
-  const secret = env('QUIZ_STRIPE_WEBHOOK_SECRET');
+  const secret = webhookSecret;
   const signature = request.headers.get('stripe-signature');
-  if (!secret || !signature) return json({ message: 'Missing webhook signature.' }, 400);
+  if (!stripe || !secret || !signature) return json({ message: 'Missing webhook signature.' }, 400);
   let event: Stripe.Event;
   try {
     event = await stripe.webhooks.constructEventAsync(await request.text(), signature, secret, undefined, cryptoProvider);

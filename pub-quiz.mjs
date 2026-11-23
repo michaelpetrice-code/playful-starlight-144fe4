@@ -7,6 +7,7 @@ const setup = byId('setup-form');
 const room = byId('room');
 const draftKey = 'local-quiz-party-draft';
 let partyAttempt;
+let checkoutReady = false;
 const projector = new URLSearchParams(location.search).get('display') === 'projector';
 if (projector) document.body.classList.add('quiz-projector');
 const answerLetters = ['A', 'B', 'C', 'D'];
@@ -186,11 +187,11 @@ async function access() {
       if (request !== accessRequest) return;
       setMediaAccess(true);
       create.disabled = !complimentary && balance < 1;
-      byId('quiz-checkout').hidden = complimentary || balance > 0;
+      byId('quiz-checkout').hidden = !checkoutReady || complimentary || balance > 0;
       byId('quiz-checkout').textContent = 'Buy one Party Quiz Pass · £7.99';
       byId('access').textContent = complimentary ? 'Complimentary hosting for your account.' : balance > 0
         ? 'Opening a new party lobby uses one pass.'
-        : 'One pass unlocks a single party quiz, including pictures, video and projector view.';
+        : checkoutReady ? 'One pass unlocks a single party quiz, including pictures, video and projector view.' : 'Party Quiz Pass checkout is coming soon.';
       return;
     }
     const venues = await rpc('local_quiz_venues');
@@ -200,7 +201,7 @@ async function access() {
     if (request !== accessRequest) return;
     setMediaAccess(multimedia);
     const checkout = byId('quiz-checkout');
-    checkout.hidden = !selected?.can_buy;
+    checkout.hidden = !checkoutReady || !selected?.can_buy;
     checkout.textContent = selected?.tier === 'subscriber' ? 'Get Pub Quiz Pro · £9.99/month' : 'Get Pub Quiz Pro · £19.99/month';
     byId('media-access').textContent = multimedia
       ? 'Picture and video questions are enabled for this venue.'
@@ -209,7 +210,7 @@ async function access() {
     byId('access').textContent = ({
       paid: 'This venue can host quizzes.',
       complimentary: 'Complimentary hosting for Coombe Social Club.',
-      subscription_required: 'Ask your venue owner to subscribe to Pub Quiz Pro.',
+      subscription_required: checkoutReady ? 'Ask your venue owner to subscribe to Pub Quiz Pro.' : 'Paid quiz hosting is coming soon.',
       denied: 'Venue owner or administrator access is required.',
     })[result];
   } catch (error) {
@@ -517,7 +518,11 @@ async function init() {
     if (!params.has('code')) announce('Open the projector from an active quiz host screen.');
     return;
   }
-  const venues = await rpc('local_quiz_venues');
+  const [venues, billing] = await Promise.all([
+    rpc('local_quiz_venues'),
+    db.functions.invoke('quiz-billing', { body: { status: true } }).catch(() => null),
+  ]);
+  checkoutReady = billing?.data?.checkoutReady === true;
   for (const entry of venues || []) {
     setup.elements.venue.add(new Option(entry.name, entry.id));
   }

@@ -30,3 +30,7 @@ For one-time Party Quiz Passes, also set `QUIZ_PARTY_PRICE` to the matching
 `checkout.session.completed` and `checkout.session.async_payment_succeeded`.
 The Stripe test price is `price_1UewSbRlvtejByKswCtCnDuh`. A verified paid live
 checkout adds one pass. Opening a new private-party lobby consumes the pass.
+
+Set `QUIZ_CHECKOUT_ENABLED=true` only when the live price and webhook
+configuration has been verified. The public quiz asks this function whether
+checkout is enabled before offering payment.
