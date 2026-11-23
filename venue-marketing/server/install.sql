@@ -32,3 +32,19 @@ create function public.local_marketing_finish(p_id uuid,p_content jsonb,p_succes
 end$$;
 revoke all on function public.local_marketing_access(uuid),public.local_marketing_reserve(uuid,uuid,uuid,jsonb),public.local_marketing_finish(uuid,jsonb,boolean) from public,anon,authenticated;
 grant execute on function public.local_marketing_access(uuid),public.local_marketing_reserve(uuid,uuid,uuid,jsonb),public.local_marketing_finish(uuid,jsonb,boolean) to service_role;
+
+-- Checkout records migration (applied separately after the core schema).
+create table if not exists public.local_marketing_checkouts (
+ id text primary key,
+ user_id uuid not null references auth.users(id),
+ venue_id uuid not null references public.local_venue_directory(id),
+ status text not null default 'open',
+ access_until timestamptz,
+ checked_at timestamptz,
+ created_at timestamptz not null default now()
+);
+create index if not exists local_marketing_checkout_venue on public.local_marketing_checkouts(venue_id,created_at desc);
+alter table public.local_marketing_checkouts enable row level security;
+revoke all on public.local_marketing_checkouts from public,anon,authenticated;
+grant all on public.local_marketing_checkouts to service_role;
+create policy marketing_checkout_service on public.local_marketing_checkouts for all to service_role using(true) with check(true);
