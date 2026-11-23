@@ -39,47 +39,118 @@ insert into public.local_quiz_coombe_hosts(user_id)
 select id from auth.users
 where lower(email) = 'michaelpetrice@gmail.com' and email_confirmed_at is not null;
 
-create function public.local_quiz_venues()
-returns table(id uuid, name text, entitlement text)
-language sql stable security definer set search_path = '' as $$
-  select v.id, v.name,
-    case when v.id = '65da0d42-64b0-47a7-852c-997c1ea03b18' then 'complimentary'
-      when exists (
-        select 1 from public.local_billing_subscriptions b where b.user_id = a.owner_id
-          and b.live and b.status = 'active' and b.active_until > now()
-      ) then 'paid' else 'subscription_required' end
-  from public.local_venue_directory v
-  left join public.local_builder_apps a on a.slug = v.builder_app_slug
-  where v.status in ('approved','featured') and auth.uid() is not null
-    and case when v.id = '65da0d42-64b0-47a7-852c-997c1ea03b18'
-      then exists (select 1 from public.local_quiz_coombe_hosts h where h.user_id = auth.uid())
-      else a.owner_id = public.local_builder_effective_owner() end
-  order by v.name
+-- Operators may register a verified owner for an approved venue without an App Builder.
+create table public.local_quiz_venue_owners (
+  venue_id uuid primary key references public.local_venue_directory(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade
+);
+create table public.local_quiz_subscriptions (
+  id text primary key,
+  venue_id uuid not null references public.local_venue_directory(id) on delete cascade,
+  purchaser_id uuid not null references auth.users(id) on delete cascade,
+  tier text not null check (tier in ('standard','subscriber')),
+  status text not null,
+  active_until timestamptz,
+  live boolean not null,
+  observed_at timestamptz not null
+);
+create index local_quiz_subscriptions_venue on public.local_quiz_subscriptions(venue_id);
+alter table public.local_quiz_venue_owners enable row level security;
+alter table public.local_quiz_subscriptions enable row level security;
+revoke all on public.local_quiz_venue_owners, public.local_quiz_subscriptions from public, anon, authenticated;
+
+create function public.local_quiz_record_subscription(
+  p_id text, p_venue uuid, p_purchaser uuid, p_tier text, p_status text,
+  p_until timestamptz, p_live boolean, p_observed timestamptz
+) returns void language sql security definer set search_path = '' as $$
+  insert into public.local_quiz_subscriptions(id,venue_id,purchaser_id,tier,status,active_until,live,observed_at)
+  values(p_id,p_venue,p_purchaser,p_tier,p_status,p_until,p_live,p_observed)
+  on conflict(id) do update set status=excluded.status,active_until=excluded.active_until,
+    observed_at=excluded.observed_at
+  where local_quiz_subscriptions.observed_at <= excluded.observed_at
+    and local_quiz_subscriptions.venue_id = excluded.venue_id
+    and local_quiz_subscriptions.purchaser_id = excluded.purchaser_id
+    and local_quiz_subscriptions.live = excluded.live
 $$;
+revoke all on function public.local_quiz_record_subscription(text,uuid,uuid,text,text,timestamptz,boolean,timestamptz)
+from public, anon, authenticated;
+grant execute on function public.local_quiz_record_subscription(text,uuid,uuid,text,text,timestamptz,boolean,timestamptz)
+to service_role;
+
+create function public.local_quiz_venues()
+returns table(id uuid, name text, entitlement text, tier text, multimedia boolean, can_buy boolean)
+language sql stable security definer set search_path = '' as $$
+  with managed as (
+    select v.id, v.name, coalesce(a.owner_id, registered.user_id) as owner_id,
+      v.id = '65da0d42-64b0-47a7-852c-997c1ea03b18' as coombe
+    from public.local_venue_directory v
+    left join public.local_builder_apps a on a.slug = v.builder_app_slug
+    left join public.local_quiz_venue_owners registered on registered.venue_id = v.id
+    where v.status in ('approved','featured')
+  ), eligibility as (
+    select m.*, exists (
+      select 1 from public.local_billing_subscriptions b where b.user_id = m.owner_id
+        and b.live and b.status = 'active' and b.active_until > now()
+    ) as venue_paid
+    from managed m where auth.uid() is not null and case when coombe
+      then exists (select 1 from public.local_quiz_coombe_hosts h where h.user_id = auth.uid())
+      else m.owner_id = auth.uid() or m.owner_id = public.local_builder_effective_owner() end
+  ), access as (
+    select e.*, exists (
+      select 1 from public.local_quiz_subscriptions q where q.venue_id = e.id
+        and q.purchaser_id = e.owner_id and q.live and q.status = 'active'
+        and q.active_until > now() and (q.tier = 'standard' or e.venue_paid)
+    ) as quiz_paid
+    from eligibility e
+  )
+  select a.id,a.name,
+    case when coombe then 'complimentary' when venue_paid or quiz_paid then 'paid' else 'subscription_required' end,
+    case when venue_paid then 'subscriber' else 'standard' end,
+    coombe or quiz_paid,
+    not coombe and not quiz_paid and owner_id = auth.uid() and not exists (
+      select 1 from public.local_quiz_subscriptions q where q.venue_id = a.id
+        and q.purchaser_id = a.owner_id and q.live and q.status = 'active' and q.active_until > now()
+    )
+  from access a order by a.name
+$$;
+
+create table public.local_quiz_checkout_leases (
+  venue_id uuid primary key references public.local_venue_directory(id) on delete cascade,
+  purchaser_id uuid not null,
+  key uuid not null,
+  expires_at bigint not null
+);
+alter table public.local_quiz_checkout_leases enable row level security;
+revoke all on public.local_quiz_checkout_leases from public, anon, authenticated;
+
+create function public.local_quiz_checkout_lease(p_venue uuid)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare lease public.local_quiz_checkout_leases; expiry bigint;
+begin
+  if not exists(select 1 from public.local_quiz_venues() where id=p_venue and can_buy) then
+    raise exception 'Only the verified venue owner can purchase';
+  end if;
+  expiry := floor(extract(epoch from clock_timestamp())) + 3660;
+  insert into public.local_quiz_checkout_leases values(p_venue,auth.uid(),gen_random_uuid(),expiry)
+  on conflict(venue_id) do update set
+    key = excluded.key, expires_at = excluded.expires_at, purchaser_id = excluded.purchaser_id
+  where local_quiz_checkout_leases.expires_at <= expiry - 3660
+  returning * into lease;
+  if not found then select * into lease from public.local_quiz_checkout_leases where venue_id=p_venue; end if;
+  if lease.purchaser_id <> auth.uid() then raise exception 'A checkout is already open for this venue'; end if;
+  return jsonb_build_object('key',lease.key,'expires_at',lease.expires_at);
+end $$;
+revoke all on function public.local_quiz_checkout_lease(uuid) from public,anon,authenticated;
+grant execute on function public.local_quiz_checkout_lease(uuid) to authenticated;
 
 create function public.local_quiz_host_access(p_venue uuid)
 returns text language sql stable security definer set search_path = '' as $$
   select coalesce((select entitlement from public.local_quiz_venues() where id = p_venue), 'denied')
 $$;
 
--- Payment processing writes this table from the server after Stripe verifies payment.
-create table public.local_quiz_media_entitlements (
-  venue_id uuid primary key references public.local_venue_directory(id) on delete cascade,
-  active_until timestamptz not null
-);
-alter table public.local_quiz_media_entitlements enable row level security;
-revoke all on public.local_quiz_media_entitlements from public, anon, authenticated;
-grant select, insert, update, delete on public.local_quiz_media_entitlements to service_role;
-
 create function public.local_quiz_media_access(p_venue uuid)
 returns boolean language sql stable security definer set search_path = '' as $$
-  select case public.local_quiz_host_access(p_venue)
-    when 'complimentary' then true
-    when 'paid' then exists (
-      select 1 from public.local_quiz_media_entitlements
-      where venue_id = p_venue and active_until > now()
-    )
-    else false end
+  select coalesce((select multimedia from public.local_quiz_venues() where id = p_venue), false)
 $$;
 
 create function public.local_quiz_create(p_venue uuid, p_title text, p_questions jsonb)

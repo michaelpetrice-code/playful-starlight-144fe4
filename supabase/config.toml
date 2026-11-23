@@ -1,0 +1,2 @@
+[functions.quiz-billing]
+verify_jwt = false

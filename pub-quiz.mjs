@@ -172,25 +172,27 @@ async function access() {
   const request = ++accessRequest;
   const create = byId('create');
   create.disabled = true;
-  byId('subscribe').hidden = true;
   byId('media-access').textContent = '';
+  byId('quiz-checkout').hidden = true;
   byId('access').textContent = 'Checking hosting access…';
   try {
-    const args = { p_venue: setup.elements.venue.value };
-    const [result, multimedia] = await Promise.all([
-      rpc('local_quiz_host_access', args), rpc('local_quiz_media_access', args),
-    ]);
+    const venues = await rpc('local_quiz_venues');
+    const selected = venues.find(venue => venue.id === setup.elements.venue.value);
+    const result = selected?.entitlement ?? 'denied';
+    const multimedia = selected?.multimedia === true;
     if (request !== accessRequest) return;
     setMediaAccess(multimedia);
+    const checkout = byId('quiz-checkout');
+    checkout.hidden = !selected?.can_buy;
+    checkout.textContent = selected?.tier === 'subscriber' ? 'Get Pub Quiz Pro · £9.99/month' : 'Get Pub Quiz Pro · £19.99/month';
     byId('media-access').textContent = multimedia
       ? 'Picture and video questions are enabled for this venue.'
       : 'Picture and video questions require the multimedia add-on.';
     create.disabled = !['paid', 'complimentary'].includes(result);
-    byId('subscribe').hidden = result !== 'subscription_required';
     byId('access').textContent = ({
-      paid: 'Hosting included with your active venue subscription.',
+      paid: 'This venue can host quizzes.',
       complimentary: 'Complimentary hosting for Coombe Social Club.',
-      subscription_required: 'A paid venue subscription is required to host.',
+      subscription_required: 'Ask your venue owner to subscribe to Pub Quiz Pro.',
       denied: 'Venue owner or administrator access is required.',
     })[result];
   } catch (error) {
@@ -205,6 +207,23 @@ function questionMedia(group) {
   const alt = group.querySelector('[name=media-alt]').value.trim();
   return { media: { kind, url: url.href, alt: kind === 'image' ? alt : '' } };
 }
+
+byId('quiz-checkout').onclick = () => action(async () => {
+  const checkout = byId('quiz-checkout');
+  checkout.disabled = true;
+  try {
+    const { data, error } = await db.functions.invoke('quiz-billing', { body: { venue: setup.elements.venue.value } });
+    if (error) {
+      const detail = await error.context?.json?.().catch(() => null);
+      throw Error(detail?.message || 'Quiz checkout is unavailable.');
+    }
+    const url = new URL(data.url);
+    if (url.origin !== 'https://checkout.stripe.com') throw Error('Unexpected checkout address.');
+    location.assign(url.href);
+  } finally {
+    checkout.disabled = false;
+  }
+});
 
 setup.elements.venue.onchange = access;
 setup.onsubmit = event => {
@@ -447,5 +466,8 @@ async function init() {
   if ([...setup.elements.venue.options].some(item => item.value === params.get('venue'))) setup.elements.venue.value = params.get('venue');
   byId('setup').hidden = false;
   await access();
+  if (params.get('checkout') === 'success' && !mediaAllowed) {
+    announce('Stripe has returned you to The Local. Payment verification can take a moment. Refresh this page to check access.');
+  }
 }
 init().catch(error => announce(error.message));
