@@ -13,6 +13,8 @@ export function createSocialExperience({win=window,doc=document,openPage,openTab
   ['Virtual Pub Tables','♧','Virtual Tables'],
   ['Football','⚽','Football'],
   ['Pub Quiz Pro','★','Pub Quiz Pro'],
+  ['The Local DJ','♫','The Local DJ'],
+  ['Race Night','♞','Horse & dog racing'],
   ['Buy, Sell or Give Away','▱','Buy, Sell or Give Away'],
   ['Trades & Services','⚒','Local Tradesman'],
   ['Who’s Up for It?','▦','What’s on'],
@@ -49,7 +51,7 @@ export function createSocialExperience({win=window,doc=document,openPage,openTab
  function update({user,groupId,profileName='Your profile',profileImage='',tab,admin=false,records=[],sb}){
   if(!user){clear();return;}
   const key=user.id+':'+(groupId||'');if(scope!==key){clear();scope=key;}
-  doc.documentElement.classList.add('social-member');layout.classList.toggle('social-wide',['Administration','Venue App Builder','Arcade','Games','Football','Virtual Pub Tables'].includes(tab));
+  doc.documentElement.classList.add('social-member');layout.classList.toggle('social-wide',['Administration','Venue App Builder','Arcade','Games','Football','Virtual Pub Tables','The Local DJ','Race Night'].includes(tab));
   if(tab==='Virtual Pub Tables')closeDock();
   left.innerHTML=`<button class="social-profile-link" data-social-page="Account">${profileImage?`<img src="${esc(profileImage)}" alt="" width="40" height="40">`:'<span class="social-table-avatar" aria-hidden="true">'+esc(profileName.slice(0,1))+'</span>'}<strong>${esc(profileName)}</strong></button><div class="social-desktop-menu" role="navigation" aria-label="Desktop navigation">${common.map(([page,icon,label])=>`<button data-social-page="${page}" ${page===tab?'aria-current="page"':''}><span aria-hidden="true">${icon}</span>${label}</button>`).join('')}<button data-social-more>••• More features</button>${admin?'<button data-social-page="Administration">Administration</button>':''}</div><div class="social-left-footer"><button data-social-page="Venue App Builder">Build your own app →</button><small>For your venue or community</small></div>`;
   bind(left);left.querySelector('[data-social-more]').onclick=()=>{doc.getElementById('moreNav')?.click();doc.getElementById('moreSearch')?.focus()};drawRight(records);

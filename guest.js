@@ -1,7 +1,8 @@
-import {featureGallery,visitorIntroduction} from './social-features.js?v=278';
+import {entertainmentPages} from './entertainment.js?v=280';
+import {featureGallery,visitorIntroduction} from './social-features.js?v=280';
 import { renderVenuePageFeed } from './venue-page-feed.js?v=232';
 import { trackPage } from './analytics-track.js?v=174';
-import { memberPageUrl, sharedPage } from './page-share.js?v=173';
+import { memberPageUrl, sharedPage } from './page-share.js?v=280';
 import { venueDirectoryView, bindVenueDirectory } from './venue-directory.js?v=213';
 import { renderClubContent } from './simple-admin-v82.js?v=175';
 import { marketTeaserHTML } from './marketplace.js?v=175';
@@ -26,6 +27,8 @@ const guestPages = {
   events: ['Find something to do', 'Explore upcoming events from local venue pages.'],
   marketplace: ['Buy, Sell or Give Away', 'Log in to browse live listings, contact sellers or post an item.'],
   tables: ['Virtual Pub Tables', 'See how members meet and chat around virtual tables.'],
+  dj: ['The Local DJ', 'Join the venue music room or open Staff controls to host. Guest song requests are free.'],
+  'race-night': ['Horse & dog race nights', 'Host with your authorised race recordings, printable cards and a TV or projector.'],
   games: ['Games Room', 'Play 14 browser games, including pool, darts and solitaire.'],
   trades: ['Local Tradesmen', 'Discover local trades and services.'],
   challenges: ['Challenges & Competitions', 'See the activities members can take part in.'],
@@ -160,3 +163,5 @@ if (isPublicPage && guestPreview[page]) {
 }
 
 if(isPublicPage && page==='home'){document.documentElement.classList.add('social-guest-home');content.innerHTML=visitorIntroduction()+featureGallery()+'<section class="social-owner-offer"><span class="social-eyebrow">FOR VENUES & COMMUNITIES</span><h2>Your venue deserves its own Local.</h2><p>Bring your news, events and members together in a branded app. Explore what is included before choosing a venue subscription.</p><a href="for-venues.html">Explore venue apps →</a></section>';document.getElementById('guest-title').textContent='Welcome to your Local';}
+
+if(isPublicPage && ['dj','race-night'].includes(page)){const item=Object.values(entertainmentPages).find(item=>item.key===page);const frame=document.createElement('iframe');frame.title=item.title;frame.src=item.href+'?embedded=1';frame.className='guest-entertainment-frame';frame.allow="autoplay 'self'; fullscreen 'self'";frame.setAttribute('allowfullscreen','');const link=document.createElement('a');link.href=item.href;link.target='_blank';link.rel='noopener';link.textContent='Open in a separate tab ↗';content.replaceChildren(link,frame);}

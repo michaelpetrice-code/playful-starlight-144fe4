@@ -1,5 +1,5 @@
 import { readTableChatLink, tableChatLink } from './table-chat-link.js?v=169';
-import { sharedPage, memberPageUrl } from './page-share.js?v=173';
+import { sharedPage, memberPageUrl } from './page-share.js?v=280';
 import {bindVenueSignIn} from './venue-member-sign-in.js?v=170';
 import { selectedVenuePlan, venuePlans, venueSignupReturn } from './venue-plans.js?v=154';
 
