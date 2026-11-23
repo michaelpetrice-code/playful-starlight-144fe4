@@ -19,3 +19,8 @@ html:has(#tl122-secure-tables.tl-conversation-frame){overflow:hidden}
 
 html.table-keyboard-open #bottomNav{display:none!important}
 html:has(#tl122-secure-tables.tl-conversation-frame) .tl122-table-heading{visibility:hidden}
+
+/* A full conversation owns the viewport. Preferences remain on other pages. */
+html:has(#tl122-secure-tables:is(.tl-conversation-frame,.tl-chat-frame-expanded)) body > .tl-an-preferences {
+  display: none !important;
+}

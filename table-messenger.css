@@ -82,3 +82,20 @@ html.table-conversation-open,html.table-conversation-open body{height:var(--conv
 .table-compact-chat.table-conversation-open #tableDetail>#back{padding:3px 10px!important;min-height:30px;font-size:.9rem!important}
 .table-compact-chat.table-conversation-open #feed>#postForm{padding-top:5px!important;padding-bottom:4px!important}
 .table-compact-chat.table-conversation-open #feed.panel{padding:6px!important}
+
+/* Keep the message list and composer in the same, centred conversation column. */
+html.messenger-tables.table-conversation-open body > main {
+  width: min(100%, 1100px) !important;
+  max-width: none !important;
+  min-width: 0;
+  margin-inline: auto !important;
+}
+html.messenger-tables.table-conversation-open :is(#tableDetail,#memberArea) {
+  width: 100%;
+  min-width: 0;
+}
+html.messenger-tables.table-conversation-open #feed:not([hidden]) {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
