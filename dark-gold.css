@@ -59,3 +59,15 @@ html.local-dark-gold body .local-feed-intro p{color:#c8cec4!important}
 html.local-dark-gold body .local-compose-launch span:last-child{background:linear-gradient(180deg,#132219,#0b160f)!important;color:#d8dfd2!important;border:1px solid #a98a4c88!important;box-shadow:inset 0 2px 5px #0005!important}
 html.local-dark-gold body .local-composer-tools label{background:#17291e!important;color:#edcf8b!important;border:1px solid #a98a4c88!important}
 html.local-dark-gold body :is(.local-compose-actions,.local-compose-heading,.local-post-buttons){border-color:#a98a4c66!important}
+
+/* Keep the mobile alerts sheet inside the phone, independent of the bell position. */
+@media(max-width:600px){html.local-dark-gold body>header #member-notifications section{position:fixed!important;top:min(150px,20dvh)!important;left:12px!important;right:12px!important;width:auto!important;max-width:420px!important;margin:0 auto!important;max-height:min(60dvh,calc(100dvh - 240px))!important;box-sizing:border-box!important;z-index:10010!important;overflow:auto!important;overscroll-behavior:contain}html.local-dark-gold body>header #member-notifications :is(h2,p,button){white-space:normal!important;overflow-wrap:anywhere;max-width:100%;box-sizing:border-box}}
+/* The parent page already introduces Tables; avoid a second promotional banner. */
+html.tl122-embedded body>.tl135-section-art{display:none!important}
+html.local-dark-gold body .tl122-table-heading{min-height:0!important;padding:16px 18px!important;margin-bottom:8px!important}
+html.local-dark-gold body .tl122-table-heading h2{font-size:1.5rem!important;margin:0 0 6px!important}
+html.local-dark-gold body .tl122-table-heading p{font-size:.95rem!important;line-height:1.45!important;margin:0!important}
+html.tl122-embedded body main #tables.panel{padding:16px!important}
+html.tl122-embedded body #tables>h2{font-size:1.35rem!important;margin:0 0 12px!important}
+html.tl122-embedded body .table-quick-actions{margin:12px 0!important}
+html.tl122-embedded body .table-quick-actions>span{display:none}
