@@ -6,7 +6,7 @@ const db = createClient(supabaseUrl, supabaseAnonKey);
 const setup = byId('setup-form');
 const room = byId('room');
 const answerLetters = ['A', 'B', 'C', 'D'];
-let code, state, busy = false, refreshTimer, accessRequest = 0;
+let code, state, busy = false, refreshTimer, accessRequest = 0, mediaAllowed = false;
 
 function node(tag, text) {
   const item = document.createElement(tag);
@@ -81,6 +81,29 @@ function addQuestion(list, data = { prompt: '', options: ['', '', '', ''], corre
   group.append(field('Correct answer', correct), button('Remove question', () => {
     if (list.children.length > 1) group.remove();
   }));
+  const media = node('div');
+  media.className = 'quiz-media-fields';
+  media.hidden = !mediaAllowed;
+  const kind = node('select');
+  kind.name = 'media-kind';
+  kind.append(new Option('Text question', ''), new Option('Picture', 'image'), new Option('Video clip', 'video'));
+  const url = input(2048);
+  url.name = 'media-url';
+  url.type = 'url';
+  url.placeholder = 'https://';
+  const alt = input(200);
+  alt.name = 'media-alt';
+  const urlField = field('Direct HTTPS media URL', url);
+  const altField = field('Picture description', alt);
+  kind.onchange = () => {
+    urlField.hidden = !kind.value;
+    url.disabled = !kind.value;
+    altField.hidden = kind.value !== 'image';
+    alt.disabled = kind.value !== 'image';
+  };
+  kind.onchange();
+  media.append(field('Question media', kind), urlField, altField);
+  group.append(media);
   list.append(group);
 }
 const sample = [
@@ -132,15 +155,34 @@ byId('sample').onclick = () => {
 };
 addRound('General Knowledge', [undefined]);
 
+function setMediaAccess(enabled) {
+  mediaAllowed = enabled;
+  rounds.querySelectorAll('.quiz-media-fields').forEach(item => {
+    item.hidden = !enabled;
+    const kind = item.querySelector('select');
+    kind.disabled = !enabled;
+    if (!enabled) kind.value = '';
+    kind.onchange();
+  });
+}
+
 async function access() {
   const request = ++accessRequest;
   const create = byId('create');
   create.disabled = true;
   byId('subscribe').hidden = true;
+  byId('media-access').textContent = '';
   byId('access').textContent = 'Checking hosting access…';
   try {
-    const result = await rpc('local_quiz_host_access', { p_venue: setup.elements.venue.value });
+    const args = { p_venue: setup.elements.venue.value };
+    const [result, multimedia] = await Promise.all([
+      rpc('local_quiz_host_access', args), rpc('local_quiz_media_access', args),
+    ]);
     if (request !== accessRequest) return;
+    setMediaAccess(multimedia);
+    byId('media-access').textContent = multimedia
+      ? 'Picture and video questions are enabled for this venue.'
+      : 'Picture and video questions require the multimedia add-on.';
     create.disabled = !['paid', 'complimentary'].includes(result);
     byId('subscribe').hidden = result !== 'subscription_required';
     byId('access').textContent = ({
@@ -153,6 +195,15 @@ async function access() {
     if (request === accessRequest) byId('access').textContent = error.message;
   }
 }
+function questionMedia(group) {
+  const kind = group.querySelector('[name=media-kind]').value;
+  if (!mediaAllowed || !kind) return {};
+  const url = new URL(group.querySelector('[name=media-url]').value.trim());
+  if (url.protocol !== 'https:' || url.username || url.password) throw Error('Use a direct HTTPS link for each picture or clip.');
+  const alt = group.querySelector('[name=media-alt]').value.trim();
+  return { media: { kind, url: url.href, alt: kind === 'image' ? alt : '' } };
+}
+
 setup.elements.venue.onchange = access;
 setup.onsubmit = event => {
   event.preventDefault();
@@ -161,6 +212,7 @@ setup.onsubmit = event => {
       const topic = round.querySelector('[name=round-topic]').value.trim();
       if (!topic) throw Error('Give each round a topic.');
       return [...round.querySelectorAll('.quiz-question')].map(group => ({
+        ...questionMedia(group),
         round: index + 1,
         topic,
         prompt: group.querySelector('[name=prompt]').value.trim(),
@@ -211,10 +263,38 @@ async function refresh() {
 function actOnRoom(p_action, params = {}) {
   return action(async () => show(await rpc('local_quiz_room', { p_code: code, p_action, ...params })));
 }
+function mediaView(data) {
+  let url;
+  try { url = new URL(data.url); } catch { return null; }
+  if (url.protocol !== 'https:' || url.username || url.password) return null;
+  const image = data.kind === 'image';
+  const element = node(image ? 'img' : 'video');
+  element.className = 'quiz-question-media';
+  element.src = url.href;
+  if (image) {
+    element.alt = data.alt;
+    element.referrerPolicy = 'no-referrer';
+  } else {
+    element.controls = true;
+    element.playsInline = true;
+    element.preload = 'metadata';
+    element.setAttribute('aria-label', 'Question video clip');
+  }
+  const fallback = node('p', 'This media could not load. Ask the host to check the link or play the clip aloud.');
+  fallback.hidden = true;
+  element.addEventListener('error', () => { fallback.hidden = false; });
+  const wrap = node('div');
+  wrap.dataset.questionMedia = '';
+  wrap.append(element, fallback);
+  return wrap;
+}
+
 function show(next) {
   if (JSON.stringify(state) === JSON.stringify(next)) return;
   const previousName = room.querySelector('input')?.value;
   const editing = room.contains(document.activeElement) && document.activeElement.tagName === 'INPUT';
+  const currentMedia = state?.position === next.position && next.prompt
+    ? room.querySelector('[data-question-media]') : null;
   state = next;
   room.replaceChildren(node('h2', next.title));
   if (next.phase === 'lobby' && next.host) {
@@ -241,6 +321,10 @@ function show(next) {
   if (next.prompt) {
     if (next.topic) room.append(node('p', 'Round ' + next.round + ' · ' + next.topic));
     room.append(node('h3', 'Question ' + (next.position + 1) + ' of ' + next.total), node('p', next.prompt));
+    if (next.media) {
+      const media = currentMedia || mediaView(next.media);
+      if (media) room.append(media);
+    }
     const choices = node('div');
     choices.className = 'choices';
     next.options.forEach((choice, index) => {

@@ -62,6 +62,26 @@ returns text language sql stable security definer set search_path = '' as $$
   select coalesce((select entitlement from public.local_quiz_venues() where id = p_venue), 'denied')
 $$;
 
+-- Payment processing writes this table from the server after Stripe verifies payment.
+create table public.local_quiz_media_entitlements (
+  venue_id uuid primary key references public.local_venue_directory(id) on delete cascade,
+  active_until timestamptz not null
+);
+alter table public.local_quiz_media_entitlements enable row level security;
+revoke all on public.local_quiz_media_entitlements from public, anon, authenticated;
+grant select, insert, update, delete on public.local_quiz_media_entitlements to service_role;
+
+create function public.local_quiz_media_access(p_venue uuid)
+returns boolean language sql stable security definer set search_path = '' as $$
+  select case public.local_quiz_host_access(p_venue)
+    when 'complimentary' then true
+    when 'paid' then exists (
+      select 1 from public.local_quiz_media_entitlements
+      where venue_id = p_venue and active_until > now()
+    )
+    else false end
+$$;
+
 create function public.local_quiz_create(p_venue uuid, p_title text, p_questions jsonb)
 returns text language plpgsql security definer set search_path = '' as $$
 declare question jsonb; join_code text;
@@ -73,6 +93,17 @@ begin
     or jsonb_typeof(p_questions) is distinct from 'array' then raise exception 'Invalid quiz'; end if;
   if jsonb_array_length(p_questions) not between 1 and 60 then raise exception 'Add 1 to 60 questions'; end if;
   for question in select value from jsonb_array_elements(p_questions) loop
+    if question ? 'media' then
+      if not public.local_quiz_media_access(p_venue) then
+        raise exception 'This venue needs the quiz multimedia add-on';
+      end if;
+      if jsonb_typeof(question->'media') is distinct from 'object'
+        or coalesce(question->'media'->>'kind','') not in ('image','video')
+        or coalesce(question->'media'->>'url','') !~ '^https://[^[:space:]]+$'
+        or length(question->'media'->>'url') > 2048
+        or (question->'media'->>'kind' = 'image' and coalesce(length(trim(question->'media'->>'alt')),0) not between 1 and 200)
+      then raise exception 'Use an HTTPS media link and describe any image'; end if;
+    end if;
     if coalesce(length(trim(question->>'prompt')),0) not between 1 and 240
       or jsonb_typeof(question->'options') is distinct from 'array'
       or coalesce(question->>'correct','') !~ '^[0-3]$' then raise exception 'Invalid question'; end if;
@@ -168,14 +199,14 @@ begin
     'host', mine, 'team', team.name, 'position', room.current_question,
     'total', jsonb_array_length(room.questions), 'selected', selected,
     'prompt', prompt->>'prompt', 'options', prompt->'options',
-    'round', prompt->'round', 'topic', prompt->>'topic',
+    'round', prompt->'round', 'topic', prompt->>'topic', 'media', prompt->'media',
     'correct', case when room.phase='reveal' then prompt->'correct' end, 'scores', scores);
 end $$;
 
-revoke all on function public.local_quiz_venues(), public.local_quiz_host_access(uuid),
+revoke all on function public.local_quiz_venues(), public.local_quiz_host_access(uuid), public.local_quiz_media_access(uuid),
   public.local_quiz_create(uuid,text,jsonb), public.local_quiz_room(text,text,text,integer,integer)
 from public, anon, authenticated;
-grant execute on function public.local_quiz_venues(), public.local_quiz_host_access(uuid),
+grant execute on function public.local_quiz_venues(), public.local_quiz_host_access(uuid), public.local_quiz_media_access(uuid),
   public.local_quiz_create(uuid,text,jsonb), public.local_quiz_room(text,text,text,integer,integer)
 to authenticated;
 commit;

@@ -33,3 +33,6 @@ fieldset{display:grid;gap:.7rem;margin:0 0 1rem;min-width:0;border:1px solid var
 .quiz-benefits article{padding:1rem;border:1px solid var(--rim);border-radius:.7rem;background:#171b16}
 .quiz-benefits h3{margin-top:0;color:var(--gold)}
 .quiz-benefits p{margin-bottom:0}
+
+.quiz-media-fields{display:grid;gap:.6rem}
+.quiz-question-media{display:block;width:100%;max-height:65vh;object-fit:contain;background:#101310;border-radius:.6rem;margin-block:1rem}
