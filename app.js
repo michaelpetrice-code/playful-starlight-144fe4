@@ -1,3 +1,4 @@
+import {createAppNavigation,readPageRoute,tableFrameMatches,createDraftStore} from './app-navigation.js?v=242';
 import {createPushClient} from './push-notifications.js?v=241';
 import {watchMessageAlerts} from './message-alerts.js?v=240';
 import { renderVenuePageFeed } from './venue-page-feed.js?v=232';
@@ -23,8 +24,8 @@ import {initLounge,decorateLounge,uploadTablePhoto,uploadProfilePhoto,loadProfil
 import {virtualTablesView,meetupsView,venueView,bindCommunityHub,hubEntries} from './community-hub.js?v=173';
 import {shareLocal} from './share.js?v=172';
 import { memberPages, sharedPage, shareButton, shareMemberPage, pageLabel, shareItem, focusSharedItem } from './page-share.js?v=173';
-import {privateChatView,bindPrivateChat} from './private-chat.js?v=227';
-import {appearancePanel,bindAppearance} from './theme-settings.js';
+import {privateChatView,bindPrivateChat,disposePrivateChat} from './private-chat.js?v=242';
+import {appearancePanel,bindAppearance} from './theme-settings.js?v=242';
 import {tradesView,bindTrades} from './trades.js?v=202';
 import {marketplaceView,bindMarketplace} from './marketplace.js?v=202';
 // Optional games module: a broken game must never prevent the entire app loading.
@@ -48,7 +49,7 @@ if(cloud){
   }
 }
 
-const names=['Home','Local Updates','Virtual Pub Tables','Who’s Up for It?','Venue Hub','Venue Applications','Venue App Builder','Events','Community','Buy, Sell or Give Away','Trades & Services','Rounds','Photos','Football','Kitty','Quiz','Games','Arcade','More Games','Tournaments','Leaderboard','Alerts','Install','Account','Report Behaviour' ];let ownerAccess=false;let memberStatus='active';let tab=location.hash==='#tables'?'Virtual Pub Tables':location.hash.startsWith('#venue=')?'Venue Hub':(['Buy, Sell or Give Away','Trades & Services'].includes(new URLSearchParams(location.search).get('section'))?new URLSearchParams(location.search).get('section'):'Home'),user=null,group=null,groupId=null,records=[],activeChatRoom='general',local=(()=>{try{return JSON.parse(localStorage.getItem('lads-local-v1')||'null')}catch{return null}})()||{name:'You',items:[],group:'The Local'};
+const names=['Home','Local Updates','Virtual Pub Tables','Private Chats','Who’s Up for It?','Venue Hub','Venue Applications','Venue App Builder','Events','Community','Buy, Sell or Give Away','Trades & Services','Rounds','Photos','Football','Kitty','Quiz','Games','Arcade','More Games','Tournaments','Leaderboard','Alerts','Install','Account','Report Behaviour' ];let ownerAccess=false;let memberStatus='active';let tab=location.hash==='#tables'?'Virtual Pub Tables':location.hash.startsWith('#venue=')?'Venue Hub':(['Buy, Sell or Give Away','Trades & Services'].includes(new URLSearchParams(location.search).get('section'))?new URLSearchParams(location.search).get('section'):'Home'),user=null,group=null,groupId=null,records=[],activeChatRoom='general',local=(()=>{try{return JSON.parse(localStorage.getItem('lads-local-v1')||'null')}catch{return null}})()||{name:'You',items:[],group:'The Local'};
 const builderLink = new URLSearchParams(location.search);
 const incomingShare = sharedPage();
 if(incomingShare && builderLink.has('section'))incomingShare.item=null;
@@ -65,7 +66,7 @@ let sharedHighlight = false;
 const groupItemPages = new Set(['updates', 'plans', 'events', 'photos']);
 const tableDestination = builderLink.get('section') === 'tables' ? readTableChatLink(builderLink) : null;
 if (builderLink.get('section') === 'tables') tab = 'Virtual Pub Tables';
-const tableFrameUrl = tableDestination
+let tableFrameUrl = tableDestination
   ? tableChatLink('secure-tables.html', location.href, tableDestination, {embedded:'1', v:'170', ...(builderLink.get('invite') ? {invite:builderLink.get('invite')} : {})}).href
   : 'secure-tables.html?embedded=1&v=170';
 if (builderLink.get('section') === 'venue-app-builder') tab = 'Venue App Builder';
@@ -96,6 +97,7 @@ let builderUser;
 const invitationHash=(()=>{const raw=location.hash.slice(1);const i=raw.indexOf('=');if(i<0)return null;const kind=raw.slice(0,i);if(!['join-private','join-community'].includes(kind))return null;try{return {kind,code:decodeURIComponent(raw.slice(i+1))}}catch{return null}})();
 if(invitationHash){tab=invitationHash.kind==='join-private'?'Private Chats':'Account';sessionStorage.setItem('local-pending-'+invitationHash.kind,invitationHash.code);history.replaceState(null,'',location.pathname+location.search)}
 const pendingInvite=kind=>sessionStorage.getItem('local-pending-'+kind)||'';
+if(!invitationHash){const route=readPageRoute(location);if(route)tab=route.page;}
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function notice(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',3200)}
 function activeSharedItem() {
@@ -181,7 +183,7 @@ function bindLocalFeed(){void renderVenuePageFeed(sb,$('venue-page-feed'));const
    finally { if(submit.isConnected)submit.disabled=false; }
   };
  });loadFeedPhotos()}
-function bindComposer(){document.getElementById('closeLocalComposer')?.addEventListener('click',()=>{tab='Local Updates';render()});const text=document.getElementById('localPostText'),file=document.getElementById('localPostFile'),post=document.getElementById('publishLocalPost'),preview=document.getElementById('localPostPreview');let previewUrl='';const update=()=>post.disabled=!text.value.trim()&&!file.files.length;text.addEventListener('input',update);file.addEventListener('change',()=>{if(previewUrl)URL.revokeObjectURL(previewUrl);preview.replaceChildren();if(file.files[0]){previewUrl=URL.createObjectURL(file.files[0]);const img=document.createElement('img');img.src=previewUrl;img.className='local-upload-preview';img.alt='Selected photo';preview.append(img)}update()});document.getElementById('localClearPost')?.addEventListener('click',()=>{text.value='';file.value='';preview.replaceChildren();update()});document.getElementById('localAddFeeling')?.addEventListener('click',()=>{text.value+=(text.value?' ':'')+'🙂 Feeling good';update();text.focus()});document.getElementById('localAddEvent')?.addEventListener('click',()=>{text.value+=(text.value?' ':'')+'📅 Upcoming event: ';update();text.focus()});post.addEventListener('click',async()=>{if(post.disabled)return;if(cloud&&(!user||!groupId))return notice('Sign in and join a community in Account before posting');post.disabled=true;try{const photo=file.files[0]?await uploadImage(file.files[0]):{};await add('chat',{roomId:'local-feed',text:text.value.trim(),...photo,by:profileName(),avatar:profileAvatar(),audience:'Community'});tab='Local Updates';render();notice('Your local update has been posted')}catch(e){notice(e.message);update()}})}
+function bindComposer(){document.getElementById('closeLocalComposer')?.addEventListener('click',()=>{tab='Local Updates';render()});const text=document.getElementById('localPostText'),file=document.getElementById('localPostFile'),post=document.getElementById('publishLocalPost'),preview=document.getElementById('localPostPreview');let previewUrl='';const update=()=>post.disabled=!text.value.trim()&&!file.files.length;text.addEventListener('input',update);file.addEventListener('change',()=>{if(previewUrl)URL.revokeObjectURL(previewUrl);preview.replaceChildren();if(file.files[0]){previewUrl=URL.createObjectURL(file.files[0]);const img=document.createElement('img');img.src=previewUrl;img.className='local-upload-preview';img.alt='Selected photo';preview.append(img)}update()});document.getElementById('localClearPost')?.addEventListener('click',()=>{text.value='';file.value='';preview.replaceChildren();update()});document.getElementById('localAddFeeling')?.addEventListener('click',()=>{text.value+=(text.value?' ':'')+'🙂 Feeling good';update();text.focus()});document.getElementById('localAddEvent')?.addEventListener('click',()=>{text.value+=(text.value?' ':'')+'📅 Upcoming event: ';update();text.focus()});post.addEventListener('click',async()=>{if(post.disabled)return;if(cloud&&(!user||!groupId))return notice('Sign in and join a community in Account before posting');post.disabled=true;try{const photo=file.files[0]?await uploadImage(file.files[0]):{};await add('chat',{roomId:'local-feed',text:text.value.trim(),...photo,by:profileName(),avatar:profileAvatar(),audience:'Community'});const sentDraft=document.getElementById('localPostText');if(sentDraft)sentDraft.value='';tab='Local Updates';render();notice('Your local update has been posted')}catch(e){notice(e.message);update()}})}
 function bindProfile() {
  const form = $('profileForm');
  if (!form || form.dataset.bound) return;
@@ -358,7 +360,17 @@ function updateNotificationBell() {
  });
 }
 
+const tableDrafts=createDraftStore();
+const navigation=createAppNavigation({win:window,doc:document,getScope:()=>`${user?.id||'guest'}:${groupId||''}`,getPage:()=>tab,setPage:page=>{tab=page},render:()=>render(),label:page=>pageLabel(page),setDetail:detail=>{
+ notificationRoom=detail.room||null;
+ if(detail.table&&detail.venue)tableFrameUrl=tableChatLink('secure-tables.html',location.href,{venue:detail.venue,table:detail.table},{embedded:'1',v:'242',...(new URLSearchParams(location.search).get('invite')?{invite:new URLSearchParams(location.search).get('invite')}:{})}).href;
+ else tableFrameUrl='secure-tables.html?embedded=1&v=242';
+}});
 function render(){
+ if (Object.hasOwn(legacyAdmin,tab)) { adminPane=legacyAdmin[tab];tab='Administration'; }
+ if(['Chat','Chat & Media Settings'].includes(tab))tab='Virtual Pub Tables';
+ navigation.beforeRender(tab);
+ if(tab!=='Private Chats')disposePrivateChat();
  updateNotificationBell();
  if (Object.hasOwn(legacyAdmin,tab)) { adminPane=legacyAdmin[tab]; tab='Administration'; }
  const analyticsPage = Object.keys(memberPages).find(key => memberPages[key]===tab)
@@ -372,16 +384,21 @@ function render(){
   cog.onclick=event=>{event.preventDefault();tab='Administration';render();$('administration')?.querySelector('h1')?.focus();window.scrollTo(0,0)};
  }
  if(['Chat','Chat & Media Settings'].includes(tab))tab='Virtual Pub Tables'; if(memberStatus!=='active'&&!ownerAccess){$('tabs').innerHTML='';$('view').innerHTML=`<section class="panel" style="margin:40px auto;max-width:600px"><h2>Account ${memberStatus==='banned'?'banned':'suspended'}</h2><p>Your account is currently restricted. Contact the platform owner if you believe this is an error.</p><button id="restrictedSignOut">Sign out</button></section>`;document.getElementById('restrictedSignOut').onclick=()=>sb?.auth.signOut();return} const visibleNames=names;$('tabs').innerHTML=visibleNames.map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}">${esc(pageLabel(n))}</button>`).join('');
-const quick=['Home','Virtual Pub Tables','Who’s Up for It?','Arcade'];
+const quick=['Home','Virtual Pub Tables','Who’s Up for It?','Private Chats'];
 const labels={Home:`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8 M5 10v11h14V10 M9 21v-7h6v7"/></svg>`,'Virtual Pub Tables':`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h11v13H5z M16 9h3a3 3 0 0 1 0 6h-3 M7 4h7 M8 2v2 M12 2v2 M8 11v5 M12 11v5"/></svg>`,'Who’s Up for It?':`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2 M17 5a3 3 0 0 1 0 6 M18 14a5 5 0 0 1 3 5v1"/></svg>`,'Venue Hub':`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8 M5 10v11h14V10 M9 21v-7h6v7"/></svg>`,Arcade:`<svg class="local-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="5"/><path d="M7 11v4 M5 13h4 M15 12h.01 M18 14h.01"/></svg>`};
+labels['Private Chats']='<svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 11a8 8 0 0 1-8 8H7l-5 3V11a9 9 0 0 1 19 0Z"/></svg>';
 const inMore=!quick.includes(tab);
 const bottom=document.getElementById('bottomNav');
-if(bottom)bottom.innerHTML=quick.map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}" aria-label="${n}"><span class="bottom-icon">${n==='Home'?'<img class="local55-nav-logo" src="icons/the-local-pint-transparent-v150.png" alt="">':labels[n]}</span><span>${({"Virtual Pub Tables":"Tables","Who’s Up for It?":"Plans","Venue Hub":"Venues","Arcade":"Games Room"}[n]||n)}</span></button>`).join('')+`<button id="moreNav" class="${inMore?'active':''}" aria-label="More sections"><span class="bottom-icon"><svg class="tl124-icon" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg></span><span>More</span></button>`;
+if(bottom)bottom.innerHTML=quick.map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}" aria-label="${n}"><span class="bottom-icon">${n==='Home'?'<img class="local55-nav-logo" src="icons/the-local-pint-transparent-v150.png" alt="">':labels[n]}</span><span>${({"Virtual Pub Tables":"Tables","Who’s Up for It?":"Plans","Venue Hub":"Venues","Arcade":"Games Room","Private Chats":"Messages"}[n]||n)}</span></button>`).join('')+`<button id="moreNav" aria-expanded="false" aria-controls="moreDrawer" class="${inMore?'active':''}" aria-label="More sections"><span class="bottom-icon"><svg class="tl124-icon" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg></span><span>More</span></button>`;
 const more=document.getElementById('moreMenu');
-if(more)more.innerHTML=visibleNames.filter(n=>!quick.includes(n)&&n!=='Administration'&&n!=='Analytics').map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}">${esc(pageLabel(n))}</button>`).join('');
-if(bottom){bottom.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.getElementById('moreDrawer')?.setAttribute('hidden','');render();window.scrollTo(0,0)});bottom.querySelector('#moreNav').onclick=()=>{const drawer=document.getElementById('moreDrawer');drawer.hidden=!drawer.hidden}}
-if(more)more.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.getElementById('moreDrawer').hidden=true;render();window.scrollTo(0,0)});
-$('status').textContent=cloud?(user?(groupId?'Shared group • connected':'Signed in • choose group'):'Cloud mode • sign in to share'):'Demo mode • saved on this device only';let h='';
+if(more){
+ const groups=[['Explore',['Venue Hub','Events','Buy, Sell or Give Away','Trades & Services']],['Your community',['Local Updates','Community','Photos','Rounds','Kitty']],['Games & football',['Arcade','Football','Quiz','Games','More Games','Tournaments','Leaderboard']],['Your account',['Alerts','Account','Install','Report Behaviour']],['For venues',['Venue App Builder','Venue Applications','Venue subscription']]];
+ more.innerHTML='<label for="moreSearch">Find a feature</label><input id="moreSearch" type="search" placeholder="Search features…">'+groups.map(([title,pages])=>`<section data-more-group><h3>${esc(title)}</h3><div class="more-feature-grid">${pages.filter(n=>!quick.includes(n)).map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}">${esc(pageLabel(n))}</button>`).join('')}</div></section>`).join('')+'<p id="moreSearchEmpty" hidden>No matching features. Try another word.</p>';
+}
+
+if(bottom){bottom.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.getElementById('moreDrawer')?.setAttribute('hidden','');render()});bottom.querySelector('#moreNav').onclick=()=>{const drawer=document.getElementById('moreDrawer');drawer.hidden=!drawer.hidden;bottom.querySelector('#moreNav').setAttribute('aria-expanded',String(!drawer.hidden))}}
+if(more)more.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.getElementById('moreDrawer').hidden=true;render()});
+$('status').hidden=Boolean(cloud&&user);$('status').textContent=cloud?(user?(groupId?'Shared group • connected':'Signed in • choose group'):'Cloud mode • sign in to share'):'Demo mode • saved on this device only';let h='';
 function homeForYou(){
  const now=Date.now(), current=profileName();
  const updates=entries('chat').filter(x=>x.data?.roomId==='local-feed' && (x.data?.text||x.data?.image)).slice(0,3);
@@ -400,7 +417,7 @@ async function loadHomeMarket(){
  if(!target.isConnected)return;
  if(error)throw error;
  target.innerHTML=data?.length?data.map(x=>`<article class="tl195-item"><strong>${esc(x.title||'Marketplace listing')}</strong><p>${x.price==null?'Price on listing':`£${Number(x.price).toFixed(2)}`}</p><button type="button" data-go="Buy, Sell or Give Away">Explore listing →</button></article>`).join(''):'<p class="tl195-empty">No available listings yet. Be the first to post one.</p>';
- target.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.go;render();window.scrollTo(0,0)}));
+ target.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.go;render()}));
  }catch(e){if(target.isConnected)target.innerHTML='<p class="tl195-empty">Marketplace updates are temporarily unavailable. Browse the marketplace to try again.</p>'}
 }
 if(tab==='Home'){
@@ -445,7 +462,7 @@ if(tab==='Venue subscription') h='<section class="tl149-admin" id="venue-billing
 const hubApi={openVenueTables(id){
   sessionStorage.setItem('local-table-venue',id);
   sessionStorage.removeItem('local-active-table');
-  tab='Virtual Pub Tables';render();window.scrollTo(0,0);
+  tab='Virtual Pub Tables';render();
 },entries:hubEntries(entries),sharePlan: record => record.data.scope === "table" ? "" : groupShareButton("plans",record,"Share activity"),add,who,userId:()=>user?.id||'',sb,user,groupId,cloud,uploadImage,renderLiveGame:()=>renderLiveGame(),isGroupOwner:()=>!cloud||!!(user&&group&&group.owner_id===user.id),notice,render};
 if(tab==='Virtual Pub Tables')h=`<section class="tl122-tables-shell"><div class="tl122-table-heading"><h2>🍻 Virtual Pub Tables</h2><p>Pull up a chair · Choose a venue, then pull up a chair to join your table.</p></div><iframe id="tl122-secure-tables" title="Virtual Pub Tables — secure member groups" src="${esc(tableFrameUrl)}" loading="eager" allowfullscreen allow="fullscreen 'self'; camera 'self'; microphone 'self'; autoplay 'self'"></iframe></section>`;
 if(tab==='Who’s Up for It?')h=meetupsView(hubApi);
@@ -492,7 +509,7 @@ const keepAdmin = tab==='Administration' && adminRoot?.isConnected;
 const keepBilling = tab==='Venue subscription' && billingRoot?.isConnected;
 const keepTables = tab === 'Virtual Pub Tables'
   && view.dataset.tablesSession === tablesSession
-  && view.querySelector('#tl122-secure-tables');
+  && tableFrameMatches(view.querySelector('#tl122-secure-tables'),navigation.detail());
 if (!keepTables && !keepAdmin && !keepBilling) {
   const ownProfile = tab === 'Account' ? view.querySelector('.local-profile-panel') : null;
   const profileIdentity = cloud ? user?.id || 'signed-out' : 'demo';
@@ -529,7 +546,7 @@ if (tab==='Venue subscription' && !keepBilling) {
  billingUser=user?.id;
  mountBilling(billingRoot,sb,user,builderLink);
 }
-bind();if(tab==='Football')mountFootball(document.getElementById('football-hub'),{sb,user});bindPageSharing(view);if(tab==='Who’s Up for It?')bindCommunityHub(hubApi);if(tab==='Venue Hub')bindVenueDirectory(hubApi);if(tab==='Venue Applications')bindVenueApprovals(hubApi);if(tab==='Home'||tab==='Local Updates')bindLocalFeed();if(tab==='Create Post')bindComposer();if(tab==='Account')bindProfile();if(tab==='Report Behaviour')bindSafety({sb,user,cloud,notice,render,committee:false});if(tab==='Account')bindAppearance();if(tab==='Chat & Media Settings')bindChatMediaSettings();if(tab==='Alerts')updatePushStatus();if(tab==='Quiz')quiz();if(tab==='Games')bindGames();if(tab==='Arcade'){bindGamesRoomHub({notify:notice, sharedGame:builderLink.get('share-game')});bindMemberGames(sb,()=>({user,cloud}));bindOnlineDarts(sb,user);bindOnlineCue(sb,user);bindLiveMatches({entries,add,who,notice,render,cloud,user,groupId,refresh});bindPremiumGames({add,who,notice});bindArcade({add,who,notice,render});bindExtraGames({add,who,notice})}if(tab==='More Games')bindExtraGames({add,who,notice});if(tab==='Private Chats')bindPrivateChat({sb,user,notice,roomId:notificationRoom});if(tab==='Tournaments')bindTournaments();if(tab==='Buy, Sell or Give Away')bindMarketplace({sb,user,notice,sharedItem: (!cloud || adminChecked) ? takeSharedDetail() : null});if(tab==='Trades & Services')bindTrades({sb,user,notice,sharedItem: (!cloud || adminChecked) ? takeSharedDetail() : null});if(tab==='Home'){loadHomeMarket();document.getElementById('tl195-refresh')?.addEventListener('click',()=>refresh())}if(tab==='Home'||tab==='Local Updates')renderAnnouncements();if(['Home','Local Updates','Events'].includes(tab))renderPublicStudioContent(sb,notice);if(tab==='Events')renderClubContent(sb,tab,notice);if(tab==='Photos'||tab==='Chat')loadPhotos();}
+bind();if(tab==='Football')mountFootball(document.getElementById('football-hub'),{sb,user});bindPageSharing(view);if(tab==='Who’s Up for It?')bindCommunityHub(hubApi);if(tab==='Venue Hub')bindVenueDirectory(hubApi);if(tab==='Venue Applications')bindVenueApprovals(hubApi);if(tab==='Home'||tab==='Local Updates')bindLocalFeed();if(tab==='Create Post')bindComposer();if(tab==='Account')bindProfile();if(tab==='Report Behaviour')bindSafety({sb,user,cloud,notice,render,committee:false});if(tab==='Account')bindAppearance();if(tab==='Chat & Media Settings')bindChatMediaSettings();if(tab==='Alerts')updatePushStatus();if(tab==='Quiz')quiz();if(tab==='Games')bindGames();if(tab==='Arcade'){bindGamesRoomHub({notify:notice, sharedGame:builderLink.get('share-game')});bindMemberGames(sb,()=>({user,cloud}));bindOnlineDarts(sb,user);bindOnlineCue(sb,user);bindLiveMatches({entries,add,who,notice,render,cloud,user,groupId,refresh});bindPremiumGames({add,who,notice});bindArcade({add,who,notice,render});bindExtraGames({add,who,notice})}if(tab==='More Games')bindExtraGames({add,who,notice});if(tab==='Private Chats')bindPrivateChat({sb,user,notice,roomId:notificationRoom,onBack:()=>navigation.closeDetail(),onSelect:room=>{notificationRoom=room;navigation.openDetail(room?{room}:{})}});if(tab==='Tournaments')bindTournaments();if(tab==='Buy, Sell or Give Away')bindMarketplace({sb,user,notice,sharedItem: (!cloud || adminChecked) ? takeSharedDetail() : null});if(tab==='Trades & Services')bindTrades({sb,user,notice,sharedItem: (!cloud || adminChecked) ? takeSharedDetail() : null});if(tab==='Home'){loadHomeMarket();document.getElementById('tl195-refresh')?.addEventListener('click',()=>refresh())}if(tab==='Home'||tab==='Local Updates')renderAnnouncements();if(['Home','Local Updates','Events'].includes(tab))renderPublicStudioContent(sb,notice);if(tab==='Events')renderClubContent(sb,tab,notice);if(tab==='Photos'||tab==='Chat')loadPhotos();navigation.afterRender();}
 const val=id=>$(id)?.value.trim()||'',who=()=>profileName();
 async function uploadImage(file){const img=await resize(file);if(!cloud){if(img.length>800000)throw Error('Photo too large for local demo');return {image:img}}if(!groupId)throw Error('Join a group first');const path=`${groupId}/${crypto.randomUUID()}.jpg`;const blob=await(await fetch(img)).blob();const {error}=await sb.storage.from('pub-photos').upload(path,blob,{contentType:'image/jpeg'});if(error)throw error;return {path}}
 function bind(){document.querySelectorAll('#shareFriends,#headerShare').forEach(b=>b.onclick=()=>shareLocal({notify:notice}));if($('enableAlerts'))$('enableAlerts').onclick=enablePush;if($('testMessageAlerts'))$('testMessageAlerts').onclick=async()=>{try{notice(await phoneAlerts.test(user?.id))}catch(error){notice(error.message)}};if($('disableMessageAlerts'))$('disableMessageAlerts').onclick=async()=>{try{notice(await phoneAlerts.disable());updatePushStatus()}catch(error){notice(error.message)}}; if($('inviteCode'))$('inviteCode').value=pendingInvite('join-community')||localStorage.getItem('lads-pending-invite')||'';if($('goPrivateJoin'))$('goPrivateJoin').onclick=e=>{e.preventDefault();tab='Private Chats';render()};if($('shareInvite'))$('shareInvite').onclick=()=>shareLocal({title:'Join my community on The Local',message:'Join my community on The Local! Sign in or register, then follow this invitation link.',url:location.origin+location.pathname+'#join-community='+encodeURIComponent(group.invite_code),notify:notice});document.querySelectorAll('#view [data-go],#tabs [data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab||b.dataset.go;if(cloud&&groupId)refresh();else render()});function form(id,fn){if($(id))$(id).onsubmit=async e=>{e.preventDefault();try{await fn();}catch(err){notice(err.message)}}}
@@ -540,7 +557,7 @@ document.querySelectorAll('[data-chat-room]').forEach(b=>b.onclick=()=>{activeCh
 form('createChatRoom',async()=>{const name=val('newChatRoom');if(!name||name.length>60)return notice('Enter a group name up to 60 characters');if(entries('chat_room').some(r=>r.data.name?.toLowerCase()===name.toLowerCase()))return notice('A group with this name already exists');await add('chat_room',{name,by:who()});const created=entries('chat_room').find(r=>r.data.name===name);if(created){activeChatRoom=String(created.id);render()}});
 form('chatForm',async()=>{const file=$('chatPhoto')?.files?.[0],message=val('message');if(!message&&!file)return notice('Write a message or choose a photo');const photo=file?await uploadImage(file):{};await add('chat',{text:message,...photo,roomId:activeChatRoom,by:who()})});form('eventForm',()=>{const day=val('eventDay'),time=val('eventTime');if(!day)return notice('Please choose an event date');return add('event',{title:val('eventTitle'),date:`${day}T${time||'19:00'}`,place:val('eventPlace'),by:who()})});form('roundForm',()=>add('round',{buyer:val('roundBuyer'),desc:val('roundDesc'),cost:val('roundCost'),by:who()}));form('footballForm',()=>add('football',{fixture:val('fixture'),prediction:val('prediction'),by:who()}));form('kittyForm',()=>add('kitty',{desc:val('kittyDesc'),amount:val('kittyAmount'),by:who()}));form('nameForm',()=>{local.name=val('nickname')||'You';save();notice('Name saved');render()});document.querySelectorAll('[data-rsvp]').forEach(b=>b.onclick=()=>add('rsvp',{title:b.dataset.title,by:who()}));
 form('photoForm',async()=>{const f=$('photoFile').files[0];if(!f)return;await add('photo',{caption:val('photoCaption'),...await uploadImage(f),by:who()})});
-if($('signup'))$('signup').onclick=()=>auth('signup');form('authForm',()=>auth('login'));if($('logout'))$('logout').onclick=async()=>{stopMessageAlerts();await phoneAlerts.sync(null).catch(()=>{});await sb.auth.signOut();user=null;group=null;groupId=null;records=[];await syncPushIdentity();render()};form('groupForm',async()=>{let {data,error}=await sb.from('groups').insert({name:val('groupName'),owner_id:user.id}).select().single();if(error)throw error;await chooseGroup(data)});form('joinForm',async()=>{let {data,error}=await sb.rpc('join_group_by_code',{code:val('inviteCode')});if(error){if(/invalid|not found|code/i.test(error.message))throw new Error('Community code not recognised. Private chat codes must be entered under Private Chats → Join Private Chat.');throw error}let {data:g,error:ge}=await sb.from('groups').select('*').eq('id',data).single();if(ge)throw ge;await chooseGroup(g);sessionStorage.removeItem('local-pending-join-community');localStorage.removeItem('lads-pending-invite')})}
+if($('signup'))$('signup').onclick=()=>auth('signup');form('authForm',()=>auth('login'));if($('logout'))$('logout').onclick=async()=>{navigation.clear();disposePrivateChat(true);tableDrafts.clear();stopMessageAlerts();await phoneAlerts.sync(null).catch(()=>{});await sb.auth.signOut();user=null;group=null;groupId=null;records=[];await syncPushIdentity();render()};form('groupForm',async()=>{let {data,error}=await sb.from('groups').insert({name:val('groupName'),owner_id:user.id}).select().single();if(error)throw error;await chooseGroup(data)});form('joinForm',async()=>{let {data,error}=await sb.rpc('join_group_by_code',{code:val('inviteCode')});if(error){if(/invalid|not found|code/i.test(error.message))throw new Error('Community code not recognised. Private chat codes must be entered under Private Chats → Join Private Chat.');throw error}let {data:g,error:ge}=await sb.from('groups').select('*').eq('id',data).single();if(ge)throw ge;await chooseGroup(g);sessionStorage.removeItem('local-pending-join-community');localStorage.removeItem('lads-pending-invite')})}
 async function auth(mode){let email=val('email'),password=val('password');let {data,error}=mode==='signup'?await sb.auth.signUp({email,password}):await sb.auth.signInWithPassword({email,password});if(error)return notice(error.message);if(mode==='signup'&&!data.session)return notice('Check your email to confirm registration');user=data.user;await restoreGroup();notice('Signed in');render()}
 async function chooseGroup(g){let {error}=await sb.from('group_members').upsert({group_id:g.id,user_id:user.id},{onConflict:'group_id,user_id'});if(error)return notice(error.message);group=g;groupId=g.id;activeChatRoom='general';localStorage.setItem('lads-group-id',groupId);await refresh()}
 async function restoreGroup(){
@@ -621,7 +638,7 @@ if(cloud){
  async function applyIdentity(identity){
   const identityChanged=lastIdentity!==identity?.id;
   if(identityChanged){
-   stopMessageAlerts();
+   disposePrivateChat(true);tableDrafts.clear();stopMessageAlerts();
    messageNotificationItems = []; notificationRoom = linkedNotificationRoom; ++messageRequest;
    sharedGroupState='pending'; sharedHighlight=false; openedSharedDetails.clear();
    if(lastIdentity){group=null;groupId=null;records=[];}
@@ -668,5 +685,41 @@ window.setInterval(() => {
 window.addEventListener('message',event=>{
  const frame=$('tl122-secure-tables');
  if(event.origin!==location.origin || event.source!==frame?.contentWindow || event.data?.type!=='tl-enable-message-alerts')return;
- tab='Alerts';render();window.scrollTo(0,0);
+ tab='Alerts';render();
 });
+
+const bottomNavigation=document.getElementById('bottomNav');
+if(bottomNavigation && 'ResizeObserver' in window)new ResizeObserver(()=>document.documentElement.style.setProperty('--local-bottom-height',bottomNavigation.getBoundingClientRect().height+'px')).observe(bottomNavigation);
+document.addEventListener('input',event=>{
+ if(event.target.id!=='moreSearch')return;
+ const term=event.target.value.trim().toLocaleLowerCase();let visible=0;
+ document.querySelectorAll('[data-more-group]').forEach(group=>{let count=0;group.querySelectorAll('button[data-tab]').forEach(button=>{button.hidden=!button.textContent.toLocaleLowerCase().includes(term);if(!button.hidden)count++});group.hidden=!count;visible+=count});
+ document.getElementById('moreSearchEmpty').hidden=Boolean(visible);
+});
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&!document.getElementById('moreDrawer').hidden){document.getElementById('moreDrawer').hidden=true;document.getElementById('moreNav')?.focus();event.preventDefault()}
+});
+window.addEventListener('message',event=>{
+ const frame=document.getElementById('tl122-secure-tables');
+ if(event.origin!==location.origin || event.source!==frame?.contentWindow)return;
+ if(['tl-table-draft','tl-table-draft-request'].includes(event.data?.type)){
+  const detail=navigation.detail();const data=event.data;if(!user||data.table!==detail.table||data.venue!==detail.venue)return;
+  const key=detail.venue+':'+detail.table;
+  if(data.type==='tl-table-draft'&&typeof data.body==='string')tableDrafts.set(user.id,key,data.body);
+  if(data.type==='tl-table-draft-request')frame.contentWindow.postMessage({type:'tl-table-restore-draft',table:detail.table,venue:detail.venue,body:tableDrafts.get(user.id,key)},location.origin);
+  return;
+ }
+ if(event.data?.type==='tl-table-route-clear'){navigation.closeDetail();return;}
+ if(event.data?.type!=='tl-table-route')return;
+ const detail=event.data;const uuid=/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
+ if(uuid.test(detail.table||'')&&uuid.test(detail.venue||'')){
+  frame.dataset.openTable=detail.table;frame.dataset.openVenue=detail.venue;
+  const old=navigation.detail();if(old.table===detail.table&&old.venue===detail.venue)return;
+  navigation.openDetail({table:detail.table,venue:detail.venue});tableFrameUrl=tableChatLink('secure-tables.html',location.href,{table:detail.table,venue:detail.venue},{embedded:'1',v:'242'}).href;
+ }
+});
+
+const moreDrawerElement=document.getElementById('moreDrawer');
+moreDrawerElement?.setAttribute('role','dialog');moreDrawerElement?.setAttribute('aria-label','More features');
+moreDrawerElement?.querySelector('.more-drawer-header button')?.setAttribute('aria-label','Close More menu');
+if(moreDrawerElement)new MutationObserver(()=>document.getElementById('moreNav')?.setAttribute('aria-expanded',String(!moreDrawerElement.hidden))).observe(moreDrawerElement,{attributes:true,attributeFilter:['hidden']});

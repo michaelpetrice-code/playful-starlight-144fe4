@@ -45,3 +45,8 @@ jobs:
 
       - name: Check message notifications, table access and invitations
         run: node --test tests/native-push.test.cjs tests/message-alerts.test.cjs tests/table-chat-entry.test.cjs tests/table-message-visibility.test.cjs tests/table-invitations.test.cjs
+
+      - name: Install DOM regression test dependency
+        run: npm ci --prefix tests --ignore-scripts
+      - name: Check social navigation, drafts and private chat lifecycle
+        run: node --test tests/social-flow.test.cjs
