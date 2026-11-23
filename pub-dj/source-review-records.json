@@ -1,0 +1,213 @@
+{
+  "checked": "2026-11-23",
+  "included": {
+    "Incompetech": 400,
+    "Audionautix": 1
+  },
+  "deferred": [
+    {
+      "provider": "ccMixter",
+      "reason": "Metadata/API reachable; tested browser audio did not load. Not included in live playable list.",
+      "candidates": [
+        {
+          "id": "mix-71497",
+          "title": "Connections",
+          "artist": "Gabriel Shellington",
+          "mood": "Party",
+          "genre": "Vocal",
+          "tags": ",media,remix,bpm_150_155,attribution,audio,mp3,44k,stereo,VBR,flac,male_vocals,female_vocals,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/gabriel_shelligton/gabriel_shelligton_-_Connections_1.mp3",
+          "source": "https://ccmixter.org/files/gabriel_shelligton/71497",
+          "license": "https://creativecommons.org/licenses/by/3.0/",
+          "duration": "3:38",
+          "credit": "Connections by Gabriel Shellington. Featuring Brad Sucks, Kara Square. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "mix-71387",
+          "title": "Greedy",
+          "artist": "Radioontheshelf",
+          "mood": "Party",
+          "genre": "Vocal",
+          "tags": ",media,secret_mixter,remix,underpressure22,attribution,audio,mp3,44k,stereo,CBR,guitar,drums,female_vocals,bass,piano,strings,orchestral,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/Radioontheshelf/Radioontheshelf_-_Greedy.mp3",
+          "source": "https://ccmixter.org/files/Radioontheshelf/71387",
+          "license": "https://creativecommons.org/licenses/by/2.5/",
+          "duration": "4:31",
+          "credit": "Greedy by Radioontheshelf. Featuring Snowflake. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "mix-71247",
+          "title": "I Just Wanna",
+          "artist": "mykleanthony",
+          "mood": "Party",
+          "genre": "Vocal",
+          "tags": ",media,remix,bpm_095_100,ccplus,attribution,audio,mp3,44k,stereo,CBR,female_vocals,hip_hop,downtempo,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/mykleanthony/mykleanthony_-_I_Just_Wanna.mp3",
+          "source": "https://ccmixter.org/files/mykleanthony/71247",
+          "license": "https://creativecommons.org/licenses/by/3.0/",
+          "duration": "4:14",
+          "credit": "I Just Wanna by mykleanthony. Featuring So Sha. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "mix-71219",
+          "title": "Age of AI Revisited",
+          "artist": "MikeTheBee",
+          "mood": "Party",
+          "genre": "Vocal",
+          "tags": ",media,remix,how_i_did_it,attribution,audio,mp3,48k,stereo,VBR,ai_generated,electronic,female_vocals,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/mikethebee/mikethebee_-_Age_of_AI_Revisited.mp3",
+          "source": "https://ccmixter.org/files/mikethebee/71219",
+          "license": "https://creativecommons.org/licenses/by/3.0/",
+          "duration": "2:33",
+          "credit": "Age of AI Revisited by MikeTheBee. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "mix-71182",
+          "title": "Havens For Heroes",
+          "artist": "Radioontheshelf",
+          "mood": "Party",
+          "genre": "Vocal",
+          "tags": ",media,remix,attribution,audio,mp3,44k,stereo,CBR,male_vocals,guitar,bass,music_for_film,piano,trumpet,brass,saxophone,cello,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/Radioontheshelf/Radioontheshelf_-_Havens_For_Heroes_1.mp3",
+          "source": "https://ccmixter.org/files/Radioontheshelf/71182",
+          "license": "https://creativecommons.org/licenses/by/2.5/",
+          "duration": "4:29",
+          "credit": "Havens For Heroes by Radioontheshelf. Featuring Colin. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "mix-71178",
+          "title": "Come Home",
+          "artist": "Gabriel Shellington",
+          "mood": "Party",
+          "genre": "Vocal",
+          "tags": ",big_bang_2026,remix,pell,media,bpm_110_115,attribution,audio,mp3,44k,stereo,VBR,archive,zip,male_vocals,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/gabriel_shelligton/gabriel_shelligton_-_Come_Home_1.mp3",
+          "source": "https://ccmixter.org/files/gabriel_shelligton/71178",
+          "license": "https://creativecommons.org/licenses/by/3.0/",
+          "duration": "1:15",
+          "credit": "Come Home by Gabriel Shellington. Featuring spinningmerkaba. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "mix-71077",
+          "title": "Lost Roamin'",
+          "artist": "Speck",
+          "mood": "Party",
+          "genre": "Independent",
+          "tags": ",media,remix,bpm_080_085,ccplus,attribution,audio,mp3,44k,stereo,CBR,instrumental,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/speck/speck_-_Lost_Roamin_1.mp3",
+          "source": "https://ccmixter.org/files/speck/71077",
+          "license": "https://creativecommons.org/licenses/by/3.0/",
+          "duration": "3:26",
+          "credit": "Lost Roamin' by Speck. Featuring mwic, airtone, Martijn de Boer. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "mix-71068",
+          "title": "M.U.S.T.A.N.G Beats",
+          "artist": "Gabriel Shellington",
+          "mood": "Party",
+          "genre": "Vocal",
+          "tags": ",media,remix,bpm_110_115,attribution,audio,mp3,44k,stereo,VBR,female_vocals,bass,hip_hop,chords,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/gabriel_shelligton/gabriel_shelligton_-_M.U.S.T.A.N.G_Beats.mp3",
+          "source": "https://ccmixter.org/files/gabriel_shelligton/71068",
+          "license": "https://creativecommons.org/licenses/by/2.5/",
+          "duration": "2:20",
+          "credit": "M.U.S.T.A.N.G Beats by Gabriel Shellington. Featuring Ms. Vybe. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "mix-71053",
+          "title": "A Bag Of Motifs",
+          "artist": "Radioontheshelf",
+          "mood": "Party",
+          "genre": "Vocal",
+          "tags": ",media,remix,attribution,audio,mp3,44k,stereo,CBR,male_vocals,female_vocals,guitar,drums,bass,electronic,piano,music_for_film,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/Radioontheshelf/Radioontheshelf_-_A_Bag_Of_Motifs.mp3",
+          "source": "https://ccmixter.org/files/Radioontheshelf/71053",
+          "license": "https://creativecommons.org/licenses/by/2.5/",
+          "duration": "2:15",
+          "credit": "A Bag Of Motifs by Radioontheshelf. Featuring Spinningmerkaba. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "mix-71030",
+          "title": "Young Love",
+          "artist": "Radioontheshelf",
+          "mood": "Party",
+          "genre": "Vocal",
+          "tags": ",media,remix,attribution,audio,mp3,44k,stereo,CBR,male_vocals,guitar,drums,bass,piano,brass,strings,orchestral,",
+          "provider": "ccMixter",
+          "url": "https://ccmixter.org/content/Radioontheshelf/Radioontheshelf_-_Young_Love_1.mp3",
+          "source": "https://ccmixter.org/files/Radioontheshelf/71030",
+          "license": "https://creativecommons.org/licenses/by/3.0/",
+          "duration": "4:18",
+          "credit": "Young Love by Radioontheshelf. Featuring Apoxode. Full source credits at the track page. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        }
+      ]
+    },
+    {
+      "provider": "Scott Buckley",
+      "reason": "Published terms restrict isolated music streaming; not included."
+    },
+    {
+      "provider": "Free Music Archive",
+      "reason": "Individual rights review and self-hosting required; not included."
+    },
+    {
+      "provider": "Jamendo",
+      "reason": "Commercial API agreement required; not included."
+    },
+    {
+      "provider": "Audionautix",
+      "reason": "Acoustic Rock passed browser playback. Big Swing Band and Dirt Road Traveler failed and are excluded.",
+      "candidates": [
+        {
+          "id": "aud-bigswingband",
+          "title": "Big Swing Band",
+          "artist": "Jason Shaw",
+          "mood": "Party",
+          "genre": "Jazz",
+          "tags": "Jazz",
+          "provider": "Audionautix",
+          "url": "https://audionautix.com/Music/BigSwingBand.mp3",
+          "source": "https://audionautix.com/free-music/jazz",
+          "license": "https://creativecommons.org/licenses/by/4.0/",
+          "duration": "",
+          "credit": "Big Swing Band by Jason Shaw. Music by audionautix.com. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        },
+        {
+          "id": "aud-dirtroadtraveler",
+          "title": "Dirt Road Traveler",
+          "artist": "Jason Shaw",
+          "mood": "Party",
+          "genre": "Country",
+          "tags": "Country",
+          "provider": "Audionautix",
+          "url": "https://audionautix.com/Music/DirtRoadTraveler.mp3",
+          "source": "https://audionautix.com/free-music/country",
+          "license": "https://creativecommons.org/licenses/by/4.0/",
+          "duration": "",
+          "credit": "Dirt Road Traveler by Jason Shaw. Music by audionautix.com. Audio unchanged.",
+          "reviewed": "2026-11-23"
+        }
+      ]
+    }
+  ]
+}
