@@ -1,8 +1,8 @@
 import {createAppNavigation,readPageRoute,tableFrameMatches,createDraftStore} from './app-navigation.js?v=242';
-import {createPushClient} from './push-notifications.js?v=241';
+import {createPushClient} from './push-notifications.js?v=244';
 import {watchMessageAlerts} from './message-alerts.js?v=240';
 import { renderVenuePageFeed } from './venue-page-feed.js?v=232';
-import { loadMessageNotifications, renderMemberNotifications } from './member-notifications.js';
+import { loadMessageNotifications, renderMemberNotifications } from './member-notifications.js?v=244';
 import {footballView,mountFootball} from './football/hub.js';
 import {trackPage} from './analytics-track.js?v=174';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';

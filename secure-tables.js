@@ -1,4 +1,4 @@
-import {createPushClient} from './push-notifications.js?v=241';
+import {createPushClient} from './push-notifications.js?v=244';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';
 import {bindChatScreen} from './table-chat-screen.js?v=168';
 import {bindTableVideo} from './table-video.js?v=167';

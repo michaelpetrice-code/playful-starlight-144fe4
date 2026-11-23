@@ -44,10 +44,10 @@ export function renderMemberNotifications({ member, groupId, records, messages, 
   list.replaceChildren();
   document.getElementById('enable-message-notifications-notice')?.remove();
   const invitation=unread.find(record=>record.notice?.campaign==='enable-message-notifications-v240');
-  if(invitation && globalThis.Notification?.permission!=='granted' && enableNotifications){
+  if(globalThis.Notification?.permission==='default' && enableNotifications){
     const banner=document.createElement('section');banner.id='enable-message-notifications-notice';banner.className='panel';
-    const title=document.createElement('strong');title.textContent=invitation.notice.label;
-    const body=document.createElement('p');body.textContent=invitation.notice.body;
+    const title=document.createElement('strong');title.textContent=invitation?.notice?.label || 'Keep up with your messages';
+    const body=document.createElement('p');body.textContent=invitation?.notice?.body || 'Message alerts are ready by default. Tap Enable notifications and allow them once on this device. You can turn them off in Alerts.';
     const enable=document.createElement('button');enable.type='button';enable.textContent='Enable notifications';
     enable.onclick=async()=>{await enableNotifications();if(globalThis.Notification?.permission==='granted')banner.remove()};
     banner.append(title,body,enable);document.getElementById('view')?.prepend(banner);
