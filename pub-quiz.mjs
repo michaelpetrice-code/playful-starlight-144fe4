@@ -180,13 +180,15 @@ async function access() {
   byId('access').textContent = 'Checking hosting access…';
   try {
     if (setup.elements.venue.value === 'party') {
-      const balance = await rpc('local_quiz_party_balance');
+      const [balance, complimentary] = await Promise.all([
+        rpc('local_quiz_party_balance'), rpc('local_quiz_party_complimentary'),
+      ]);
       if (request !== accessRequest) return;
       setMediaAccess(true);
-      create.disabled = balance < 1;
-      byId('quiz-checkout').hidden = balance > 0;
+      create.disabled = !complimentary && balance < 1;
+      byId('quiz-checkout').hidden = complimentary || balance > 0;
       byId('quiz-checkout').textContent = 'Buy one Party Quiz Pass · £7.99';
-      byId('access').textContent = balance > 0
+      byId('access').textContent = complimentary ? 'Complimentary hosting for your account.' : balance > 0
         ? 'Opening a new party lobby uses one pass.'
         : 'One pass unlocks a single party quiz, including pictures, video and projector view.';
       return;

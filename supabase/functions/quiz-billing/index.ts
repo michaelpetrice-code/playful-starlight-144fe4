@@ -23,6 +23,9 @@ async function checkout(request: Request) {
   if (error || !user?.email_confirmed_at) return json({ message: 'Sign in with a confirmed email.' }, 401);
   const { venue, party, attempt } = await request.json();
   if (party === true) {
+    const { data: complimentary, error: accessError } = await db.rpc('local_quiz_party_complimentary');
+    if (accessError) throw accessError;
+    if (complimentary) return json({ message: 'Your account has complimentary hosting.' }, 409);
     if (!partyPrice || !id(attempt)) return json({ message: 'Party pass checkout is not configured.' }, 503);
     const price = await stripe.prices.retrieve(partyPrice);
     if (!price.active || price.livemode !== live || price.currency !== 'gbp' ||

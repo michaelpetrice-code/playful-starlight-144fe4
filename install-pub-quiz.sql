@@ -170,6 +170,22 @@ for insert to service_role with check (true);
 create policy "Stripe server reads party passes" on public.local_quiz_party_passes
 for select to service_role using (true);
 
+-- Personal complimentary access is independent of any venue entitlement.
+create table public.local_quiz_complimentary_hosts (
+  user_id uuid primary key references auth.users(id) on delete cascade
+);
+alter table public.local_quiz_complimentary_hosts enable row level security;
+revoke all on public.local_quiz_complimentary_hosts from public,anon,authenticated;
+insert into public.local_quiz_complimentary_hosts(user_id)
+select id from auth.users where lower(email) = 'michaelpetrice@gmail.com' and email_confirmed_at is not null;
+
+create function public.local_quiz_party_complimentary()
+returns boolean language sql stable security definer set search_path = '' as $$
+  select exists(select 1 from public.local_quiz_complimentary_hosts where user_id = auth.uid())
+$$;
+revoke all on function public.local_quiz_party_complimentary() from public,anon,authenticated;
+grant execute on function public.local_quiz_party_complimentary() to authenticated;
+
 create function public.local_quiz_party_balance()
 returns integer language sql stable security definer set search_path = '' as $$
   select count(*)::integer from public.local_quiz_party_passes
@@ -213,7 +229,7 @@ begin
       where jsonb_typeof(option) <> 'string' or length(trim(option #>> '{}')) not between 1 and 120
     ) then raise exception 'Each question requires four answer options'; end if;
   end loop;
-  if p_venue is null then
+  if p_venue is null and not public.local_quiz_party_complimentary() then
     update public.local_quiz_party_passes set used_at = now()
     where checkout_id = (
       select checkout_id from public.local_quiz_party_passes
