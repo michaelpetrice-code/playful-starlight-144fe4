@@ -5,6 +5,8 @@ const { supabaseUrl, supabaseAnonKey } = window.LADS_CONFIG;
 const db = createClient(supabaseUrl, supabaseAnonKey);
 const setup = byId('setup-form');
 const room = byId('room');
+const projector = new URLSearchParams(location.search).get('display') === 'projector';
+if (projector) document.body.classList.add('quiz-projector');
 const answerLetters = ['A', 'B', 'C', 'D'];
 let code, state, busy = false, refreshTimer, accessRequest = 0, mediaAllowed = false;
 
@@ -234,16 +236,19 @@ async function open(value) {
   const next = value.trim().toUpperCase();
   if (!/^[A-F0-9]{10}$/.test(next)) throw Error('Enter the 10-character quiz code.');
   const result = await rpc('local_quiz_room', { p_code: next });
+  if (projector && !result.host) throw Error('Sign in as the host of this quiz to open the projector.');
   code = next;
   const url = new URL(location.href);
   url.search = '';
   url.searchParams.set('code', code);
+  if (projector) url.searchParams.set('display', 'projector');
   history.replaceState(null, '', url);
   state = null;
   show(result);
   byId('setup').hidden = true;
   byId('join').hidden = true;
   room.hidden = false;
+  byId('projector-tools').hidden = !projector;
   clearInterval(refreshTimer);
   refreshTimer = setInterval(refresh, 2500);
 }
@@ -252,7 +257,14 @@ async function refresh() {
   if (busy || document.hidden || state?.phase === 'finished') return;
   busy = true;
   try {
-    show(await rpc('local_quiz_room', { p_code: code }));
+    const next = await rpc('local_quiz_room', { p_code: code });
+    if (projector && !next.host) {
+      clearInterval(refreshTimer);
+      room.replaceChildren();
+      announce('Projector access has ended. Reopen this view from the host controls.');
+      return;
+    }
+    show(next);
     if (syncFailed) announce();
     syncFailed = false;
   } catch {
@@ -289,14 +301,78 @@ function mediaView(data) {
   return wrap;
 }
 
+const fullscreen = byId('projector-fullscreen');
+fullscreen.hidden = !document.fullscreenEnabled;
+fullscreen.onclick = async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {
+    announce('Fullscreen is unavailable in this browser. You can still display this tab on the venue screen.');
+  }
+};
+document.addEventListener('fullscreenchange', () => {
+  fullscreen.textContent = document.fullscreenElement ? 'Exit full screen' : 'Full screen';
+});
+
+function projectorContent(next) {
+  const title = node('h1', next.title);
+  const content = node('div');
+  if (next.phase === 'lobby') {
+    const joinCode = node('strong', next.code);
+    joinCode.className = 'join-code';
+    content.append(node('h2', 'Join on your phone'), node('p', 'Open Pub Quiz in The Local and enter this code.'), joinCode);
+  }
+  if (next.prompt) {
+    const round = next.topic ? 'Round ' + next.round + ' · ' + next.topic + ' · ' : '';
+    content.append(node('p', round + 'Question ' + (next.position + 1) + ' of ' + next.total), node('h2', next.prompt));
+    const media = next.media && mediaView(next.media);
+    if (media) content.append(media);
+    const choices = node('ul');
+    choices.className = 'quiz-projector-choices';
+    next.options.forEach((option, index) => {
+      const correct = next.correct !== null && Number(next.correct) === index;
+      const choice = node('li', answerLetters[index] + '. ' + option + (correct ? ' · Correct' : ''));
+      if (correct) choice.className = 'quiz-correct-choice';
+      choices.append(choice);
+    });
+    content.append(choices);
+  }
+  if (next.phase !== 'open') {
+    const ranking = node('ol');
+    ranking.className = 'quiz-projector-ranks';
+    next.scores.slice(0, 10).forEach(team => {
+      ranking.append(node('li', team.name + (next.phase === 'lobby' ? '' : ' · ' + team.points + ' points')));
+    });
+    if (next.scores.length) content.append(node('h2', next.phase === 'lobby' ? 'Teams' : next.phase === 'finished' ? 'Final leaderboard' : 'Leaderboard'), ranking);
+    if (next.scores.length > 10) content.append(node('p', 'Showing 10 of ' + next.scores.length + ' teams'));
+  }
+  room.replaceChildren(title, content);
+}
+
 function show(next) {
   if (JSON.stringify(state) === JSON.stringify(next)) return;
+  if (projector) {
+    projectorContent(next);
+    state = next;
+    return;
+  }
   const previousName = room.querySelector('input')?.value;
   const editing = room.contains(document.activeElement) && document.activeElement.tagName === 'INPUT';
   const currentMedia = state?.position === next.position && next.prompt
     ? room.querySelector('[data-question-media]') : null;
   state = next;
   room.replaceChildren(node('h2', next.title));
+  if (next.host) {
+    const displayUrl = new URL(location.href);
+    displayUrl.searchParams.set('display', 'projector');
+    const display = node('a', 'Open projector view');
+    display.href = displayUrl;
+    display.target = '_blank';
+    display.rel = 'noopener';
+    display.className = 'quiz-cta quiz-secondary';
+    room.append(display);
+  }
   if (next.phase === 'lobby' && next.host) {
     room.append(node('p', 'Ask each team captain to open Pub Quiz and enter this code.'));
     const joinCode = node('strong', next.code);
@@ -357,6 +433,11 @@ async function init() {
     byId('join-form').elements.code.value = params.get('code');
     try { await open(params.get('code')); return; }
     catch (error) { announce(error.message); }
+  }
+  if (projector) {
+    byId('join').hidden = true;
+    if (!params.has('code')) announce('Open the projector from an active quiz host screen.');
+    return;
   }
   const venues = await rpc('local_quiz_venues');
   for (const entry of venues || []) {
