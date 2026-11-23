@@ -1,3 +1,4 @@
+import {coombeCommunitySamples} from './coombe-community-samples.js';
 import {featureGallery,visitorIntroduction} from './social-features.js?v=260';
 import {createSocialExperience,installVisitorShowcase} from './social-experience.js?v=267';
 import {createAppNavigation,readPageRoute,tableFrameMatches,createDraftStore} from './app-navigation.js?v=242';
@@ -448,6 +449,7 @@ if(tab==='Home'){
   </nav>
  </section>
  <section id="tl82-public"></section>
+ ${user ? coombeCommunitySamples() : ""}
  ${communityReady ? localFeed() : `<section class="panel">
   <h2>Join a community to see its updates</h2>
   <p>If you have an invitation code, enter it in your account.</p>
