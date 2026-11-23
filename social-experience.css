@@ -75,7 +75,7 @@ html.social-member .community-home .social-feature-grid{grid-template-columns:re
  html.social-member #local-page-navigation{max-width:1500px;padding-left:268px!important}
  html.social-member .social-left button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;min-height:46px;padding:10px 12px!important;margin:3px 0;border:1px solid transparent!important;background:transparent!important;box-shadow:none!important;font-size:.92rem!important;color:var(--social-text)!important}
  html.social-member .social-left button[aria-current=page]{background:linear-gradient(#43391f,#292617)!important;border-color:var(--social-gold)!important;color:#ffe5a6!important}
- .social-left nav button>span{display:grid;place-items:center;width:26px;font-size:1.5rem;color:var(--social-gold)}
+ .social-desktop-menu button>span{display:grid;place-items:center;width:26px;font-size:1.5rem;color:var(--social-gold)}
  .social-profile-link{border-bottom:1px solid var(--social-line)!important;padding-bottom:18px!important;margin-bottom:14px!important}
  .social-profile-link img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--social-gold)}
  .social-left-footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--social-line)}
@@ -87,10 +87,10 @@ html.social-member .community-home .social-feature-grid{grid-template-columns:re
  html.social-member #social-layout.social-wide{grid-template-columns:220px minmax(0,1fr)}
  html.social-member #social-layout.social-wide>.social-right{display:none}
  .social-side-card{padding:16px;border:1px solid var(--social-line);border-radius:16px;margin-bottom:16px;background:linear-gradient(145deg,#17291d,#0d1710);box-shadow:inset 0 1px #fff2b514,0 3px 8px #0004}
- .social-side-card>header{display:flex;align-items:center;gap:6px;justify-content:space-between;margin-bottom:10px}
+ .social-side-heading{display:flex;align-items:center;gap:6px;justify-content:space-between;margin-bottom:10px}
  .social-side-card h2{font:700 1.2rem/1.2 Georgia,serif!important;color:var(--social-text)!important;margin:0!important}
  .social-side-card p{font-size:.85rem!important;color:var(--social-muted)!important;line-height:1.5!important}
- .social-side-card header>button{font-size:.72rem!important;padding:6px!important;border:0!important;background:none!important;box-shadow:none!important}
+ .social-side-heading>button{font-size:.72rem!important;padding:6px!important;border:0!important;background:none!important;box-shadow:none!important}
  .social-table-list>button{display:flex;align-items:center;gap:9px;width:100%;padding:10px 0!important;text-align:left;border:0!important;border-bottom:1px solid var(--social-line)!important;box-shadow:none!important;background:none!important}
  .social-table-list strong{font-size:.85rem}.social-table-list small{display:block;font-size:.72rem;color:var(--social-muted)!important;margin-top:3px}.social-table-list>button>span:nth-child(2){flex:1;min-width:0}.social-table-list strong{display:block;overflow-wrap:anywhere}
  .social-event-link{display:flex;flex-direction:column;gap:5px;width:100%;text-align:left;padding:10px!important;margin:8px 0}.social-event-link strong{font-size:.9rem}.social-event-link small{font-size:.75rem}
@@ -191,4 +191,42 @@ html.local-dark-gold #social-welcome-features .social-visitor-hero h2 {
     grid-template-areas: "brand" "navigation" "account" "hero" "features";
     gap: 12px;
   }
+}
+
+@media (min-width: 1000px) {
+  html.local-dark-gold.social-member body > header.local-app-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center !important;
+    padding: 8px 24px !important;
+  }
+  html.local-dark-gold.social-member body > header.local-app-header .tl-header-logo {
+    flex: none;
+  }
+  html.local-dark-gold.social-member body > header.local-app-header .social-header-search {
+    margin: 0;
+    width: min(100%, 430px);
+    min-width: 0;
+  }
+  html.social-member body > .local-options:has(> .tl-install-banner),
+  html.social-member body > .tl-install-banner { display: none; }
+  html.social-member .social-left { min-width: 0; overflow: visible; max-height: none; position: static; }
+  html.social-member .social-desktop-menu {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+  }
+  html.social-member .social-left button {
+    min-width: 0;
+    margin: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    justify-content: flex-start;
+  }
+  .social-desktop-menu button > span { flex: 0 0 26px; }
+}
+@media (min-width: 1200px) {
+  html.social-member .social-right { position: static; min-width: 0; max-height: none; overflow: visible; }
+  .social-side-heading h2 { min-width: 0; }
+  .social-side-heading > button { flex: none; }
 }
