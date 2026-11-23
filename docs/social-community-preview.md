@@ -18,3 +18,6 @@ This change is a development proposal. Do not merge or deploy to the live domain
 Run the static checks, JavaScript syntax checks and complete automated suite. Additional DOM tests cover catalogue visibility and route safety, view/draft preservation, management visibility, account isolation and untrusted table-name escaping. Browser review is required before publication. Real two-account chat, a physical Samsung keyboard, video/calling, venue publishing, ticket payments and all multiplayer modes are not certified by this visual redesign. Legacy service gaps from the earlier audit remain separate work.
 
 The AI pictures are design direction, not exact screenshots. The implementation uses existing working features; story creation, public follower graphs and new social networks have not been invented as placeholder controls.
+
+## Professional depth finish
+The development branch applies `professional-depth.css` consistently across all 17 existing themed HTML entry points, plus both design previews. It adds raised dark surfaces, fine gold edges, inset form fields, restrained button bevels, consistent focus and disabled states, and polished header/navigation panels. Branded venue previews and game boards are excluded from the shared component treatments. Reduced-motion and forced-colour preferences are respected. This remains unpublished development work.
