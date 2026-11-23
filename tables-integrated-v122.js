@@ -20,6 +20,7 @@ window.addEventListener('message', event => {
   if (event.data?.type !== 'tl122-table-height') return;
   const height = event.data.height;
   if (!Number.isFinite(height) || height <= 0) return;
+  if(frame.classList.contains('tl-conversation-frame'))return;
   const size = Math.max(360, Math.ceil(height)) + 'px';
   if (frame.style.height !== size) frame.style.height = size;
 });
@@ -29,15 +30,19 @@ function sizeConversationFrame() {
   const frame = document.getElementById('tl122-secure-tables');
   if (!frame?.classList.contains('tl-conversation-frame')) return;
   const viewport = window.visualViewport;
+  const keyboard = Boolean(viewport && innerHeight-viewport.height>120);
+  document.documentElement.classList.toggle('table-keyboard-open',keyboard);
   const nav = document.getElementById('bottomNav');
-  const navHeight = nav && getComputedStyle(nav).display !== 'none' ? nav.getBoundingClientRect().height : 0;
+  const navHeight = !keyboard && nav && getComputedStyle(nav).display !== 'none' ? nav.getBoundingClientRect().height : 0;
   frame.style.setProperty('--conversation-frame-height', `${Math.max(160,(viewport?.height || innerHeight)-navHeight)}px`);
   frame.style.setProperty('--conversation-frame-top', `${viewport?.offsetTop || 0}px`);
+  frame.contentWindow.postMessage({type:'tl-table-viewport',height:Math.max(160,(viewport?.height || innerHeight)-navHeight),compact:keyboard || (viewport?.height || innerHeight)<600},location.origin);
 }
 window.addEventListener('message', event => {
   const frame = document.getElementById('tl122-secure-tables');
   if (event.origin !== location.origin || event.source !== frame?.contentWindow || event.data?.type !== 'tl-table-conversation' || typeof event.data.active !== 'boolean') return;
   frame.classList.toggle('tl-conversation-frame',event.data.active);
+  if(!event.data.active)document.documentElement.classList.remove('table-keyboard-open');
   sizeConversationFrame();
 });
 window.visualViewport?.addEventListener('resize',sizeConversationFrame);

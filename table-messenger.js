@@ -56,6 +56,7 @@ function syncConversationViewport() {
   const active = !byId('tableDetail').hidden && !byId('memberArea').hidden && !feed.hidden;
   document.documentElement.classList.toggle('table-conversation-open', active);
   const viewport = window.visualViewport;
+  if(parent===window)document.documentElement.classList.toggle('table-compact-chat',(viewport?.height || innerHeight)<600);
   document.documentElement.style.setProperty('--conversation-height', `${viewport?.height || innerHeight}px`);
   if (parent !== window) parent.postMessage({type:'tl-table-conversation',active},location.origin);
 }
@@ -64,3 +65,11 @@ for (const id of ['tableDetail','memberArea','feed']) conversationObserver.obser
 window.visualViewport?.addEventListener('resize',syncConversationViewport);
 window.addEventListener('resize',syncConversationViewport);
 syncConversationViewport();
+
+window.addEventListener('message',event=>{
+ if(parent===window || event.source!==parent || event.origin!==location.origin || event.data?.type!=='tl-table-viewport')return;
+ const height=event.data.height;if(!Number.isFinite(height)||height<160||height>3000)return;
+ document.documentElement.style.setProperty('--conversation-height',height+'px');
+ document.documentElement.classList.toggle('table-compact-chat',event.data.compact===true);
+});
+if(parent===window)window.visualViewport?.addEventListener('resize',()=>document.documentElement.classList.toggle('table-compact-chat',window.visualViewport.height<600));
