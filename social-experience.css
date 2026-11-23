@@ -108,3 +108,87 @@ html.local-dark-gold #tabs{display:none!important}
 .social-guest-home :is(#guest-title,#guest-intro){position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap!important}
 /* Search results must stay hidden even when legacy button styles set display. */
 #moreMenu [hidden],#moreDrawer[hidden]{display:none!important}
+
+/* Signed-out home shares the member layout's navigation and surface treatment. */
+.tl-welcome-navigation {
+  display: grid;
+  grid-area: navigation;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid var(--social-line);
+  border-radius: 16px;
+  background: linear-gradient(150deg, #192c20, #101b14);
+  box-shadow: 0 3px 0 #030804, 0 9px 22px #0005;
+}
+.tl-welcome-navigation a {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 44px;
+  padding: 7px 9px;
+  color: var(--social-gold);
+  text-decoration: none;
+  border-radius: 9px;
+}
+.tl-welcome-navigation a:hover, .tl-welcome-navigation a:focus-visible {
+  background: #293a27;
+}
+html.local-dark-gold #tl-auth-gate {
+  padding: 18px clamp(12px, 2.5vw, 36px) 32px !important;
+}
+html.local-dark-gold #tl-auth-gate .tl-auth-shell {
+  display: grid;
+  max-width: 1330px;
+  grid-template-columns: minmax(145px, .72fr) minmax(0, 2.1fr) minmax(245px, 1.05fr);
+  grid-template-areas: "brand brand brand" "navigation hero account" "navigation features features";
+  gap: 20px;
+}
+html.local-dark-gold #tl-auth-gate .tl-auth-brand {
+  grid-area: brand;
+  padding: 0 0 10px;
+  border-bottom: 1px solid var(--social-line);
+  text-align: left;
+}
+html.local-dark-gold #tl-auth-gate .tl-auth-brand img { width: min(174px, 70vw); }
+#tl-auth-gate .tl-auth-brand p, #tl-auth-gate .tl-auth-features { display: none; }
+html.local-dark-gold #tl-auth-gate .tl-auth-card { grid-area: account; min-width: 0; }
+#social-welcome-features { display: contents; }
+#social-welcome-features .social-visitor-hero {
+  grid-area: hero;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--social-line);
+  border-radius: 17px;
+  background: linear-gradient(160deg, #1d3020, #101a14);
+  box-shadow: 0 3px 0 #030804, 0 12px 28px #0006;
+}
+#social-welcome-features .social-visitor-hero > div { padding: 20px; }
+#social-welcome-features .social-visitor-hero > img {
+  height: clamp(165px, 20vw, 275px);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+html.local-dark-gold #social-welcome-features .social-visitor-hero h2 {
+  font-size: clamp(1.8rem, 3.4vw, 3rem) !important;
+}
+#social-welcome-features .social-feature-section { grid-area: features; }
+@media (max-width: 900px) {
+  html.local-dark-gold #tl-auth-gate .tl-auth-shell {
+    grid-template-columns: minmax(0, 1fr) minmax(245px, .85fr);
+    grid-template-areas: "brand brand" "navigation navigation" "hero account" "features features";
+  }
+  .tl-welcome-navigation { display: flex; overflow-x: auto; }
+  .tl-welcome-navigation a { flex: none; }
+}
+@media (max-width: 600px) {
+  html.local-dark-gold #tl-auth-gate .tl-auth-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "brand" "navigation" "account" "hero" "features";
+    gap: 12px;
+  }
+}
