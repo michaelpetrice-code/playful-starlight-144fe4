@@ -157,8 +157,41 @@ function addRound(topic, questions, level = 'Mix') {
     changed = false;
     announce();
   }
+  const assistant = button('Generate with AI', async () => {
+    const topic = topicInput.value.trim();
+    const level = difficulty.value;
+    const venue = setup.elements.venue.value;
+    if (!topic) { announce('Enter a round topic first.'); topicInput.focus(); return; }
+    const hasRoom = () => rounds.querySelectorAll('.quiz-question').length - list.children.length + 5 <= 60;
+    if (!hasRoom()) { announce('Leave room for five questions within the 60-question limit.'); return; }
+    assistant.disabled = true;
+    assistant.textContent = 'Generating…';
+    announce();
+    try {
+      const { data, error } = await db.functions.invoke('quiz-ai', {
+        body: { topic, difficulty: level, venue: venue === 'party' ? null : venue },
+      });
+      if (error) {
+        const detail = await error.context?.json?.().catch(() => null);
+        throw Error(detail?.message || 'The AI assistant is unavailable. Try the question bank.');
+      }
+      if (!round.isConnected || byId('setup').hidden || topic !== topicInput.value.trim() ||
+          level !== difficulty.value || venue !== setup.elements.venue.value) return;
+      if (!hasRoom()) throw Error('There is no longer room for five questions.');
+      if (!window.confirm('Replace this round’s questions with the AI draft?')) return;
+      list.replaceChildren();
+      data.questions.forEach(question => addQuestion(list, question));
+      changed = true;
+      announce('AI draft added. Check the questions and answers before hosting.');
+    } catch (error) {
+      announce(error.message);
+    } finally {
+      assistant.disabled = false;
+      assistant.textContent = 'Generate with AI';
+    }
+  });
   topicInput.onchange = difficulty.onchange = () => generate();
-  controls.append(button('Generate questions', () => generate(true)),
+  controls.append(button('Use question bank', () => generate(true)), assistant,
     button('Add question to round', () => { addQuestion(list); changed = true; }), remove);
   round.append(field('Round topic', topicInput), field('Difficulty', difficulty), list, controls);
   rounds.append(round);
