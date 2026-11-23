@@ -23,14 +23,6 @@ jobs:
           script: |
             const fs = require('fs');
             const token = await core.getIDToken('https://thelocal.me.uk/dj-source-review');
-            const claims = JSON.parse(Buffer.from(token.split('.')[1],'base64url').toString('utf8'));
-            core.info('Workflow identity match flags: '+JSON.stringify({
-              repository:claims.repository==='michaelpetrice-code/playful-starlight-144fe4',
-              subject:claims.sub==='repo:michaelpetrice-code/playful-starlight-144fe4:ref:refs/heads/main',
-              ref:claims.ref==='refs/heads/main',
-              workflow:claims.workflow_ref==='michaelpetrice-code/playful-starlight-144fe4/.github/workflows/dj-source-review.yml@refs/heads/main',
-              event:['schedule','workflow_dispatch'].includes(claims.event_name)
-            }));
             const report = JSON.parse(fs.readFileSync('music-source-review.json','utf8'));
             const response = await fetch('https://huuqwjmztqurnyyokrxd.supabase.co/functions/v1/local-dj', {
               method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
