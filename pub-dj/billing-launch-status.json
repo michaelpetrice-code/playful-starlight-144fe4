@@ -3,7 +3,7 @@
   "stripe_account": "acct_1T7FH4RlvtejByKs",
   "livemode": true,
   "checkout_enabled": true,
-  "deployment_status": "ready_for_publish",
+  "deployment_status": "published",
   "pricing_status": "launch",
   "music_supply_included": false,
   "plans": [
@@ -45,5 +45,17 @@
   "music_supply": "venue_authorised_local_files",
   "payment_verification": "server_verified_checkout_subscription_invoice_and_charge_on_demand",
   "paid_access_recheck_seconds": 120,
-  "complimentary_access": "connected_personal_and_venue_grants"
+  "complimentary_access": "connected_personal_and_venue_grants",
+  "published_url": "https://thelocal.me.uk/pub-dj/index.html",
+  "pricing_url": "https://thelocal.me.uk/pub-dj-pro",
+  "public_service_status": "connected",
+  "release_commit": "5b587f830033f40786bd4bab2e1fd5d5f74cd2aa",
+  "verification": {
+    "automated_tests_passed": 29,
+    "github_checks": "passed",
+    "live_database_assertions": "passed",
+    "browser_demo_play_pause": "passed",
+    "real_payment_completed": false,
+    "physical_speaker_test": false
+  }
 }
