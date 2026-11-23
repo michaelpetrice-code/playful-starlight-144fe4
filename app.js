@@ -310,10 +310,19 @@ const interiorPages={
 'Admin Dashboard':['BEHIND THE BAR','Manage your community with confidence.','venues'],
 'Install':['TAKE US WITH YOU','Your Local is always close by.','tables']
 };
+// These screens provide their own title in the feature content.
+const screensWithOwnTitle = new Set([
+ 'Create Post', 'Buy, Sell or Give Away', 'Trades & Services', 'Arcade',
+ 'More Games', 'Private Chats', 'Report Behaviour', 'Chat & Media Settings'
+]);
 function premiumInterior(name,content){
 const [,description,theme]=interiorPages[name]||['EXPLORE THE LOCAL','Everything under one roof.','venues'];
 const safe=esc(pageLabel(name)),safeDescription=esc(description);
-return `<div class="local50-interior local50-${theme}"><section class="local50-page-hero"><div class="local50-hero-inner"><span class="local50-eyebrow"><img class="local55-mini-brand" src="icons/the-local-pint-transparent-v150.png" alt=""> The Local</span><h1>${safe}</h1><p>${safeDescription}</p><div class="local50-hero-links">${Object.values(memberPages).includes(name) ? shareButton("Share page","tl172-page-share") : ""}</div></div></section><section class="local50-page-body">${content}</section></div>`;
+const share = Object.values(memberPages).includes(name) ? shareButton("Share page","tl172-page-share") : '';
+const heading = screensWithOwnTitle.has(name)
+ ? ''
+ : `<section class="local50-page-hero"><div class="local50-hero-inner"><span class="local50-eyebrow"><img class="local55-mini-brand" src="icons/the-local-pint-transparent-v150.png" alt=""> The Local</span><h1>${safe}</h1><p>${safeDescription}</p><div class="local50-hero-links">${share}</div></div></section>`;
+return `<div class="local50-interior local50-${theme}">${heading}<section class="local50-page-body">${content}${!heading && share ? `<div class="local50-hero-links">${share}</div>` : ''}</section></div>`;
 }
 
 async function renderAnnouncements(){if(!sb)return;const view=document.getElementById('view');if(!view)return;const marker=document.createElement('section');marker.className='local-owner-news';marker.innerHTML='<h2>✦ News from The Local</h2><p>Loading announcements…</p>';const target=view.querySelector('.local50-page-body')||view;const content=view.querySelector('.tl149-home #tl82-public');if(content)content.after(marker);else target.prepend(marker);const news=await loadPublicAnnouncements(sb);if(!marker.isConnected)return;if(!news.length){marker.remove();return}marker.innerHTML='<h2>✦ News from The Local</h2>';for(const item of news){const article=document.createElement('article');const title=document.createElement('strong');title.textContent=item.title;const body=document.createElement('p');body.textContent=item.body;article.append(title,body);if(item.image_url&&/^https:\/\//.test(item.image_url)){const img=document.createElement('img');img.src=item.image_url;img.loading='lazy';img.alt='Announcement image';article.append(img)}marker.append(article)}}
@@ -468,7 +477,7 @@ const hubApi={openVenueTables(id){
   sessionStorage.removeItem('local-active-table');
   tab='Virtual Pub Tables';render();
 },entries:hubEntries(entries),sharePlan: record => record.data.scope === "table" ? "" : groupShareButton("plans",record,"Share activity"),add,who,userId:()=>user?.id||'',sb,user,groupId,cloud,uploadImage,renderLiveGame:()=>renderLiveGame(),isGroupOwner:()=>!cloud||!!(user&&group&&group.owner_id===user.id),notice,render};
-if(tab==='Virtual Pub Tables')h=`<section class="tl122-tables-shell"><div class="tl122-table-heading"><h2>🍻 Virtual Pub Tables</h2><p>Pull up a chair · Choose a venue, then pull up a chair to join your table.</p></div><iframe id="tl122-secure-tables" title="Virtual Pub Tables — secure member groups" src="${esc(tableFrameUrl)}" loading="eager" allowfullscreen allow="fullscreen 'self'; camera 'self'; microphone 'self'; autoplay 'self'"></iframe></section>`;
+if(tab==='Virtual Pub Tables')h=`<section class="tl122-tables-shell"><iframe id="tl122-secure-tables" title="Virtual Pub Tables — secure member groups" src="${esc(tableFrameUrl)}" loading="eager" allowfullscreen allow="fullscreen 'self'; camera 'self'; microphone 'self'; autoplay 'self'"></iframe></section>`;
 if(tab==='Who’s Up for It?')h=meetupsView(hubApi);
 if(tab==='Venue Hub')h=venueDirectoryView(hubApi);if(tab==='Venue Applications')h=venueApprovalsView();
 
