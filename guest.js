@@ -160,4 +160,4 @@ if (isPublicPage && guestPreview[page]) {
   content.replaceChildren(panel);
 }
 
-if(isPublicPage && page==='home'){content.innerHTML=visitorIntroduction()+featureGallery()+'<section class="social-owner-offer"><span class="social-eyebrow">FOR VENUES & COMMUNITIES</span><h2>Your venue deserves its own Local.</h2><p>Bring your news, events and members together in a branded app. Explore what is included before choosing a venue subscription.</p><a href="for-venues.html">Explore venue apps →</a></section>';document.getElementById('guest-title').textContent='Welcome to your Local';}
+if(isPublicPage && page==='home'){document.documentElement.classList.add('social-guest-home');content.innerHTML=visitorIntroduction()+featureGallery()+'<section class="social-owner-offer"><span class="social-eyebrow">FOR VENUES & COMMUNITIES</span><h2>Your venue deserves its own Local.</h2><p>Bring your news, events and members together in a branded app. Explore what is included before choosing a venue subscription.</p><a href="for-venues.html">Explore venue apps →</a></section>';document.getElementById('guest-title').textContent='Welcome to your Local';}
