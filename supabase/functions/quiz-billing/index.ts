@@ -4,6 +4,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const env = (name: string) => Deno.env.get(name) ?? '';
 const origin = env('QUIZ_APP_ORIGIN');
 const live = env('QUIZ_STRIPE_MODE') === 'live';
+const partyPrice = env('QUIZ_PARTY_PRICE');
 const prices = { standard: env('QUIZ_STANDARD_PRICE'), subscriber: env('QUIZ_SUBSCRIBER_PRICE') };
 const stripe = new Stripe(env('QUIZ_STRIPE_KEY'), { httpClient: Stripe.createFetchHttpClient() });
 const cryptoProvider = Stripe.createSubtleCryptoProvider();
@@ -13,7 +14,6 @@ const id = (value: unknown) => typeof value === 'string' && /^[0-9a-f]{8}(-[0-9a
 
 async function checkout(request: Request) {
   if (request.headers.get('origin') !== origin) return json({ message: 'Unexpected origin.' }, 403);
-  if (!prices.standard || !prices.subscriber || prices.standard === prices.subscriber) return json({ message: 'Quiz checkout is not configured.' }, 503);
   const authorization = request.headers.get('authorization');
   if (!authorization?.startsWith('Bearer ')) return json({ message: 'Sign in to continue.' }, 401);
   const db = createClient(env('SUPABASE_URL'), env('SUPABASE_ANON_KEY'), {
@@ -21,7 +21,25 @@ async function checkout(request: Request) {
   });
   const { data: { user }, error } = await db.auth.getUser();
   if (error || !user?.email_confirmed_at) return json({ message: 'Sign in with a confirmed email.' }, 401);
-  const { venue } = await request.json();
+  const { venue, party, attempt } = await request.json();
+  if (party === true) {
+    if (!partyPrice || !id(attempt)) return json({ message: 'Party pass checkout is not configured.' }, 503);
+    const price = await stripe.prices.retrieve(partyPrice);
+    if (!price.active || price.livemode !== live || price.currency !== 'gbp' ||
+        price.unit_amount !== 799 || price.type !== 'one_time') {
+      return json({ message: 'Party pass price is misconfigured.' }, 503);
+    }
+    const url = new URL('/pub-quiz.html?party=1', origin);
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment', customer_email: user.email,
+      line_items: [{ price: price.id, quantity: 1 }],
+      metadata: { source: 'pub_quiz_party', purchaser: user.id },
+      success_url: url.href + '&checkout=success', cancel_url: url.href,
+    }, { idempotencyKey: 'quiz-party-' + user.id + '-' + attempt });
+    if (session.status !== 'open' || !session.url) return json({ message: 'Checkout has already completed or expired.' }, 409);
+    return json({ url: session.url });
+  }
+  if (!prices.standard || !prices.subscriber || prices.standard === prices.subscriber) return json({ message: 'Quiz checkout is not configured.' }, 503);
   if (!id(venue)) return json({ message: 'Choose an approved venue.' }, 400);
   const { data, error: accessError } = await db.rpc('local_quiz_venues');
   if (accessError) throw accessError;
@@ -63,6 +81,23 @@ async function webhook(request: Request) {
     event = await stripe.webhooks.constructEventAsync(await request.text(), signature, secret, undefined, cryptoProvider);
   } catch { return json({ message: 'Invalid webhook signature.' }, 400); }
   if (event.livemode !== live) return json({ received: true });
+  if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
+    const incoming = event.data.object;
+    if (incoming.metadata?.source !== 'pub_quiz_party' || !partyPrice) return json({ received: true });
+    const session = await stripe.checkout.sessions.retrieve(incoming.id);
+    const purchaser = session.metadata?.purchaser;
+    if (!purchaser || !id(purchaser) || session.mode !== 'payment' || session.payment_status !== 'paid' ||
+        session.livemode !== live || session.currency !== 'gbp' || session.amount_total !== 799) return json({ received: true });
+    const lines = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
+    if (lines.data.length !== 1 || lines.data[0].price?.id !== partyPrice || lines.data[0].quantity !== 1) return json({ received: true });
+    const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
+    const { error } = await db.from('local_quiz_party_passes').upsert(
+      { checkout_id: session.id, purchaser_id: purchaser, live: session.livemode },
+      { onConflict: 'checkout_id', ignoreDuplicates: true },
+    );
+    if (error) throw error;
+    return json({ received: true });
+  }
   let subscriptionId: string | null = null;
   switch (event.type) {
     case 'customer.subscription.created':

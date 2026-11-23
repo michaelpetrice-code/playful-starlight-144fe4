@@ -1,7 +1,7 @@
 begin;
 create table public.local_quiz_sessions (
   id uuid primary key default gen_random_uuid(),
-  venue_id uuid not null references public.local_venue_directory(id) on delete cascade,
+  venue_id uuid references public.local_venue_directory(id) on delete cascade,
   host_id uuid not null,
   code text unique not null default upper(left(replace(gen_random_uuid()::text, '-', ''), 10)),
   title text not null,
@@ -153,11 +153,36 @@ returns boolean language sql stable security definer set search_path = '' as $$
   select coalesce((select multimedia from public.local_quiz_venues() where id = p_venue), false)
 $$;
 
+create table public.local_quiz_party_passes (
+  checkout_id text primary key,
+  purchaser_id uuid not null references auth.users(id) on delete cascade,
+  live boolean not null,
+  purchased_at timestamptz not null default now(),
+  used_at timestamptz
+);
+create index local_quiz_party_unused on public.local_quiz_party_passes(purchaser_id)
+where used_at is null and live;
+alter table public.local_quiz_party_passes enable row level security;
+revoke all on public.local_quiz_party_passes from public, anon, authenticated;
+grant insert, select on public.local_quiz_party_passes to service_role;
+create policy "Stripe server records party passes" on public.local_quiz_party_passes
+for insert to service_role with check (true);
+create policy "Stripe server reads party passes" on public.local_quiz_party_passes
+for select to service_role using (true);
+
+create function public.local_quiz_party_balance()
+returns integer language sql stable security definer set search_path = '' as $$
+  select count(*)::integer from public.local_quiz_party_passes
+  where purchaser_id = auth.uid() and used_at is null and live
+$$;
+revoke all on function public.local_quiz_party_balance() from public,anon,authenticated;
+grant execute on function public.local_quiz_party_balance() to authenticated;
+
 create function public.local_quiz_create(p_venue uuid, p_title text, p_questions jsonb)
 returns text language plpgsql security definer set search_path = '' as $$
 declare question jsonb; join_code text;
 begin
-  if public.local_quiz_host_access(p_venue) not in ('paid','complimentary') then
+  if auth.uid() is null or (p_venue is not null and public.local_quiz_host_access(p_venue) not in ('paid','complimentary')) then
     raise exception 'An eligible registered venue is required to host';
   end if;
   if coalesce(length(trim(p_title)),0) not between 1 and 80
@@ -165,7 +190,7 @@ begin
   if jsonb_array_length(p_questions) not between 1 and 60 then raise exception 'Add 1 to 60 questions'; end if;
   for question in select value from jsonb_array_elements(p_questions) loop
     if question ? 'media' then
-      if not public.local_quiz_media_access(p_venue) then
+      if p_venue is not null and not public.local_quiz_media_access(p_venue) then
         raise exception 'This venue needs the quiz multimedia add-on';
       end if;
       if jsonb_typeof(question->'media') is distinct from 'object'
@@ -188,6 +213,15 @@ begin
       where jsonb_typeof(option) <> 'string' or length(trim(option #>> '{}')) not between 1 and 120
     ) then raise exception 'Each question requires four answer options'; end if;
   end loop;
+  if p_venue is null then
+    update public.local_quiz_party_passes set used_at = now()
+    where checkout_id = (
+      select checkout_id from public.local_quiz_party_passes
+      where purchaser_id = auth.uid() and used_at is null and live
+      order by purchased_at, checkout_id limit 1 for update skip locked
+    );
+    if not found then raise exception 'A Party Quiz Pass is required to open a new party lobby'; end if;
+  end if;
   insert into public.local_quiz_sessions(venue_id,host_id,title,questions)
   values(p_venue,auth.uid(),trim(p_title),p_questions) returning code into join_code;
   return join_code;
@@ -210,7 +244,7 @@ begin
   if p_action <> 'view' then
     select * into room from public.local_quiz_sessions where id = room.id for update;
   end if;
-  mine := room.host_id = auth.uid() and public.local_quiz_host_access(room.venue_id) in ('paid','complimentary');
+  mine := room.host_id = auth.uid() and (room.venue_id is null or public.local_quiz_host_access(room.venue_id) in ('paid','complimentary'));
   select * into team from public.local_quiz_teams where session_id=room.id and captain_id=auth.uid();
 
   case p_action

@@ -5,6 +5,8 @@ const { supabaseUrl, supabaseAnonKey } = window.LADS_CONFIG;
 const db = createClient(supabaseUrl, supabaseAnonKey);
 const setup = byId('setup-form');
 const room = byId('room');
+const draftKey = 'local-quiz-party-draft';
+let partyAttempt;
 const projector = new URLSearchParams(location.search).get('display') === 'projector';
 if (projector) document.body.classList.add('quiz-projector');
 const answerLetters = ['A', 'B', 'C', 'D'];
@@ -89,11 +91,11 @@ function addQuestion(list, data = { prompt: '', options: ['', '', '', ''], corre
   const kind = node('select');
   kind.name = 'media-kind';
   kind.append(new Option('Text question', ''), new Option('Picture', 'image'), new Option('Video clip', 'video'));
-  const url = input(2048);
+  const url = input(2048, data.media?.url || '');
   url.name = 'media-url';
   url.type = 'url';
   url.placeholder = 'https://';
-  const alt = input(200);
+  const alt = input(200, data.media?.alt || '');
   alt.name = 'media-alt';
   const urlField = field('Direct HTTPS media URL', url);
   const altField = field('Picture description', alt);
@@ -103,6 +105,7 @@ function addQuestion(list, data = { prompt: '', options: ['', '', '', ''], corre
     altField.hidden = kind.value !== 'image';
     alt.disabled = kind.value !== 'image';
   };
+  kind.value = data.media?.kind || '';
   kind.onchange();
   media.append(field('Question media', kind), urlField, altField);
   group.append(media);
@@ -176,6 +179,18 @@ async function access() {
   byId('quiz-checkout').hidden = true;
   byId('access').textContent = 'Checking hosting access…';
   try {
+    if (setup.elements.venue.value === 'party') {
+      const balance = await rpc('local_quiz_party_balance');
+      if (request !== accessRequest) return;
+      setMediaAccess(true);
+      create.disabled = balance < 1;
+      byId('quiz-checkout').hidden = balance > 0;
+      byId('quiz-checkout').textContent = 'Buy one Party Quiz Pass · £7.99';
+      byId('access').textContent = balance > 0
+        ? 'Opening a new party lobby uses one pass.'
+        : 'One pass unlocks a single party quiz, including pictures, video and projector view.';
+      return;
+    }
     const venues = await rpc('local_quiz_venues');
     const selected = venues.find(venue => venue.id === setup.elements.venue.value);
     const result = selected?.entitlement ?? 'denied';
@@ -212,7 +227,21 @@ byId('quiz-checkout').onclick = () => action(async () => {
   const checkout = byId('quiz-checkout');
   checkout.disabled = true;
   try {
-    const { data, error } = await db.functions.invoke('quiz-billing', { body: { venue: setup.elements.venue.value } });
+    const party = setup.elements.venue.value === 'party';
+    if (party) {
+      partyAttempt ||= crypto.randomUUID();
+      try {
+        sessionStorage.setItem(draftKey, JSON.stringify({
+          title: setup.elements.title.value,
+          rounds: [...rounds.children].map(round => ({
+            topic: round.querySelector('[name=round-topic]').value,
+            questions: [...round.querySelectorAll('.quiz-question')].map(readQuestion),
+          })),
+        }));
+      } catch { throw Error('This browser could not save your party draft before checkout.'); }
+    }
+    const body = party ? { party, attempt: partyAttempt } : { venue: setup.elements.venue.value };
+    const { data, error } = await db.functions.invoke('quiz-billing', { body });
     if (error) {
       const detail = await error.context?.json?.().catch(() => null);
       throw Error(detail?.message || 'Quiz checkout is unavailable.');
@@ -225,6 +254,18 @@ byId('quiz-checkout').onclick = () => action(async () => {
   }
 });
 
+function readQuestion(group) {
+  return {
+    prompt: group.querySelector('[name=prompt]').value.trim(),
+    options: [...group.querySelectorAll('[name=option]')].map(option => option.value.trim()),
+    correct: Number(group.querySelector('[name=correct]').value),
+    media: {
+      kind: group.querySelector('[name=media-kind]').value,
+      url: group.querySelector('[name=media-url]').value,
+      alt: group.querySelector('[name=media-alt]').value,
+    },
+  };
+}
 setup.elements.venue.onchange = access;
 setup.onsubmit = event => {
   event.preventDefault();
@@ -232,18 +273,21 @@ setup.onsubmit = event => {
     const questions = [...rounds.children].flatMap((round, index) => {
       const topic = round.querySelector('[name=round-topic]').value.trim();
       if (!topic) throw Error('Give each round a topic.');
-      return [...round.querySelectorAll('.quiz-question')].map(group => ({
-        ...questionMedia(group),
-        round: index + 1,
-        topic,
-        prompt: group.querySelector('[name=prompt]').value.trim(),
-        options: [...group.querySelectorAll('[name=option]')].map(option => option.value.trim()),
-        correct: Number(group.querySelector('select').value),
-      }));
+      return [...round.querySelectorAll('.quiz-question')].map(group => {
+        const { prompt, options, correct } = readQuestion(group);
+        return { ...questionMedia(group), round: index + 1, topic, prompt, options, correct };
+      });
     });
+    const party = setup.elements.venue.value === 'party';
     const result = await rpc('local_quiz_create', {
-      p_venue: setup.elements.venue.value, p_title: setup.elements.title.value, p_questions: questions,
+      p_venue: party ? null : setup.elements.venue.value, p_title: setup.elements.title.value, p_questions: questions,
     });
+    if (party) {
+      const resume = new URL(location.href);
+      resume.search = new URLSearchParams({ code: result }).toString();
+      history.replaceState(null, '', resume);
+      try { sessionStorage.removeItem(draftKey); } catch { /* Private storage can be unavailable. */ }
+    }
     await open(result);
   });
 };
@@ -334,6 +378,18 @@ document.addEventListener('fullscreenchange', () => {
   fullscreen.textContent = document.fullscreenElement ? 'Exit full screen' : 'Full screen';
 });
 
+function winnerScreen(scores) {
+  if (!scores.length) return node('p', 'Quiz complete.');
+  const points = Math.max(...scores.map(team => team.points));
+  const winners = scores.filter(team => team.points === points);
+  const celebration = node('div');
+  celebration.className = 'quiz-winner';
+  const names = node('h2', winners.map(team => team.name).join(' & '));
+  celebration.append(node('p', winners.length > 1 ? 'Joint quiz winners' : 'Quiz winner'),
+    names, node('p', points + (points === 1 ? ' point' : ' points')));
+  return celebration;
+}
+
 function projectorContent(next) {
   const title = node('h1', next.title);
   const content = node('div');
@@ -357,6 +413,7 @@ function projectorContent(next) {
     });
     content.append(choices);
   }
+  if (next.phase === 'finished') content.append(winnerScreen(next.scores));
   if (next.phase !== 'open') {
     const ranking = node('ol');
     ranking.className = 'quiz-projector-ranks';
@@ -436,7 +493,7 @@ function show(next) {
     control.disabled = next.phase === 'lobby' && next.scores.length === 0;
     room.append(control);
   }
-  if (next.phase === 'finished') room.append(node('p', 'Quiz complete.'));
+  if (next.phase === 'finished') room.append(winnerScreen(next.scores));
   room.append(node('h3', next.phase === 'lobby' ? 'Teams' : 'Leaderboard'));
   const ranks = node('ol');
   next.scores.forEach(team => ranks.append(node('li', team.name + (next.phase === 'lobby' ? '' : ' · ' + team.points + ' points'))));
@@ -462,11 +519,22 @@ async function init() {
   for (const entry of venues || []) {
     setup.elements.venue.add(new Option(entry.name, entry.id));
   }
-  if (!setup.elements.venue.options.length) return;
+  setup.elements.venue.add(new Option('Private party · Party Quiz Pass', 'party'));
+  if (params.get('party') === '1' || !venues?.length) {
+    setup.elements.venue.value = 'party';
+    try {
+      const draft = JSON.parse(sessionStorage.getItem(draftKey) || 'null');
+      if (draft?.rounds?.length) {
+        setup.elements.title.value = draft.title;
+        rounds.replaceChildren();
+        draft.rounds.forEach(round => addRound(round.topic, round.questions));
+      }
+    } catch { announce('The saved party draft could not be loaded.'); }
+  }
   if ([...setup.elements.venue.options].some(item => item.value === params.get('venue'))) setup.elements.venue.value = params.get('venue');
   byId('setup').hidden = false;
   await access();
-  if (params.get('checkout') === 'success' && !mediaAllowed) {
+  if (params.get('checkout') === 'success' && byId('create').disabled) {
     announce('Stripe has returned you to The Local. Payment verification can take a moment. Refresh this page to check access.');
   }
 }

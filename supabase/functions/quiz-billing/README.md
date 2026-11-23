@@ -24,3 +24,9 @@ price `price_1UewECRlvtejByKsXqOTqrsG`, and subscriber price
 `price_1UewEKRlvtejByKstFPADhWU`. Use a separate staging database for test checkout.
 The current entitlement policy excludes test subscriptions from quiz access.
 Create matching live prices and configure a live webhook before exposing live checkout.
+
+For one-time Party Quiz Passes, also set `QUIZ_PARTY_PRICE` to the matching
+£7.99 one-time GBP Stripe price. Subscribe the same endpoint to
+`checkout.session.completed` and `checkout.session.async_payment_succeeded`.
+The Stripe test price is `price_1UewSbRlvtejByKswCtCnDuh`. A verified paid live
+checkout adds one pass. Opening a new private-party lobby consumes the pass.
