@@ -29,6 +29,7 @@ function upcomingCards(app, days) {
 
 export async function renderVenuePageFeed(client, host, { discovery = false } = {}) {
   if (!client || !host) return;
+  await renderMarketingNotices(client, host);
   const status = host.querySelector('[role="status"]');
   status.textContent = 'Loading venue pages…';
   try {
@@ -106,4 +107,16 @@ export async function renderVenuePageFeed(client, host, { discovery = false } = 
   } catch {
     if (host.isConnected) status.textContent = 'Venue pages are temporarily unavailable.';
   }
+}
+
+async function renderMarketingNotices(client, host) {
+ try {
+  const result=await client.from('local_marketing_announcements').select('id,venue_id,title,body,created_at').eq('published',true).order('created_at',{ascending:false}).limit(12);
+  if(result.error||!result.data?.length||!host.isConnected)return;
+  const venues=await client.from('local_venue_directory').select('id,name').in('id',[...new Set(result.data.map(a=>a.venue_id))]);
+  const names=new Map((venues.data||[]).map(v=>[v.id,v.name]));
+  const section=el('section',{className:'venue-marketing-notices'},el('h3',{},'Venue announcements'));
+  for(const item of result.data){const body=el('p',{},item.body);body.style.whiteSpace='pre-wrap';section.append(el('article',{className:'panel venue-page-feed-card'},el('p',{className:'muted'},names.get(item.venue_id)||'Local venue'),el('h4',{},item.title),body));}
+  host.querySelector('.venue-marketing-notices')?.remove();host.prepend(section);
+ }catch{}
 }

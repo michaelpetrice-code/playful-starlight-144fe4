@@ -29,6 +29,7 @@ quizLink.className = 'tl198-publish-button';
 quizLink.href = 'pub-quiz.html';
 quizLink.textContent = 'Open Pub Quiz';
 launchCard.querySelector('.tl198-launch-actions').append(quizLink);
+for (const [href,label] of [['venue-marketing.html','AI Marketing Assistant'],['race-night/index.html','Host a Race Night']]) {const link=document.createElement('a');link.className='tl198-publish-button';link.href=href;link.textContent=label;launchCard.querySelector('.tl198-launch-actions').append(link);} 
 
 const launchState = launchCard.querySelector('.tl198-launch-state');
 Promise.resolve().then(async () => {

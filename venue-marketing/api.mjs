@@ -1,0 +1,10 @@
+const cfg=window.LADS_CONFIG||{};let session;try{session=JSON.parse(sessionStorage.getItem('local-marketing-auth')||'null');}catch{}
+let signedOut=false;
+async function token(){
+ if(!session&&!signedOut){try{const saved=JSON.parse(localStorage.getItem('sb-'+new URL(cfg.supabaseUrl).hostname.split('.')[0]+'-auth-token')||'null');if(saved?.access_token&&saved.expires_at*1000>Date.now()+30000)session={access_token:saved.access_token,expires_at:saved.expires_at};}catch{}}
+ if(session?.refresh_token&&session.expires_at*1000<Date.now()+30000){const r=await fetch(cfg.supabaseUrl+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:cfg.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:session.refresh_token})});if(r.ok){session=await r.json();sessionStorage.setItem('local-marketing-auth',JSON.stringify(session));}else session=null;}
+ return session?.access_token;
+}
+export async function call(action,data={}){const bearer=await token();const r=await fetch(cfg.supabaseUrl+'/functions/v1/venue-marketing',{method:'POST',headers:{apikey:cfg.supabaseAnonKey,'Content-Type':'application/json',...(bearer?{Authorization:'Bearer '+bearer}:{})},body:JSON.stringify({action,...data}),signal:typeof AbortSignal.timeout==='function'?AbortSignal.timeout(45000):undefined});const result=await r.json();if(!r.ok)throw Error(result.error||'The marketing assistant could not finish that action.');return result;}
+export async function login(email,password){const r=await fetch(cfg.supabaseUrl+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:cfg.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({email,password})});const result=await r.json();if(!r.ok)throw Error(result.msg||result.error_description||'Sign-in failed.');session=result;signedOut=false;sessionStorage.setItem('local-marketing-auth',JSON.stringify(session));return call('access');}
+export function logout(){session=null;signedOut=true;sessionStorage.removeItem('local-marketing-auth');}

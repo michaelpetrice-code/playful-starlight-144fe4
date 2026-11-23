@@ -1,0 +1,9 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {chooseRace,randomIndex,videoFile,validMessage} from '../core.mjs';
+import {availableLocations,raceCardHTML} from '../card.mjs';
+test('random races never repeat played entries',()=>{const a={id:'a'},b={id:'b'};assert.equal(chooseRace([a,b],new Set(['a']),{getRandomValues:a=>(a[0]=0,a)}),b);assert.throws(()=>chooseRace([a],new Set(['a'])));});
+test('random rejection sampling avoids modulo bias',()=>{let calls=0;assert.equal(randomIndex(3,{getRandomValues:a=>(a[0]=calls++===0?4294967295:4,a)}),1);assert.equal(calls,2);});
+test('available locations include only imported footage, keeping racing types separate',()=>{const libs={horse:new Map([['Ascot',{races:[1,2]}],['Empty',{races:[]}]]),dog:new Map([['Hove',{races:[3]}]])};assert.deepEqual(availableLocations(libs),[{kind:'horse',course:'Ascot',count:2},{kind:'dog',course:'Hove',count:1}]);});
+test('printable card has betting record fields, course list, and escapes supplied text',()=>{const html=raceCardHTML({title:'<script>alert(1)</script>',venue:'Coombe',rows:[{kind:'dog',course:'Hove',runners:'1–6',time:'20:00'}],locations:[{kind:'horse',course:'Ascot',count:3}]});assert.ok(html.includes('Selection no.'));assert.ok(html.includes('Total staked'));assert.ok(html.includes('Ascot (horses, 3 races)'));assert.ok(html.includes('Hove'));assert.ok(!html.includes('<script>'));assert.ok(html.includes('&lt;script&gt;'));assert.ok(html.includes('@page{size:A4 landscape'));});
+test('card requires real planned races',()=>{assert.throws(()=>raceCardHTML({rows:[]}));assert.throws(()=>raceCardHTML({rows:[{kind:'invented',course:'A'}]}));});
+test('rejects wrong projector sessions and unsupported files',()=>{assert.equal(validMessage({session:'other',type:'load'},'mine'),false);assert.equal(videoFile({name:'race.exe',size:100}),false);assert.equal(videoFile({name:'race.mp4',size:100}),true);});
