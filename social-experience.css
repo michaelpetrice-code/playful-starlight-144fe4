@@ -231,3 +231,5 @@ html.local-dark-gold #social-welcome-features .social-visitor-hero h2 {
   .social-side-heading h2 { min-width: 0; }
   .social-side-heading > button { flex: none; }
 }
+
+.social-feature-card img.social-feature-icon, .guest-feature img[src$=".svg"] { object-fit: contain; padding: 1.25rem; box-sizing: border-box; background: #172d26; }

@@ -1,4 +1,4 @@
-import {featureGallery,visitorIntroduction} from './social-features.js?v=260';
+import {featureGallery,visitorIntroduction} from './social-features.js?v=278';
 import { renderVenuePageFeed } from './venue-page-feed.js?v=232';
 import { trackPage } from './analytics-track.js?v=174';
 import { memberPageUrl, sharedPage } from './page-share.js?v=173';

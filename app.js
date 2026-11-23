@@ -1,5 +1,5 @@
 import {coombeCommunitySamples} from './coombe-community-samples.js';
-import {featureGallery,visitorIntroduction} from './social-features.js?v=260';
+import {featureGallery,visitorIntroduction} from './social-features.js?v=278';
 import {createSocialExperience,installVisitorShowcase} from './social-experience.js?v=267';
 import {createAppNavigation,readPageRoute,tableFrameMatches,createDraftStore} from './app-navigation.js?v=242';
 import {createPushClient} from './push-notifications.js?v=244';
