@@ -1,7 +1,8 @@
+import {entertainmentPages,entertainmentIntro,createEntertainmentSurface} from './entertainment.js?v=280';
 import {coombeCommunitySamples} from './coombe-community-samples.js';
-import {featureGallery,visitorIntroduction} from './social-features.js?v=278';
-import {createSocialExperience,installVisitorShowcase} from './social-experience.js?v=267';
-import {createAppNavigation,readPageRoute,tableFrameMatches,createDraftStore} from './app-navigation.js?v=242';
+import {featureGallery,visitorIntroduction} from './social-features.js?v=280';
+import {createSocialExperience,installVisitorShowcase} from './social-experience.js?v=280';
+import {createAppNavigation,readPageRoute,tableFrameMatches,createDraftStore} from './app-navigation.js?v=280';
 import {createPushClient} from './push-notifications.js?v=244';
 import {watchMessageAlerts} from './message-alerts.js?v=240';
 import { renderVenuePageFeed } from './venue-page-feed.js?v=232';
@@ -10,7 +11,7 @@ import {footballView,mountFootball} from './football/hub.js';
 import {trackPage} from './analytics-track.js?v=174';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';
 import {prepareProfilePhoto} from './profile-photo.js?v=166';
-import {loadAdministration,mountAdministration} from './administration.js?v=268';
+import {loadAdministration,mountAdministration} from './administration.js?v=280';
 import {mountBilling} from './venue-billing.js?v=176';
 import {mountVenueBuilder} from './venue-app-builder.js?v=147';
 import {onlineCueView,bindOnlineCue} from './online-cue-v90.js';
@@ -26,7 +27,7 @@ import {safetyView,bindSafety} from './safety-reporting.js';
 import {initLounge,decorateLounge,uploadTablePhoto,uploadProfilePhoto,loadProfileAvatar,renderLiveGame,bindLiveGame} from './realtime-lounge.js?v=166';
 import {virtualTablesView,meetupsView,venueView,bindCommunityHub,hubEntries} from './community-hub.js?v=173';
 import {shareLocal} from './share.js?v=277';
-import { memberPages, sharedPage, shareButton, shareMemberPage, pageLabel, shareItem, focusSharedItem } from './page-share.js?v=173';
+import { memberPages, sharedPage, shareButton, shareMemberPage, pageLabel, shareItem, focusSharedItem } from './page-share.js?v=280';
 import {privateChatView,bindPrivateChat,disposePrivateChat} from './private-chat.js?v=242';
 import {appearancePanel,bindAppearance} from './theme-settings.js?v=242';
 import {tradesView,bindTrades} from './trades.js?v=202';
@@ -52,7 +53,7 @@ if(cloud){
   }
 }
 
-const names=['Home','Local Updates','Virtual Pub Tables','Private Chats','Who’s Up for It?','Venue Hub','Venue Applications','Venue App Builder','Events','Community','Buy, Sell or Give Away','Trades & Services','Rounds','Photos','Football','Kitty','Quiz','Games','Arcade','More Games','Tournaments','Leaderboard','Alerts','Install','Account','Report Behaviour' ];let ownerAccess=false;let memberStatus='active';let tab=location.hash==='#tables'?'Virtual Pub Tables':location.hash.startsWith('#venue=')?'Venue Hub':(['Buy, Sell or Give Away','Trades & Services'].includes(new URLSearchParams(location.search).get('section'))?new URLSearchParams(location.search).get('section'):'Home'),user=null,group=null,groupId=null,records=[],activeChatRoom='general',local=(()=>{try{return JSON.parse(localStorage.getItem('lads-local-v1')||'null')}catch{return null}})()||{name:'You',items:[],group:'The Local'};
+const names=['Home','Local Updates','Virtual Pub Tables','Private Chats','Who’s Up for It?','Venue Hub','Venue Applications','Venue App Builder','Events','Community','Buy, Sell or Give Away','Trades & Services','Rounds','Photos','Football','The Local DJ','Race Night','Kitty','Quiz','Games','Arcade','More Games','Tournaments','Leaderboard','Alerts','Install','Account','Report Behaviour' ];let ownerAccess=false;let memberStatus='active';let tab=location.hash==='#tables'?'Virtual Pub Tables':location.hash.startsWith('#venue=')?'Venue Hub':(['Buy, Sell or Give Away','Trades & Services'].includes(new URLSearchParams(location.search).get('section'))?new URLSearchParams(location.search).get('section'):'Home'),user=null,group=null,groupId=null,records=[],activeChatRoom='general',local=(()=>{try{return JSON.parse(localStorage.getItem('lads-local-v1')||'null')}catch{return null}})()||{name:'You',items:[],group:'The Local'};
 const builderLink = new URLSearchParams(location.search);
 const incomingShare = sharedPage();
 if(incomingShare && builderLink.has('section'))incomingShare.item=null;
@@ -74,6 +75,8 @@ let tableFrameUrl = tableDestination
   : 'secure-tables.html?embedded=1&v=250';
 if (builderLink.get('section') === 'venue-app-builder') tab = 'Venue App Builder';
 if (builderLink.get('section') === 'venue-applications') tab = 'Venue Applications';
+if (builderLink.get('section') === 'dj') tab = 'The Local DJ';
+if (builderLink.get('section') === 'race-night') tab = 'Race Night';
 if (builderLink.get('section') === 'football') tab = 'Football';
 if (builderLink.get('section') === 'billing') tab = 'Venue subscription';
 if (builderLink.get('section') === 'administration') tab = 'Administration';
@@ -377,6 +380,7 @@ function updateNotificationBell() {
 
 installVisitorShowcase(document,visitorIntroduction(),featureGallery());
 const socialExperience=createSocialExperience({openPage:page=>{tab=page;render()},openTable:t=>{tab='Virtual Pub Tables';render();navigation.openDetail({table:t.id,venue:t.venue_id});render()}});
+const entertainment=createEntertainmentSurface({onIdentityChange:()=>{try{sessionStorage.removeItem('local-dj-auth');}catch{}}});
 const tableDrafts=createDraftStore();
 const navigation=createAppNavigation({win:window,doc:document,getScope:()=>`${user?.id||'guest'}:${groupId||''}`,getPage:()=>tab,setPage:page=>{tab=page},render:()=>render(),label:page=>pageLabel(page),setDetail:detail=>{
  notificationRoom=detail.room||null;
@@ -384,6 +388,7 @@ const navigation=createAppNavigation({win:window,doc:document,getScope:()=>`${us
  else tableFrameUrl='secure-tables.html?embedded=1&v=250';
 }});
 function render(){
+ entertainment.show(tab,user?.id||'demo',(!cloud||Boolean(user))&&(memberStatus==='active'||ownerAccess));
  if(!user || (memberStatus!=='active'&&!ownerAccess))socialExperience.clear();
  if (Object.hasOwn(legacyAdmin,tab)) { adminPane=legacyAdmin[tab];tab='Administration'; }
  if(['Chat','Chat & Media Settings'].includes(tab))tab='Virtual Pub Tables';
@@ -406,7 +411,7 @@ const bottom=document.getElementById('bottomNav');
 if(bottom)bottom.innerHTML=quick.map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}" aria-label="${n}"><span class="bottom-icon">${n==='Home'?'<img class="local55-nav-logo" src="icons/the-local-pint-transparent-v150.png" alt="">':labels[n]}</span><span>${({"Virtual Pub Tables":"Tables","Who’s Up for It?":"Plans","Venue Hub":"Venues","Arcade":"Games Room","Private Chats":"Messages"}[n]||n)}</span></button>`).join('')+`<button id="moreNav" aria-expanded="false" aria-controls="moreDrawer" class="${inMore?'active':''}" aria-label="More sections"><span class="bottom-icon"><svg class="tl124-icon" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg></span><span>More</span></button>`;
 const more=document.getElementById('moreMenu');
 if(more){
- const groups=[['Explore',['Venue Hub','Events','Buy, Sell or Give Away','Trades & Services']],['Your community',['Local Updates','Community','Photos','Rounds','Kitty']],['Games & football',['Arcade','Football','Quiz','Games','More Games','Tournaments','Leaderboard']],['Your account',['Alerts','Account','Install','Report Behaviour']],['For venues',['Venue App Builder','Venue Applications','Venue subscription']]];
+ const groups=[['Explore',['Venue Hub','Events','Buy, Sell or Give Away','Trades & Services']],['Your community',['Local Updates','Community','Photos','Rounds','Kitty']],['Games, music & racing',['Arcade','Football','The Local DJ','Race Night','Quiz','Games','More Games','Tournaments','Leaderboard']],['Your account',['Alerts','Account','Install','Report Behaviour']],['For venues',['Venue App Builder','Venue Applications','Venue subscription']]];
  if(adminAccess && (ownerAccess || adminAccess.local || adminAccess.staff?.length))groups.push(['Management',['Administration']]);
  more.innerHTML='<label for="moreSearch">Find a feature</label><input id="moreSearch" type="search" placeholder="Search features…">'+groups.map(([title,pages])=>`<section data-more-group><h3>${esc(title)}</h3><div class="more-feature-grid">${pages.filter(n=>!quick.includes(n)).map(n=>`<button data-tab="${n}" class="${tab===n?'active':''}">${esc(pageLabel(n))}</button>`).join('')}</div></section>`).join('')+'<p id="moreSearchEmpty" hidden>No matching features. Try another word.</p>';
 }
@@ -444,9 +449,11 @@ if(tab==='Home'){
   ['Buy, Sell or Give Away','Buy, Sell or Give Away','Find a bargain or pass something on.','marketplace'],
   ['Trades & Services','Local Tradespeople','Find trades and services in your area.','local-tradesmen'],
   ['Tournaments','Club Competitions','Enter a tournament or follow the standings.','club-competitions'],
-  ['Rounds','Rounds','Keep track of whose round it is.','buy-a-round']
+  ['Rounds','Rounds','Keep track of whose round it is.','buy-a-round'],
+  ['The Local DJ','The Local DJ','Request songs and control the venue soundtrack.','music.svg'],
+  ['Race Night','Horse & dog racing','Random races, printable cards and a projector view. Bring authorised footage.','race.svg']
  ];
- const feature=(item,index)=>`<article class="tl149-feature"><img src="assets/feature-slides/${item[3]}.webp" alt="" width="504" height="333" loading="${index<4?'eager':'lazy'}"><div><h3>${item[1]}</h3><p>${item[2]}</p><button type="button" data-go="${esc(item[0])}">Open ${item[1]} <span aria-hidden="true">→</span></button></div></article>`;
+ const feature=(item,index)=>`<article class="tl149-feature"><img src="assets/${item[3].endsWith('.svg')?'builder-library/'+item[3]:'feature-slides/'+item[3]+'.webp'}" alt="" width="504" height="333" loading="${index<4?'eager':'lazy'}"><div><h3>${item[1]}</h3><p>${item[2]}</p><button type="button" data-go="${esc(item[0])}">Open ${item[1]} <span aria-hidden="true">→</span></button></div></article>`;
  const hour=new Date().getHours(), greeting=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
  const communityReady = !cloud || Boolean(user && groupId);
  h=`<div class="tl149-home ref-home community-home">
@@ -507,6 +514,7 @@ if(tab==='Trades & Services')h=tradesView();
 
 if(tab==='Rounds')h=panel('Whose round?',`<form id="roundForm">${field('Who bought it?','roundBuyer','text','Mick')}${field('What was the round?','roundDesc','text','4 pints')}${field('Cost (£)','roundCost','number','20')}<button>Log a round</button></form>`)+panel('Round history',list('round',x=>`<div class="item">🍺 <b>${esc(x.data.buyer)}</b> — ${esc(x.data.desc)} <b>£${Number(x.data.cost||0).toFixed(2)}</b></div>`));
 if(tab==='Photos')h=panel('Photo wall',`<form id="photoForm">${field('Caption','photoCaption','text','What a night!')}<label>Photo<input type="file" id="photoFile" accept="image/*" required></label><button>Share photo</button></form><small>Demo images are compressed and stored locally; cloud images use private Supabase storage.</small>`)+list('photo',x=>`<div class="item" data-tl172-record="${esc(x.id)}"><b>${author(x)}</b> — ${esc(x.data.caption)}<div class="photo" data-photo="${x.id}"></div>${groupShareButton('photos',x,'Share photo')}</div>`);
+if(entertainmentPages[tab])h=entertainmentIntro(tab);
 if(tab==='Football')h=footballView()+panel('Previous predictions',list('football',x=>`<div class="item">⚽ <b>${esc(x.data.fixture)}</b> — ${esc(x.data.prediction)} <small>by ${author(x)}</small></div>`));
 if(tab==='Kitty'){let sum=entries('kitty').reduce((a,x)=>a+Number(x.data.amount||0),0);h=panel('Group kitty',`<h2>£${sum.toFixed(2)}</h2><p class="muted">Recorded contributions minus spending. This is a ledger, not a payment or bank account.</p><form id="kittyForm">${field('Description','kittyDesc','text','Mick paid in')}${field('Amount in £ (negative for spending)','kittyAmount','number','10')}<button>Record transaction</button></form>`)+panel('Ledger',list('kitty',x=>`<div class="item">${esc(x.data.desc)} <b>£${Number(x.data.amount).toFixed(2)}</b> <small>by ${author(x)}</small></div>`))}
 if(tab==='Quiz')h=panel('Pub quiz',`<p>Five questions. Pick your answers and see your score.</p><div id="quizArea"></div>`);

@@ -52,8 +52,8 @@ def main():
     if 'id="tl-continue-guest"' not in index or 'href="guest.html"' not in index:
         failures.append('index.html: visible guest route is missing')
     links = parsed['guest.html'].links
-    if len(links) != 12:
-        failures.append(f'guest.html: expected 12 gallery links; found {len(links)}')
+    if len(links) != 14:
+        failures.append(f'guest.html: expected 14 gallery links; found {len(links)}')
     pages_in_gallery = []
     for link in links:
         if not link.startswith('guest.html?page='):
@@ -63,7 +63,7 @@ def main():
     if len(set(pages_in_gallery)) != len(pages_in_gallery):
         failures.append('guest.html: duplicate guest gallery destinations')
     for page in pages_in_gallery:
-        if not re.search(r'\b' + re.escape(page) + r'\s*:', guest_js):
+        if not re.search(r"(?:['\"]?)" + re.escape(page) + r"(?:['\"]?)\s*:", guest_js):
             failures.append(f'guest.js: no page configuration found for {page!r}')
     marketplace_js = (ROOT / 'marketplace.js').read_text(encoding='utf-8')
     sample_photos = re.findall(r"photo:'([a-z-]+)'", marketplace_js)
@@ -87,7 +87,7 @@ def main():
         for f in failures:
             print(' - ' + f)
         return 1
-    print('PASS: homepage guest link; 12 guest routes; public page assets; marketplace sample images; Games Room shell')
+    print('PASS: homepage guest link; 14 guest routes; public page assets; marketplace sample images; Games Room shell')
     print('NOTE: This does not test authentication, live Supabase, game rules, graphics, or multiplayer.')
     return 0
 

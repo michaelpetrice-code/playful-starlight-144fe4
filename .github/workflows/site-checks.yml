@@ -49,7 +49,7 @@ jobs:
       - name: Install DOM regression test dependency
         run: npm ci --prefix tests --ignore-scripts
       - name: Check social navigation, drafts and private chat lifecycle
-        run: node --test tests/social-flow.test.cjs tests/table-attachments.test.cjs tests/social-experience.test.cjs tests/table-keyboard.test.cjs
+        run: node --test tests/social-flow.test.cjs tests/table-attachments.test.cjs tests/social-experience.test.cjs tests/table-keyboard.test.cjs tests/entertainment.test.mjs
 
       - name: Check race cards, race selection and venue marketing
         run: node --test race-night/tests/*.mjs venue-marketing/tests/*.mjs

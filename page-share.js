@@ -13,6 +13,8 @@ export const memberPages = Object.freeze({
   rounds: 'Rounds',
   photos: 'Photos',
   football: 'Football',
+  dj: 'The Local DJ',
+  'race-night': 'Race Night',
   kitty: 'Kitty',
   quiz: 'Quiz',
   games: 'Games',

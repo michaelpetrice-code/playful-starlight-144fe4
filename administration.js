@@ -3,7 +3,7 @@ import { mountAnalytics } from './analytics-dashboard.js?v=196';
 import { ownerView, bindOwner } from './owner-dashboard.js';
 import { adminView, bindAdmin } from './local-admin.js';
 import { mountClubAdmin } from './simple-admin-v82.js';
-import { mountVenueControls } from './venue-control.js?v=198';
+import { mountVenueControls } from './venue-control.js?v=280';
 import { venueApprovalsView, bindVenueApprovals } from './venue-approvals.js';
 import { safetyView, bindSafety } from './safety-reporting.js';
 
