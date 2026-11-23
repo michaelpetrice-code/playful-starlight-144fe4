@@ -9,7 +9,7 @@ import {footballView,mountFootball} from './football/hub.js';
 import {trackPage} from './analytics-track.js?v=174';
 import {readTableChatLink, tableChatLink} from './table-chat-link.js?v=169';
 import {prepareProfilePhoto} from './profile-photo.js?v=166';
-import {loadAdministration,mountAdministration} from './administration.js?v=249';
+import {loadAdministration,mountAdministration} from './administration.js?v=268';
 import {mountBilling} from './venue-billing.js?v=176';
 import {mountVenueBuilder} from './venue-app-builder.js?v=147';
 import {onlineCueView,bindOnlineCue} from './online-cue-v90.js';

@@ -1,4 +1,4 @@
-import { seasonalAdminView, bindSeasonalAdmin } from './seasonal-decorations.js?v=249';
+import { seasonalAdminView, bindSeasonalAdmin } from './seasonal-decorations.js?v=268';
 import { mountAnalytics } from './analytics-dashboard.js?v=196';
 import { ownerView, bindOwner } from './owner-dashboard.js';
 import { adminView, bindAdmin } from './local-admin.js';

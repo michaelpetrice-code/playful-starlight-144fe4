@@ -1,21 +1,4 @@
-/* Seasonal welcome: drawn ornaments, warm metallic detail and quiet depth. */
-html.local-dark-gold body>header .seasonal-decoration{grid-column:1/-1;position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,24px);box-sizing:border-box;width:100%;max-width:1080px;margin:10px auto 0;padding:12px 24px 12px 12px;min-height:124px;overflow:hidden;border:1px solid #bd985b66;border-radius:16px;background:radial-gradient(ellipse at 12% 40%,#b88a3330,transparent 50%),linear-gradient(120deg,#183528,#0c1b15 60%,#19281c);box-shadow:inset 0 1px 0 #ffe1a51a,inset 0 -1px 0 #0006,0 7px 20px #0003;color:#f2db9f;text-align:left}
-html.local-dark-gold body>header .seasonal-decoration[hidden]{display:none!important}
-.seasonal-decoration::before{content:'';position:absolute;inset:5px;border:1px solid #ead49b16;border-radius:12px;pointer-events:none;z-index:-1}
-.seasonal-art{flex:0 0 148px;align-self:stretch;display:flex;align-items:center;filter:drop-shadow(0 5px 6px #0005)}
-.seasonal-art svg{display:block;width:100%;height:112px;overflow:visible}
-.seasonal-copy{display:grid;gap:6px;max-width:480px;min-width:0;padding:8px 0}
-.seasonal-eyebrow{font-family:Arial,sans-serif;font-size:9px;font-weight:700;letter-spacing:.22em;color:#ccb481;line-height:1.5}
-.seasonal-heading{font-family:Georgia,serif;font-size:clamp(21px,3vw,32px);font-weight:normal;line-height:1.12;color:#ffe8b3;text-shadow:0 2px 5px #0007}
-.seasonal-description{font-family:Arial,sans-serif;font-size:12px;line-height:1.55;color:#c6cbbc;letter-spacing:.01em}
-html.local-dark-gold body>header .seasonal-decoration[data-occasion="remembrance"]{background:linear-gradient(120deg,#211b1b,#111b17 65%);border-color:#8d6b6066;box-shadow:inset 0 1px 0 #ffffff09,0 7px 20px #0003}
-.seasonal-decoration[data-occasion="remembrance"] .seasonal-heading{color:#eee3cf}
-html.local-dark-gold body>header .seasonal-decoration[data-occasion="armed-forces"]{background:linear-gradient(120deg,#162c36,#101e20 70%)}
-html.local-dark-gold body>header .seasonal-decoration[data-occasion="halloween"]{background:radial-gradient(ellipse at 10% 50%,#a65b2433,transparent 60%),#181a16}
-html.local-dark-gold body>header .seasonal-decoration[data-occasion="valentine"]{background:linear-gradient(120deg,#3c2029,#171c18 75%)}
-html.local-dark-gold[data-season="christmas"] body>header.local-app-header{background:radial-gradient(ellipse at 5% 0%,#284f3760,transparent 50%),#0b1510f5!important}
-@media(max-width:600px){html.local-dark-gold body>header .seasonal-decoration{min-height:114px;padding:8px 12px 8px 4px;margin-top:8px;gap:6px;border-radius:12px}.seasonal-art{flex-basis:104px}.seasonal-art svg{height:100px}.seasonal-copy{gap:5px}.seasonal-eyebrow{font-size:8px;letter-spacing:.15em}.seasonal-heading{font-size:23px}.seasonal-description{font-size:10px}}
-@media(max-width:360px){.seasonal-art{flex-basis:80px}.seasonal-heading{font-size:20px}.seasonal-description{font-size:10px}}
+/* The artwork lives inside the existing logo. Only the settings dialog needs styling. */
 .seasonal-dialog{box-sizing:border-box;width:min(420px,calc(100vw - 32px));max-height:80dvh;overflow:auto;padding:24px;border:1px solid #c9a75c;border-radius:18px;background:#111b17;color:#f4f1e6;box-shadow:0 16px 50px #0008}
 .seasonal-dialog::backdrop{background:#0009}
 .seasonal-dialog h2{margin-top:0;color:#edcf8b}.seasonal-dialog p{line-height:1.5}
