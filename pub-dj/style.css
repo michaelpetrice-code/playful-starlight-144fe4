@@ -14,3 +14,5 @@
 @media(max-width:720px){.now-song .now-artwork{width:75px;grid-column:1;grid-row:2/4;margin:0}.now-artwork .cover-letter{font-size:22px}}
 
 .source-discovery-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}.source-discovery-links a{display:block;padding:14px;border:1px solid #53634c;border-radius:10px;background:#1b2921;color:#eddba9;overflow-wrap:anywhere}.source-discovery-links a:focus-visible{outline:3px solid #e9c76a;outline-offset:3px}@media(max-width:550px){.source-discovery-links{grid-template-columns:1fr}}
+
+#personal-player-slot iframe{display:block;width:100%;min-height:270px;aspect-ratio:16/9;border:0;border-radius:12px;background:#000}#personal-player-slot:empty{display:none}.screen #personal-player-panel{display:none}#personal-player-url{min-width:0;width:100%}
