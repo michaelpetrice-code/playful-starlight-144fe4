@@ -289,3 +289,7 @@ html.local-dark-gold body .social-feature-section .social-feature-card>div{paddi
 html.local-dark-gold body .social-feature-section .social-feature-card h3{font-size:16px!important;line-height:1.2!important;margin:0!important;color:#f5d58a!important}
 html.local-dark-gold body .social-feature-section .social-feature-card p{font-size:13px!important;line-height:1.3!important;margin:0!important}
 html.local-dark-gold body .social-feature-section .social-feature-card :is(a,button){font-size:13px!important;padding:5px 0!important;min-height:32px!important;margin-top:auto!important}
+
+html.local-dark-gold body:has(.social-feature-section){background:#090909!important}
+html.local-dark-gold body .social-feature-section .social-feature-card>div{background:linear-gradient(145deg,#17130e,#090909)!important}
+html.local-dark-gold body .social-left button,html.local-dark-gold body .tl-welcome-navigation a{font-size:14px!important;line-height:1.3!important;padding:8px 10px!important;min-height:36px!important}
