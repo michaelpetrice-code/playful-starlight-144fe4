@@ -59,15 +59,22 @@ coach(()=>sn?'Use the white ball to pot a red, then a colour. This is physics pr
 registerCleanup(()=>{alive=false;pendingRespots=[];cancelAnimationFrame(raf)});setup()
 }
 function darts({root,say,record,coach,registerCleanup,difficulty='normal'},start=501){
-let alive=true,score=start,bot=start,throws=0,turn=0,done=false,visitStart=start;
+let alive=true,score=start,bot=start,throws=0,turn=0,done=false,visitStart=start,landed=[];
 const wrap=E('div','v192-panel'),status=E('div','v192-status'),canvas=E('canvas','v192-dartboard');canvas.width=560;canvas.height=560;
-const control=E('div','v192-actions'),mode=E('select');for(const m of ['Single','Double','Treble']){const o=E('option','',m);mode.append(o)}const targetNumber=E('input');targetNumber.type='number';targetNumber.min=1;targetNumber.max=25;targetNumber.value=20;targetNumber.setAttribute('aria-label','Dart target number or 25 for bull');mode.setAttribute('aria-label','Dart target ring');control.append(E('span','','Target ring'),mode,targetNumber,btn('Throw at target',()=>{const n=Number(targetNumber.value);if(!Number.isInteger(n)||(n>20&&n!==25)||n<1){say('Choose 1–20 or 25 for bull.');return;}const index=order.indexOf(n),angle=-Math.PI/2+index*Math.PI/10,radius=n===25?0:mode.value==='Double'?190:mode.value==='Treble'?112:160;const rect=canvas.getBoundingClientRect();throwAt({clientX:rect.left+(280+Math.cos(angle)*radius)*rect.width/560,clientY:rect.top+(280+Math.sin(angle)*radius)*rect.height/560});}),btn('New leg',reset));wrap.append(status,canvas,control);root.append(wrap);
+const control=E('div','v192-actions'),mode=E('select');for(const m of ['Single','Double','Treble']){const o=E('option','',m);mode.append(o)}const targetNumber=E('input');targetNumber.type='number';targetNumber.min=1;targetNumber.max=25;targetNumber.value=20;targetNumber.setAttribute('aria-label','Dart target number or 25 for bull');mode.setAttribute('aria-label','Dart target ring');control.append(E('span','','Target ring'),mode,targetNumber,btn('Throw at target',()=>{const n=Number(targetNumber.value);if(!Number.isInteger(n)||(n>20&&n!==25)||n<1){say('Choose 1–20 or 25 for bull.');return;}const index=order.indexOf(n),angle=-Math.PI/2+index*Math.PI/10,radius=n===25?0:mode.value==='Double'?(D+DI)/2:mode.value==='Treble'?(T+TI)/2:175;const rect=canvas.getBoundingClientRect();throwAt({clientX:rect.left+(280+Math.cos(angle)*radius)*rect.width/560,clientY:rect.top+(280+Math.sin(angle)*radius)*rect.height/560});}),btn('New leg',reset));wrap.append(status,canvas,control);root.append(wrap);
 const ctx=canvas.getContext('2d'),order=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-function draw(){ctx.clearRect(0,0,560,560);ctx.fillStyle='#152b28';ctx.fillRect(0,0,560,560);ctx.translate(280,280);
-for(let i=0;i<20;i++){let a=-Math.PI/2+(i-.5)*Math.PI/10,b=a+Math.PI/10;for(let [outer,inner,col] of [[220,198,i%2?'#e5d5b3':'#1e2522'],[198,183,i%2?'#bd3b40':'#237657'],[183,120,i%2?'#e5d5b3':'#1e2522'],[120,105,i%2?'#bd3b40':'#237657']]){ctx.beginPath();ctx.arc(0,0,outer,a,b);ctx.arc(0,0,inner,b,a,true);ctx.closePath();ctx.fillStyle=col;ctx.fill()}ctx.fillStyle='#f7e5b9';ctx.font='bold 19px Arial';ctx.textAlign='center';ctx.fillText(order[i],Math.cos(a+Math.PI/20)*244,Math.sin(a+Math.PI/20)*244+6)}
-for(const [r,c] of [[105,'#1b2521'],[37,'#217c5d'],[18,'#bb383d']]){ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fillStyle=c;ctx.fill()}ctx.setTransform(1,0,0,1,0,0)}
-function reset(){score=bot=start;throws=0;turn=0;done=false;visitStart=start;status.textContent=`You ${score} · Computer ${bot} · Tap a segment to throw`;say('Double-out rules apply.');draw()}
-function hit(x,y){const dx=x-280,dy=y-280,r=Math.hypot(dx,dy);if(r>220)return{points:0,double:false,label:'Miss'};if(r<=18)return{points:50,double:true,label:'Bullseye'};if(r<=37)return{points:25,double:false,label:'Outer bull'};let angle=(Math.atan2(dy,dx)+Math.PI/2+Math.PI*2)%(Math.PI*2);let index=Math.floor((angle+Math.PI/20)%(Math.PI*2)/(Math.PI/10)),n=order[index],mult=r>=183&&r<=198?2:r>=105&&r<=120?3:1;return{points:n*mult,double:mult===2,label:`${mult===3?'Treble':mult===2?'Double':'Single'} ${n}`}}
+// Regulation proportions: double outer radius 170 mm, treble outer 107 mm.
+const scale=220/170, D=220, DI=162*scale,T=107*scale,TI=99*scale,B=6.35*scale,OB=15.9*scale;
+function draw(){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,560,560);ctx.fillStyle='#101010';ctx.fillRect(0,0,560,560);ctx.translate(280,280);
+function disk(r,color){ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill()}
+disk(270,'#25211e');disk(261,'#111111');disk(225,'#b5b1a3');
+for(let i=0;i<20;i++){const a=-Math.PI/2+(i-.5)*Math.PI/10,b=a+Math.PI/10,base=i%2?'#e9dfbf':'#202020',ring=i%2?'#16834e':'#b8212c';
+for(const [outer,inner,col] of [[D,DI,ring],[DI,T,base],[T,TI,ring],[TI,OB,base]]){ctx.beginPath();ctx.arc(0,0,outer,a,b);ctx.arc(0,0,inner,b,a,true);ctx.closePath();ctx.fillStyle=col;ctx.fill();ctx.strokeStyle='#bcb8ac';ctx.lineWidth=.85;ctx.stroke()}
+ctx.fillStyle='#f5f3eb';ctx.font='bold 23px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(order[i],Math.cos(a+Math.PI/20)*244,Math.sin(a+Math.PI/20)*244)}
+disk(OB,'#16834e');disk(B,'#b8212c');for(const r of [OB,B]){ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.strokeStyle='#c4c0b5';ctx.lineWidth=1;ctx.stroke()}ctx.setTransform(1,0,0,1,0,0);
+for(const [x,y] of landed){ctx.save();ctx.translate(x,y);ctx.rotate(-.65);ctx.strokeStyle='#0008';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(3,3);ctx.lineTo(3,-47);ctx.stroke();ctx.strokeStyle='#d7dbe0';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-16);ctx.stroke();const barrel=ctx.createLinearGradient(-4,0,4,0);barrel.addColorStop(0,'#4e5158');barrel.addColorStop(.45,'#e8e9ed');barrel.addColorStop(1,'#777b82');ctx.fillStyle=barrel;ctx.fillRect(-4,-32,8,16);for(let k=-30;k<-17;k+=3){ctx.fillStyle='#303238';ctx.fillRect(-4,k,8,1)}ctx.fillStyle='#9fa3a9';ctx.fillRect(-1,-48,2,16);ctx.fillStyle='#b82d38';ctx.beginPath();ctx.moveTo(0,-38);ctx.lineTo(-10,-57);ctx.lineTo(0,-53);ctx.lineTo(10,-57);ctx.closePath();ctx.fill();ctx.restore()}}
+function reset(){landed=[];score=bot=start;throws=0;turn=0;done=false;visitStart=start;status.textContent=`You ${score} · Computer ${bot} · Tap a segment to throw`;say('Double-out rules apply.');draw()}
+function hit(x,y){const dx=x-280,dy=y-280,r=Math.hypot(dx,dy);if(r>220)return{points:0,double:false,label:'Miss'};if(r<=B)return{points:50,double:true,label:'Bullseye'};if(r<=OB)return{points:25,double:false,label:'Outer bull'};let angle=(Math.atan2(dy,dx)+Math.PI/2+Math.PI*2)%(Math.PI*2);let index=Math.floor((angle+Math.PI/20)%(Math.PI*2)/(Math.PI/10)),n=order[index],mult=r>=DI&&r<=D?2:r>=TI&&r<=T?3:1;return{points:n*mult,double:mult===2,label:`${mult===3?'Treble':mult===2?'Double':'Single'} ${n}`}}
 function apply(current,h){const rem=current-h.points;if(rem<0||rem===1||(rem===0&&!h.double))return{score:current,bust:true,win:false};return{score:rem,bust:false,win:rem===0}}
 function botVisit(){
  const starting=bot;let bust=false,won=false;
@@ -100,7 +107,7 @@ function throwAt(e){
  if(done||!alive)return;
  const r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;
  const x=(e.clientX-r.left)*560/r.width,y=(e.clientY-r.top)*560/r.height;
- if(throws%3===0)visitStart=score;
+ if(throws%3===0){visitStart=score;landed=[];}if(Math.hypot(x-280,y-280)<=261)landed.push([x,y]);draw();
  const h=hit(x,y),res=apply(score,h);throws++;
  score=res.bust?visitStart:res.score;
  say(h.label+' · '+h.points+' points'+(res.bust?' · BUST':''));
