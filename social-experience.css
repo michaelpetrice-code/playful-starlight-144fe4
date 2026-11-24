@@ -262,3 +262,13 @@ html.local-dark-gold body .social-feature-card .social-eyebrow{font-size:.65rem!
 html.local-dark-gold body .social-feature-card :is(a,button){border-top:1px solid #b99a5438!important;font-weight:650!important}
 html.local-dark-gold body .social-feature-card:focus-within{outline:2px solid #d6b66c;outline-offset:2px}
 @media(hover:hover){html.local-dark-gold body .social-feature-card:hover{border-color:#d6b66c!important;box-shadow:0 7px 20px #0007!important}}
+
+/* Approved compact gold gallery */
+html body .social-feature-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))!important;gap:12px!important}
+html body .social-feature-grid>.social-feature-card{background:linear-gradient(160deg,#181713,#090909)!important;border:1px solid #a98338!important;border-radius:14px!important;box-shadow:0 4px 12px #0006,inset 0 1px #f4d28b22!important;overflow:hidden!important}
+html body .social-feature-grid>.social-feature-card>img{width:100%!important;height:clamp(105px,10vw,145px)!important;object-fit:cover!important}
+html body .social-feature-grid>.social-feature-card h3{color:#f5d58a!important;font-weight:750!important}
+html body .social-feature-grid>.social-feature-card p{color:#e8e5df!important;line-height:1.4!important}
+@media(min-width:1200px){html body .social-feature-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:520px){html body .social-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:340px){html body .social-feature-grid{grid-template-columns:1fr!important}}
