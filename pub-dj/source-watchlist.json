@@ -2,10 +2,47 @@
   "free_only": true,
   "auto_publish": false,
   "sources": [
-    {"provider":"Chris Zabriskie","url":"https://chriszabriskie.com/music/","path_prefix":"/","review":"Use artist's CC BY 4.0 licence; retain track and album credits. Check actual media before inclusion."},
-    {"provider":"Holizna on OpenGameArt","url":"https://opengameart.org/users/holizna","path_prefix":"/content/","review":"Select individual CC0 recordings with free downloads. Do not buy Bandcamp releases."},
-    {"provider":"OpenGameArt CC0 discovery","url":"https://opengameart.org/content/cc0-music-0","path_prefix":"/content/","review":"Collection labels do not approve rights. Verify individual author, licence, audio and suitability."},
-    {"provider":"Wikimedia Commons","url":"https://commons.wikimedia.org/wiki/Category:Direct_to_Video_by_Chris_Zabriskie_(album)","path_prefix":"/wiki/","review":"Check recording and composition rights, artist confirmation and attribution. Prefer MP3 transcoding for compatibility."},
-    {"provider":"Open Music Archive","url":"https://www.openmusicarchive.org/","path_prefix":"/","review":"Check individual recording and composition status for UK use and other target countries; test playback."}
+    {
+      "provider": "Chris Zabriskie",
+      "url": "https://chriszabriskie.com/music/",
+      "path_prefix": "/",
+      "review": "Use artist's CC BY 4.0 licence; retain track and album credits. Check actual media before inclusion."
+    },
+    {
+      "provider": "Holizna on OpenGameArt",
+      "url": "https://opengameart.org/users/holizna",
+      "path_prefix": "/content/",
+      "review": "Select individual CC0 recordings with free downloads. Do not buy Bandcamp releases."
+    },
+    {
+      "provider": "OpenGameArt CC0 discovery",
+      "url": "https://opengameart.org/content/cc0-music-0",
+      "path_prefix": "/content/",
+      "review": "Collection labels do not approve rights. Verify individual author, licence, audio and suitability."
+    },
+    {
+      "provider": "Wikimedia Commons",
+      "url": "https://commons.wikimedia.org/wiki/Category:Direct_to_Video_by_Chris_Zabriskie_(album)",
+      "path_prefix": "/wiki/",
+      "review": "Check recording and composition rights, artist confirmation and attribution. Prefer MP3 transcoding for compatibility."
+    },
+    {
+      "provider": "Open Music Archive",
+      "url": "https://www.openmusicarchive.org/",
+      "path_prefix": "/",
+      "review": "Check individual recording and composition status for UK use and other target countries; test playback."
+    },
+    {
+      "provider": "SampleSwap commercial-use discovery",
+      "url": "https://sampleswap.org/mp3/creative-commons/free-music.php?focus=selections&onlycommercial=true",
+      "path_prefix": "/mp3/",
+      "review": "Discovery only. Check individual recording licence, contributor rights, attribution and actual playback. The commercial filter is not a blanket licence."
+    },
+    {
+      "provider": "Scott Buckley discovery",
+      "url": "https://www.scottbuckley.com.au/library/",
+      "path_prefix": "/library/",
+      "review": "Discovery only. Published standalone streaming restrictions need clarification for this jukebox. Do not add playback automatically. Exclude orchestral remixes."
+    }
   ]
 }
