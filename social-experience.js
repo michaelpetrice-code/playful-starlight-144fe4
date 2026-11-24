@@ -13,8 +13,7 @@ export function createSocialExperience({win=window,doc=document,openPage,openTab
   ['Virtual Pub Tables','♧','Virtual Tables'],
   ['Football','⚽','Football'],
   ['Pub Quiz Pro','★','Pub Quiz Pro'],
-  ['The Local DJ','♫','The Local DJ'],
-  ['Race Night','♞','Horse & dog racing'],
+
   ['Buy, Sell or Give Away','▱','Buy, Sell or Give Away'],
   ['Trades & Services','⚒','Local Tradesman'],
   ['Who’s Up for It?','▦','What’s on'],

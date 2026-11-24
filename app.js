@@ -1,6 +1,6 @@
 import {entertainmentPages,entertainmentIntro,createEntertainmentSurface} from './entertainment.js?v=280';
 import {coombeCommunitySamples} from './coombe-community-samples.js';
-import {featureGallery,visitorIntroduction} from './social-features.js?v=280';
+import {featureGallery,visitorIntroduction} from './social-features.js?v=291';
 import {createSocialExperience,installVisitorShowcase} from './social-experience.js?v=280';
 import {createAppNavigation,readPageRoute,tableFrameMatches,createDraftStore} from './app-navigation.js?v=280';
 import {createPushClient} from './push-notifications.js?v=244';
