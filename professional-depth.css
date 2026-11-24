@@ -19,23 +19,23 @@ html.local-dark-gold body :is(button,.guest-button,.tl149-action,.share-action):
 }
 html.local-dark-gold body :is(.panel,.card,.guest-preview-panel,.social-side-card) button:not([type=submit]):not(.game-cell,.square):not(.vb-public *,.venue-app-preview *,.tl149-venue-preview *,#game-root *,.online-board *,[data-game-board] *){background:var(--finish-control)!important}
 html.local-dark-gold body :is(button[type=submit],#publishLocalPost,#tl-auth-submit,#tl-continue-guest,.social-primary):not(.vb-public *,.venue-app-preview *,.tl149-venue-preview *,#game-root *,.online-board *,[data-game-board] *){
- background:linear-gradient(180deg,#efd99c 0%,#ddbe73 48%,#b8984c 100%)!important;color:#142015!important;border-color:#e9cf8d!important;
+ background:linear-gradient(180deg,#efd99c 0%,#ddbe73 48%,#b8984c 100%)!important;color:#17130c!important;border-color:#e9cf8d!important;
  box-shadow:inset 0 1px 0 #fff1c8aa,inset 0 -2px 0 #75551f66,0 3px 0 #5d4c2777,0 7px 14px #0005!important;
 }
 html.local-dark-gold body :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea):not(.vb-public *,.venue-app-preview *,.tl149-venue-preview *,#game-root *,.online-board *,[data-game-board] *){
- background:linear-gradient(180deg,#08110b,#0e1a12)!important;color:#f1f0e6!important;border:1px solid #a78d5888!important;border-radius:12px;box-shadow:inset 0 2px 5px #0007,0 1px 0 #f4e5af14!important;
+ background:linear-gradient(180deg,#090909,#151310)!important;color:#f1f0e6!important;border:1px solid #a78d5888!important;border-radius:12px;box-shadow:inset 0 2px 5px #0007,0 1px 0 #f4e5af14!important;
 }
-html.local-dark-gold body ::placeholder{color:#b7c1b2!important;opacity:1}
+html.local-dark-gold body ::placeholder{color:#c4c0b7!important;opacity:1}
 html.local-dark-gold body :is(button,input,select,textarea,a,summary):focus-visible:not(.vb-public *,.venue-app-preview *,.tl149-venue-preview *,#game-root *,.online-board *,[data-game-board] *){outline:3px solid #ffe4a1!important;outline-offset:3px}
 html.local-dark-gold body :is(button,a)[aria-disabled=true],html.local-dark-gold body button:disabled{cursor:not-allowed;filter:saturate(.5);opacity:.6;box-shadow:none!important}
 html.local-dark-gold body :is(.local-post-by,.local-compose-heading,.chat-head,.more-drawer-header){border-color:#b99a5666!important}
-html.local-dark-gold body :is(.local-post-meta,.local-post-by small,.social-terms,.social-free-note,.muted){color:#b9c5b5!important}
+html.local-dark-gold body :is(.local-post-meta,.local-post-by small,.social-terms,.social-free-note,.muted){color:#c8c4ba!important}
 html.local-dark-gold body :is(.social-table-avatar,.member-avatar):not(.vb-public *,.venue-app-preview *){box-shadow:inset 0 1px 0 #fff2bd66,0 3px 7px #0005}
 html.local-dark-gold body :is(.local-avatar,.local-avatar img,.member-avatar img,.social-profile-link img){border-color:#cfb16a!important}
 html.local-dark-gold body :is(.local-feed-image img,.market-photo img,.guest-feature img,.tl149-feature img,.social-feature-card>img){backface-visibility:hidden}
-html.local-dark-gold body :is(.member-notifications section,#moreDrawer,.messenger-menu-content,.messenger-attachment-tools,.social-chat-dock){border:1px solid #c7a86699!important;box-shadow:inset 0 1px 0 #fff1bf1a,0 18px 45px #0009!important;background:linear-gradient(145deg,#192a1f,#0e1a12)!important}
-html.local-dark-gold body>header.local-app-header{background:linear-gradient(180deg,#15251a,#0a150e)!important;border-bottom:1px solid #af915277!important;box-shadow:inset 0 1px 0 #fff1bf11,0 4px 16px #0005!important}
-html.local-dark-gold body #bottomNav{background:linear-gradient(180deg,#17281d,#0b160f)!important;border-top:1px solid #c1a36099!important;box-shadow:0 -6px 20px #0006!important}
+html.local-dark-gold body :is(.member-notifications section,#moreDrawer,.messenger-menu-content,.messenger-attachment-tools,.social-chat-dock){border:1px solid #c7a86699!important;box-shadow:inset 0 1px 0 #fff1bf1a,0 18px 45px #0009!important;background:linear-gradient(145deg,#201b14,#151310)!important}
+html.local-dark-gold body>header.local-app-header{background:linear-gradient(180deg,#191611,#090909)!important;border-bottom:1px solid #af915277!important;box-shadow:inset 0 1px 0 #fff1bf11,0 4px 16px #0005!important}
+html.local-dark-gold body #bottomNav{background:linear-gradient(180deg,#1b1711,#090909)!important;border-top:1px solid #c1a36099!important;box-shadow:0 -6px 20px #0006!important}
 html.local-dark-gold body #bottomNav button{border-radius:14px!important;box-shadow:inset 0 1px 0 #fff1bc14,inset 0 -2px #0006,0 3px 6px #0004!important}
 html.local-dark-gold body #bottomNav button.active{background:linear-gradient(180deg,#4a4023,#292514)!important;border-color:#e4c579!important;color:#ffe5a5!important}
 html.social-member body .social-left button{box-shadow:none!important;border-color:transparent!important}
@@ -61,10 +61,16 @@ html.local-dark-gold body :is(.tl149-public-header,.guest-header) {
   box-shadow: inset 0 1px var(--finish-highlight), 0 4px 14px #0004;
 }
 body:has(.quiz-product) .quiz-benefits article {
-  background:linear-gradient(155deg,#222c20,#151c15);
+  background:linear-gradient(155deg,#211c14,#10100e);
   box-shadow:inset 0 1px #fff1bf1a,0 3px #080c08,0 8px 18px #0004;
 }
 body:has(#setup-form) #setup fieldset {
-  background:linear-gradient(155deg,#1f291d,#182219);
+  background:linear-gradient(155deg,#201b14,#11100e);
   box-shadow:inset 0 1px #fff1bf12,0 3px 8px #0003;
 }
+
+/* Unified premium chrome; exclude game boards and subscriber theme previews. */
+html.local-dark-gold body :is(.guest-card,.tl149-panel,.social-side-card,.local-feed-post,.local-compose-card,.owner-stat,.owner-workspace-content,.market-card,.football-hub .football-card):not(.vb-public *,.venue-app-preview *,.tl149-venue-preview *,#game-root *,.online-board *,[data-game-board] *){background:linear-gradient(150deg,#1b1711,#0d0d0c)!important;border-color:#b9934866!important;border-radius:14px!important;min-width:0;overflow-wrap:anywhere}
+html.local-dark-gold body :is(.guest-header,.tl149-public-header,.social-left,.social-right){background-color:#10100e!important}
+html.local-dark-gold body :is(.guest-feature,.tl149-feature,.market-card) img{max-width:100%;object-fit:cover}
+@media(max-width:650px){html.local-dark-gold body :is(.guest-card,.tl149-panel,.social-side-card,.local-feed-post,.owner-stat){padding:12px!important}}
