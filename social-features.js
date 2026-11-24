@@ -9,8 +9,6 @@ export const features = [
  ['trades','Trades & services','Find help close to home','Explore local providers and their service listings.','Trades & Services','local-tradesmen','Discover'],
  ['games','Games Room','Bring the pub games with you','Explore browser games, practise and challenge yourself. Available modes vary by game.','Arcade','games-room','Play'],
  ['football','Football','Follow the match together','Explore football updates and analysis. Any paid options are shown separately.','Football','campaigns/football-gold-3d.jpg','Play'],
- ['dj','The Local DJ','Your pub. Your soundtrack.','Find songs, request favourites and use the host DJ decks. Guests request free; hosting access is separate.','The Local DJ','builder-library/music.svg','Play'],
- ['race-night','Horse & dog racing','Bring race night to your Local','Choose a random race from your authorised footage, print race cards and use a TV or projector. Race footage is not supplied.','Race Night','builder-library/race.svg','Play'],
  ['quiz','Quiz','Put your knowledge to the test','Try a quiz and enjoy a little friendly competition.','Quiz','games-v68/quiz.webp','Play'],
  ['pub-quiz-pro','Pub Quiz Pro','Bring quiz night to your venue','Host themed rounds with pictures and video, phone answers and a projector display. Players join free. Paid hosting is coming soon.','Pub Quiz Pro','quiz-winner.webp','Premium'],
  ['challenges','Competitions & leaderboards','Add some friendly rivalry','Explore tournaments and community standings.','Tournaments','club-competitions','Play'],
