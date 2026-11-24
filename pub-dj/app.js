@@ -110,7 +110,7 @@ function trackCard(track,index){
  card.append(element('span',String(index+1).padStart(2,'0'),'track-rank'),visual,info,requestButton(track));return card;
 }
 function renderCatalogue(){
- const query=$('search').value;$('youtube-search').href='https://www.youtube.com/results?search_query='+encodeURIComponent(query.trim()||'music');const genreFilter=$('genre-filter').value;const signature=JSON.stringify([browseTracks(),state.queue,state.joined,state.open,query,filter,libraryView,genreFilter,visibleLimit,[...savedSongs]]);
+ const query=$('search').value;const soundcloud=$('soundcloud-search');soundcloud.href=query.trim()?'https://soundcloud.com/search/sounds?q='+encodeURIComponent(query.trim()):'https://soundcloud.com/discover';soundcloud.textContent=query.trim()?'Find “'+query.trim()+'” on SoundCloud ↗':'Explore SoundCloud ↗';$('youtube-search').href='https://www.youtube.com/results?search_query='+encodeURIComponent(query.trim()||'music');const genreFilter=$('genre-filter').value;const signature=JSON.stringify([browseTracks(),state.queue,state.joined,state.open,query,filter,libraryView,genreFilter,visibleLimit,[...savedSongs]]);
  if(signature===catalogueSignature)return;catalogueSignature=signature;
  const focused=document.activeElement?.dataset?.focusKey;
  for(const tab of $('browse-tabs').querySelectorAll('button'))tab.setAttribute('aria-pressed',String(tab.dataset.view===libraryView));
