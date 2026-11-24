@@ -9,10 +9,21 @@ export async function mountCue3D(host,kind){
  const wood=new T.MeshPhysicalMaterial({map:texture(true),roughness:.36,clearcoat:.65}),felt=new T.MeshStandardMaterial({map:texture(false),roughness:1}),rubber=mat(0x16472e,.85),black=mat(0x080808),brass=mat(0xb68a43,.27,.65);
  function mesh(g,m,x,y,z){const o=new T.Mesh(g,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
  function box(w,h,d,m,x,y,z){return mesh(new T.BoxGeometry(w,h,d),m,x,y,z)}
- box(9.3,.45,5.1,wood,0,-.35,0);box(8.04,.1,3.84,felt,0,-.05,0);
- for(const z of [-2.2,2.2])for(const x of [-2.25,2.25]){box(3.85,.28,.4,wood,x,.04,z);box(3.75,.18,.19,rubber,x,.08,z*.91)}
- for(const x of [-4.32,4.32]){box(.42,.28,3.65,wood,x,.04,0);box(.19,.18,3.55,rubber,x*.95,.08,0)}
- for(const x of [-4.02,0,4.02])for(const z of [-1.92,1.92]){mesh(new T.CylinderGeometry(.23,.19,.08,40),black,x,.015,z);mesh(new T.TorusGeometry(.23,.025,12,40),brass,x,.05,z).rotation.x=-Math.PI/2}
+ // Sculpted rails with actual pocket cut-outs in the playing surface.
+ const pockets=[[-4.02,-1.92],[0,-1.92],[4.02,-1.92],[-4.02,1.92],[0,1.92],[4.02,1.92]];
+ function surface(w,d,depth,material,y,radius){
+ const s=new T.Shape();s.moveTo(-w/2,-d/2);s.lineTo(w/2,-d/2);s.lineTo(w/2,d/2);s.lineTo(-w/2,d/2);s.closePath();
+ // Boolean-style open pockets are constructed as boundary notches, not overlaid discs.
+ const outline=new T.Shape();const points=[[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]];
+ for(let i=0;i<4;i++){const p=points[i],q=points[(i+1)%4],len=Math.hypot(q[0]-p[0],q[1]-p[1]),dx=(q[0]-p[0])/len,dz=(q[1]-p[1])/len;for(let k=0;k<=Math.ceil(len*100);k++){const t=k/Math.ceil(len*100),x=p[0]+(q[0]-p[0])*t,z=p[1]+(q[1]-p[1])*t;let inset=0;for(const [px,pz] of pockets){const dist=Math.hypot(x-px,z-pz);if(dist<radius)inset=Math.max(inset,Math.sqrt(radius*radius-dist*dist))}const X=x-dz*inset,Z=z+dx*inset;if(i===0&&k===0)outline.moveTo(X,-Z);else outline.lineTo(X,-Z)}}outline.closePath();
+ const g=new T.ExtrudeGeometry(outline,{depth,bevelEnabled:false});const o=mesh(g,material,0,y,0);o.rotation.x=-Math.PI/2;return o}
+ surface(8.04,3.84,.08,felt,-.08,.27);
+ const leather=mat(0x17100b,.86);leather.side=T.DoubleSide;const chrome=mat(0xaaaeb1,.24,.85);
+ function roundedRail(w,d,x,z,material,h=.23){const s=new T.Shape(),r=Math.min(.09,w/3,d/3),l=-w/2,t=-d/2;s.moveTo(l+r,t);s.lineTo(l+w-r,t);s.quadraticCurveTo(l+w,t,l+w,t+r);s.lineTo(l+w,t+d-r);s.quadraticCurveTo(l+w,t+d,l+w-r,t+d);s.lineTo(l+r,t+d);s.quadraticCurveTo(l,t+d,l,t+d-r);s.lineTo(l,t+r);s.quadraticCurveTo(l,t,l+r,t);const g=new T.ExtrudeGeometry(s,{depth:h,bevelEnabled:true,bevelSize:.035,bevelThickness:.035,bevelSegments:3,steps:1,curveSegments:12});const o=mesh(g,material,x,-.16,z);o.rotation.x=-Math.PI/2;return o}
+ for(const z of [-2.18,2.18])for(const x of [-2.04,2.04]){roundedRail(3.45,.52,x,z,wood);roundedRail(3.45,.15,x,z*.89,rubber,.12);box(3.45,.35,.38,wood,x,-.4,z)}
+ for(const x of [-4.27,4.27]){roundedRail(.52,3.27,x,0,wood);roundedRail(.15,3.27,x*.945,0,rubber,.12);box(.38,.35,3.27,wood,x,-.4,0)}
+ for(const [x,z] of pockets){mesh(new T.CylinderGeometry(.26,.16,.38,48,1,true),leather,x,-.24,z);mesh(new T.CylinderGeometry(.16,.16,.02,32),black,x,-.44,z);mesh(new T.TorusGeometry(.26,.038,16,48),chrome,x,.025,z).rotation.x=-Math.PI/2}
+ for(const z of [-2.18,2.18])for(const x of [-3.3,-2.2,-1.1,1.1,2.2,3.3]){const o=mesh(new T.BoxGeometry(.065,.009,.065),mat(0xf0e6cf,.3),x,.12,z);o.rotation.y=Math.PI/4}
  for(const x of [-3.5,3.5])for(const z of [-1.7,1.7])box(.45,2,.45,wood,x,-1.55,z);
  box(40,.2,40,mat(0x171513),0,-2.65,0);for(const x of [-3,0,3]){const lamp=new T.SpotLight(0xffe8c5,45,18,.65,.65,1.5);lamp.position.set(x,5,0);lamp.target.position.set(x,0,0);scene.add(lamp,lamp.target)}
  scene.add(new T.HemisphereLight(0xfff3dc,0x40372e,2));const light=new T.DirectionalLight(0xffedcc,3);light.position.set(-3,9,4);light.castShadow=true;light.shadow.mapSize.set(2048,2048);Object.assign(light.shadow.camera,{left:-6,right:6,top:6,bottom:-6});scene.add(light);
