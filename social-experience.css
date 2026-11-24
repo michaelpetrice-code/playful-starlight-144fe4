@@ -272,3 +272,13 @@ html body .social-feature-grid>.social-feature-card p{color:#e8e5df!important;li
 @media(min-width:1200px){html body .social-feature-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 @media(max-width:520px){html body .social-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:340px){html body .social-feature-grid{grid-template-columns:1fr!important}}
+
+/* Final cascade: target actual member and visitor gallery, not theme-dependent selectors. */
+html body .social-feature-section .social-feature-grid,html.local-dark-gold.social-member body .community-home .social-feature-section .social-feature-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))!important;gap:10px!important;align-items:stretch!important}
+html body .social-feature-section .social-feature-grid>.social-feature-card{display:flex!important;flex-direction:column!important;aspect-ratio:auto!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;background:#10100e!important;border:1px solid #c49b49!important}
+html body .social-feature-section .social-feature-card>div{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;flex:1!important;padding:10px!important}
+html body .social-feature-section .social-feature-card>img{height:120px!important;min-height:0!important;max-height:120px!important;object-fit:cover!important}
+html body .social-feature-section .social-feature-card :is(a,button){position:static!important;min-height:44px!important;height:auto!important;white-space:normal!important}
+@media(min-width:1200px){html body .social-feature-section .social-feature-grid,html.local-dark-gold.social-member body .community-home .social-feature-section .social-feature-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:520px){html body .social-feature-section .social-feature-grid,html.local-dark-gold.social-member body .community-home .social-feature-section .social-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:340px){html body .social-feature-section .social-feature-grid,html.local-dark-gold.social-member body .community-home .social-feature-section .social-feature-grid{grid-template-columns:1fr!important}}
