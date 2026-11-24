@@ -1,18 +1,22 @@
+import {mountCue3D} from './cue-3d.mjs';
 import {freshCueGame,cueTurn,computerCueShot,legalCueTargets} from './cue-match.mjs';
 import {TABLE} from '../cue-physics-v94.js';
 export function mountCue({root,say,record,difficulty='normal',coach,registerCleanup},kind='pool',practice=false){
+ let view3d=null;
  let game=freshCueGame(kind),drag=null,busy=false,dead=false,timer=null,raf=0,position=null,placing=false,recorded=false;
  const wrap=document.createElement('section');wrap.className='v192-panel';
  wrap.innerHTML='<div class="v192-status" role="status"></div><canvas class="v192-table" width="900" height="480" aria-label="Cue table. Drag back from the white to aim; release to shoot."></canvas><div class="v192-actions"><label>Power <input aria-label="Shot power" type="range" min="1" max="20" step="0.5" value="12"></label><label>Top / back spin <input aria-label="Top or back spin" type="range" min="-1" max="1" step="0.1" value="0"></label><label>Side spin <input aria-label="Side spin" type="range" min="-1" max="1" step="0.1" value="0"></label><label>Play <select aria-label="Cue opponent"><option value="computer">Computer</option><option value="friend">Friend on this device</option></select></label><label>Shot angle (degrees) <input aria-label="Shot angle in degrees" type="number" min="-180" max="180" step="1" value="0"></label><button type="button" data-shoot>Shoot</button><button type="button" data-place>Place white</button><button type="button" data-reset>New match</button></div><p class="note">Pool uses open-table groups after the break, scratches, first contact, cushion and eight-ball checks. Snooker alternates reds and colours, clears colours in order and supports a respotted black. Referee-discretion miss/free-ball/re-rack decisions are outside this browser ruleset.</p>';
  root.replaceChildren(wrap);const canvas=wrap.querySelector('canvas'),ctx=canvas.getContext('2d'),status=wrap.querySelector('[role=status]'),power=wrap.querySelector('[aria-label="Shot power"]'),spin=wrap.querySelector('[aria-label="Top or back spin"]'),side=wrap.querySelector('[aria-label="Side spin"]'),opponent=wrap.querySelector('select'),place=wrap.querySelector('[data-place]');
  const density=Math.min(3,Math.max(1,window.devicePixelRatio||1));canvas.width=900*density;canvas.height=480*density;ctx.scale(density,density);
  if(practice){opponent.value='friend';opponent.closest('label').hidden=true;wrap.querySelector('.note').textContent='Free pool practice: pot balls and practise position. No opponent or match result is recorded.';}
+ const enable3d=document.createElement('button');enable3d.type='button';enable3d.textContent='Enable 3D view';wrap.append(enable3d);enable3d.onclick=async()=>{enable3d.disabled=true;try{const v=await mountCue3D(wrap,kind);if(dead){v.dispose();return}view3d=v;paint();enable3d.hidden=true}catch(e){enable3d.disabled=false;say('3D unavailable; the original playable table remains available.')}};
  const colors=['#fffef6','#e6bb2c','#3153ba','#c62c3c','#744398','#e87d2c','#197857','#8d263d'];
  // Deterministic material textures, generated once per mounted table.
  const material=(w,h,wood)=>{const tile=document.createElement('canvas');tile.width=w;tile.height=h;const g=tile.getContext('2d'),im=g.createImageData(w,h);let seed=4187;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;const grain=wood?Math.sin(y*.47+Math.sin(x*.019)*2.4)*.55+Math.sin(y*1.73+x*.013)*.2:((x+y)%2)*.18;const n=grain*30+(random()-.5)*(wood?13:20);im.data[i]=wood?117+n:24+n;im.data[i+1]=wood?66+n*.65:105+n;im.data[i+2]=wood?32+n*.4:64+n*.8;im.data[i+3]=255}g.putImageData(im,0,0);return ctx.createPattern(tile,'repeat')};
  const timber=material(512,128,true),baize=material(128,128,false);
  function paint(balls=game.balls){
   if(position)balls=balls.map(b=>b.n===0?{...b,...position}:b);
+  view3d?.render(balls);
   ctx.clearRect(0,0,900,480);let wood=ctx.createLinearGradient(0,0,900,480);wood.addColorStop(0,'#9b6936');wood.addColorStop(.5,'#432918');wood.addColorStop(1,'#b78546');ctx.fillStyle=timber;ctx.fillRect(0,0,900,480);ctx.save();ctx.globalAlpha=.36;ctx.fillStyle=wood;ctx.fillRect(0,0,900,480);ctx.restore();ctx.fillStyle='#073e32';ctx.fillRect(28,28,844,424);let felt=ctx.createRadialGradient(400,180,10,450,240,520);felt.addColorStop(0,'#287c60');felt.addColorStop(1,'#0c493a');ctx.fillStyle=baize;ctx.fillRect(48,48,804,384);ctx.save();ctx.globalAlpha=.46;ctx.fillStyle=felt;ctx.fillRect(48,48,804,384);ctx.restore();const edge=ctx.createRadialGradient(450,240,150,450,240,460);edge.addColorStop(0,'#0000');edge.addColorStop(1,'#001b1366');ctx.fillStyle=edge;ctx.fillRect(48,48,804,384);
   // Original layered hardwood rails, cushion bevels and inlaid sights.
   ctx.save();ctx.strokeStyle='#e5bd7b88';ctx.lineWidth=2;ctx.strokeRect(8,8,884,464);ctx.strokeStyle='#29160d';ctx.lineWidth=3;ctx.strokeRect(20,20,860,440);
@@ -50,5 +54,5 @@ export function mountCue({root,say,record,difficulty='normal',coach,registerClea
  function reset(){clearTimeout(timer);cancelAnimationFrame(raf);game=freshCueGame(kind);busy=placing=recorded=false;position=drag=null;update();say('New match. Drag away from your intended shot direction.');}
  opponent.onchange=reset;wrap.querySelector('[data-reset]').onclick=reset;
  coach(()=>game.referee.finished?'Start a new match to play again.':'Legal first-contact targets: '+legalCueTargets(game).join(', ')+'. Use lower power for positional control.');
- registerCleanup(()=>{dead=true;clearTimeout(timer);cancelAnimationFrame(raf);});update();say('Drag back from the white ball to shoot.');
+ registerCleanup(()=>{dead=true;view3d?.dispose();view3d=null;clearTimeout(timer);cancelAnimationFrame(raf);});update();say('Drag back from the white ball to shoot.');
 }
