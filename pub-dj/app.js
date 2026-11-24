@@ -5,6 +5,7 @@ const audio=$('audio'); audio.volume=.75;
 const seed=[{id:'golden',title:'Golden Hour',artist:'The Local Studio',mood:'Laid back'},{id:'friday',title:'Friday Lights',artist:'The Local Studio',mood:'Party'},{id:'after',title:'After Hours',artist:'The Local Studio',mood:'Laid back'}];
 const voted=new Set();
 const discovery=window.LocalDJDiscovery;
+let selectedTrackId='';
 let libraryView='discover', catalogueSignature='', visibleLimit=48;
 let savedSongs=new Set();
 try{const stored=JSON.parse(localStorage.getItem('local-dj-saved-v1')||'[]');if(Array.isArray(stored))savedSongs=new Set(stored.filter(id=>typeof id==='string'));}catch(e){}
@@ -68,6 +69,7 @@ function render(){
  $('collection-note').textContent=demo?'Original instrumental demos included. No commercial song catalogue connected.':state.tracks.length?'Venue-managed collection · Requests need staff approval.':'Browse free music from several independent collections. Join a venue to request songs.';
  const moods=['All music',...new Set(state.tracks.map(t=>t.mood).filter(m=>m!=='All music'))];
  renderCatalogue();
+ if(selectedTrackId){const track=browseTracks().find(t=>t.id===selectedTrackId);if(track)selectTrack(track,false);else{$('track-selection').hidden=true;selectedTrackId='';}}
  const selected=$('mix').value; $('mix').replaceChildren(...moods.map(m=>{const o=element('option',m);o.value=m;return o;}));$('mix').value=state.mode||selected;
  const approved=state.queue.filter(r=>r.status==='approved').sort((a,b)=>b.votes-a.votes||a.id-b.id);
  $('queue-count').textContent=approved.length+' SONG'+(approved.length===1?'':'S');
@@ -88,9 +90,10 @@ function cover(track,small=false){
  const src=window.LocalDJArtwork?.image(track);if(src){const img=element('img');img.src=src;img.alt='';img.loading='lazy';img.onerror=()=>img.remove();art.append(img);}
  art.append(element('span',discovery.initials(track.title),'cover-letter'),element('span','THE LOCAL · MUSIC ROOM','cover-label'));return art;
 }
-function selectTrack(track){
+function selectTrack(track,scroll=true){
+ selectedTrackId=track.id;
  const panel=$('track-selection');panel.hidden=false;const info=element('div');info.append(element('h3',track.title),element('p',track.artist));panel.replaceChildren(cover(track),info,requestButton(track));
- panel.scrollIntoView({block:'nearest',behavior:'smooth'});
+ if(scroll)panel.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 function requestButton(track){
  const queued=state.queue.find(r=>r.track===track.id&&['pending','approved'].includes(r.status));
