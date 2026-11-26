@@ -1,0 +1,40 @@
+name: Netlify production verification
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/netlify-verify.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Netlify project and published deployment
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, json, urllib.request
+          token = os.environ.get("NETLIFY_AUTH_TOKEN")
+          if not token:
+              raise SystemExit("NETLIFY_AUTH_TOKEN is missing")
+          def get(path):
+              req = urllib.request.Request("https://api.netlify.com/api/v1/" + path, headers={"Authorization": "Bearer " + token})
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  return json.load(response)
+          site = get("sites/tourmaline-chebakia-f1e2ac.netlify.app")
+          if site.get("name") != "tourmaline-chebakia-f1e2ac" or site.get("custom_domain") != "thelocal.me.uk":
+              raise SystemExit("Project or primary domain mismatch")
+          deploy = site.get("published_deploy") or {}
+          print("Project:", site["name"])
+          print("Domain:", site["custom_domain"])
+          print("Published deployment:", deploy.get("id"))
+          print("Published commit:", deploy.get("commit_ref"))
+          print("Deployment state:", deploy.get("state"))
+          if not deploy.get("id"):
+              raise SystemExit("No published deployment found")
+          PY
