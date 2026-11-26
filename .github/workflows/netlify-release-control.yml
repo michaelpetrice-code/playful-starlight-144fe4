@@ -1,0 +1,62 @@
+name: Netlify release control
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Operation
+        type: choice
+        options:
+          - status
+          - build
+          - rollback
+        default: status
+      deploy_id:
+        description: Previous ready production deploy ID (rollback only)
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: netlify-production-control
+  cancel-in-progress: false
+jobs:
+  manage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Manage fixed production project
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          OPERATION: ${{ inputs.operation }}
+          DEPLOY_ID: ${{ inputs.deploy_id }}
+        run: |
+          python3 - <<'PY'
+          import os, json, re, urllib.request
+          token = os.environ["NETLIFY_AUTH_TOKEN"]
+          def api(path, method="GET"):
+              req = urllib.request.Request("https://api.netlify.com/api/v1/" + path, method=method, headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"}, data=b"{}" if method=="POST" else None)
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return json.load(r)
+          site = api("sites/tourmaline-chebakia-f1e2ac.netlify.app")
+          if site.get("name") != "tourmaline-chebakia-f1e2ac" or site.get("custom_domain") != "thelocal.me.uk":
+              raise SystemExit("Production project mismatch")
+          sid = site["id"]
+          op = os.environ["OPERATION"]
+          if op == "build":
+              result = api(f"sites/{sid}/builds", "POST")
+              print("Build requested:", result.get("id"))
+          elif op == "rollback":
+              did = os.environ["DEPLOY_ID"]
+              if not re.fullmatch(r"[a-f0-9]{24}", did):
+                  raise SystemExit("Invalid deploy ID")
+              deploy = api(f"sites/{sid}/deploys/{did}")
+              if deploy.get("site_id") != sid or deploy.get("state") != "ready" or deploy.get("context") != "production":
+                  raise SystemExit("Not a ready production deploy for this site")
+              result = api(f"sites/{sid}/deploys/{did}/restore", "POST")
+              print("Restore requested:", result.get("id"))
+          elif op == "status":
+              d = site.get("published_deploy") or {}
+              print("Domain:", site["custom_domain"], "Deploy:", d.get("id"), "Commit:", d.get("commit_ref"), "State:", d.get("state"))
+          else:
+              raise SystemExit("Unknown operation")
+          PY
