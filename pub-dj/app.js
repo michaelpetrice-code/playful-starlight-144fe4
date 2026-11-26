@@ -154,9 +154,10 @@ async function syncAudio(){
  try{
   if(demo){audio.src=window.LocalDJCloud?.audioURL(state.current.track)||window.LocalDJFreeMusic?.url(state.current.track)||'demo/'+state.current.track+'.wav';if(audio.src.startsWith('blob:'))audioURL=audio.src;}
   else if(cloudMode){audio.src=window.LocalDJCloud.audioURL(state.current.track);if(audio.src.startsWith('blob:'))audioURL=audio.src;}
-  else{const response=await fetch('api/audio/'+state.current.track);if(!response.ok)throw Error('Unable to load audio');const blob=await response.blob();if(key!==playingKey)return;audioURL=URL.createObjectURL(blob);audio.src=audioURL;}
+  else{const response=await fetch('api/audio/'+state.current.track);if(!response.ok)throw Error('Unable to load audio');const blob=await response.blob();if(key!==playingKey||!canPlayHere())return;audioURL=URL.createObjectURL(blob);audio.src=audioURL;}
+  if(key!==playingKey||!canPlayHere())return;
   await audio.play();
- }catch(e){tell(e.name==='NotAllowedError'?'Press Play on the DJ deck to enable the speakers.':e.message);}
+ }catch(e){if(key!==playingKey)return;tell(e.name==='NotAllowedError'?'Press Play on the DJ deck to enable the speakers.':e.message);}
 }
 function runSearch(value=$('search').value){$('search').value=value;filter='All music';visibleLimit=48;$('genre-filter').value='';libraryView='songs';catalogueSignature='';render();hideSuggestions();$('results-title').scrollIntoView({block:'nearest',behavior:'smooth'});}
 function hideSuggestions(){$('song-suggestions').hidden=true;$('search').setAttribute('aria-expanded','false');}
@@ -199,10 +200,10 @@ function updateDeck(){
  const percent=Math.round(audio.volume*100);$('deck-volume').value=String(percent);$('volume').value=String(percent);$('deck-volume-value').textContent=!allowed?'Staff':audio.muted?'Muted':percent+'%';$('deck-mute').textContent=audio.muted||audio.volume===0?'Unmute':'Mute';$('deck-mute').setAttribute('aria-pressed',String(audio.muted||audio.volume===0));
  const next=state.queue.filter(r=>r.status==='approved'&&trackById(r.track)).sort((a,b)=>b.votes-a.votes||a.id-b.id)[0];$('deck-next-title').textContent=next?trackById(next.track).title:state.mode==='All music'?'Background mix':state.mode+' mix';
 }
-$('deck-play').onclick=()=>runDeck(()=>deckController.toggle());$('deck-next').onclick=()=>runDeck(()=>deckController.next());$('deck-restart').onclick=()=>runDeck(()=>deckController.restart());$('deck-forward').onclick=()=>runDeck(()=>deckController.forward());$('deck-stop').onclick=()=>runDeck(()=>{if(!canPlayHere())throw Error('Use the designated playback device to stop music.');return hostAction('stop');});
+$('deck-play').onclick=()=>runDeck(async()=>{if(canPlayHere()&&state?.current&&(!audio.getAttribute('src')||audio.error)){playingKey='';return syncAudio();}return deckController.toggle();});$('deck-next').onclick=()=>runDeck(()=>deckController.next());$('deck-restart').onclick=()=>runDeck(()=>deckController.restart());$('deck-forward').onclick=()=>runDeck(()=>deckController.forward());$('deck-stop').onclick=()=>runDeck(()=>{if(!canPlayHere())throw Error('Use the designated playback device to stop music.');return hostAction('stop');});
 $('deck-seek').oninput=()=>runDeck(()=>deckController.seek($('deck-seek').value));$('deck-volume').oninput=()=>runDeck(()=>deckController.volume(Number($('deck-volume').value)/100));$('deck-mute').onclick=()=>runDeck(()=>deckController.mute());
 for(const event of ['play','pause','timeupdate','durationchange','loadedmetadata','volumechange','emptied','ended'])audio.addEventListener(event,updateDeck);
-audio.onended=()=>hostAction('next');audio.onplay=()=>$('audio').closest('.playing').classList.add('active');audio.onpause=()=>$('audio').closest('.playing').classList.remove('active');
+audio.onended=()=>{if(canPlayHere()&&state?.current&&audio.ended)hostAction('next');};audio.onplay=()=>$('audio').closest('.playing').classList.add('active');audio.onpause=()=>$('audio').closest('.playing').classList.remove('active');
 audio.onerror=()=>{if(audio.getAttribute('src'))tell('Audio could not play. Check this file or choose the next song.');};
 function useDemo(){demo=true;const tracks=new URLSearchParams(location.search).get('free')==='1'?window.LocalDJFreeMusic.catalogue():seed;state={venue:'The Local',joined:false,host:false,open:true,current:null,mode:'All music',tracks,queue:[{id:1,track:tracks[1].id,status:'approved',votes:4}]};render();tell('Interactive demo: join with 123456, then try staff controls. Changes stay in this tab.');}
 async function showCloudAccess(){

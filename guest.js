@@ -38,7 +38,8 @@ const guestPages = {
   photos: ['Photos & Videos', 'Discover community galleries and shared moments.'],
   tickets: ['Tickets & Bookings', 'Discover events, tickets and venue activities.']
 };
-const page = incoming?.page || current.searchParams.get('page') || locationPage;
+const requestedPage = incoming?.page || current.searchParams.get('page') || locationPage;
+const page = ['dj','race-night'].includes(requestedPage) ? 'home' : requestedPage;
 const isPublicPage = !memberDestination && Object.hasOwn(guestPages, page) && !incoming?.group &&
   (!incoming?.published || incoming.source === 'club');
 if (isPublicPage) {
