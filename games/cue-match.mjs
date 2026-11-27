@@ -69,12 +69,13 @@ export function cueTurn(initial,input){
 export function computerCueShot(game,difficulty='normal',random=Math.random){
  const cue=game.balls.find(b=>number(b)===0),targets=legalCueTargets(game),objects=game.balls.filter(b=>b.live&&targets.includes(number(b)));
  const options=[];const radius=game.kind==='snooker'?10:12;
+ const clearance=(ax,ay,bx,by,ignore)=>{const dx=bx-ax,dy=by-ay,len=dx*dx+dy*dy;if(len<1e-8)return 0;return game.balls.reduce((min,o)=>{if(!o.live||ignore.includes(o))return min;const t=Math.max(0,Math.min(1,((o.x-ax)*dx+(o.y-ay)*dy)/len));return Math.min(min,Math.hypot(o.x-ax-t*dx,o.y-ay-t*dy));},Infinity);};
  for(const b of objects)for(const [px,py] of TABLE.pockets){const dx=px-b.x,dy=py-b.y,d=Math.hypot(dx,dy),gx=b.x-dx/d*radius*2,gy=b.y-dy/d*radius*2;
-  options.push({angle:Math.atan2(gy-cue.y,gx-cue.x),power:Math.min(17,Math.max(6,(d+Math.hypot(gx-cue.x,gy-cue.y))/65)),cost:d+Math.hypot(gx-cue.x,gy-cue.y)});
+  if(d<1e-6)continue;const travel=Math.hypot(gx-cue.x,gy-cue.y);if(travel<1e-6)continue;const cut=((gx-cue.x)*dx+(gy-cue.y)*dy)/(travel*d);const blocked=clearance(cue.x,cue.y,gx,gy,[cue,b])<2*radius||clearance(b.x,b.y,px,py,[cue,b])<2*radius;const cost=d+travel+(blocked?2500:0)+(cut<0.15?1800:0)+(1-cut)*240;options.push({angle:Math.atan2(gy-cue.y,gx-cue.x),power:Math.min(19,Math.max(6,(d+travel)/65)),cost});
  }
  options.sort((a,b)=>a.cost-b.cost);let best=options[0]||{angle:0,power:8};
- if(difficulty==='hard'){
-  let value=-Infinity;for(const option of options.slice(0,10)){try{const out=cueTurn(game,{...option,version:game.version,actor:game.referee.turn});const ns=out.game.referee;const score=ns.finished?(ns.winner===game.referee.turn?10000:-10000):ns.ballInHand?-200:out.shot.potted.filter(n=>n!==0).length*60+(ns.turn===game.referee.turn?10:0)-option.cost/200;if(score>value){value=score;best=option;}}catch{}}
+ if(difficulty!=='easy'){
+  let value=-Infinity;for(const option of options.slice(0,difficulty==='hard'?12:4)){try{const out=cueTurn(game,{...option,version:game.version,actor:game.referee.turn});const ns=out.game.referee;const score=ns.finished?(ns.winner===game.referee.turn?10000:-10000):ns.ballInHand?-200:out.shot.potted.filter(n=>n!==0).length*60+(ns.turn===game.referee.turn?10:0)-option.cost/200;if(score>value){value=score;best=option;}}catch{}}
  }
  const spread=difficulty==='easy'?.11:difficulty==='normal'?.035:.008;
  return {...best,angle:best.angle+(random()-.5)*spread,power:Math.min(20,best.power),spin:0,side:0,actor:game.referee.turn,version:game.version};
